@@ -1,0 +1,21 @@
+<div class="overlay" [class.active]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+
+<header class="header">
+  <div class="header-container">
+    <div class="logo" routerLink="/">JELLOF</div>
+    
+    <nav [class.active]="isMobileMenuOpen">
+      <a routerLink="/" routerLinkActive="active" (click)="closeMobileMenu()">Home</a>
+      <a routerLink="/collections" routerLinkActive="active" (click)="closeMobileMenu()">Collections</a>
+      <a routerLink="/lookbook" routerLinkActive="active" (click)="closeMobileMenu()">Lookbook</a>
+      <a routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()">About</a>
+      <a routerLink="/contact" routerLinkActive="active" (click)="closeMobileMenu()">Contact</a>
+    </nav>
+
+    <div class="hamburger" [class.active]="isMobileMenuOpen" (click)="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,66 @@
+<footer class="footer">
+    <div class="footer-container">
+      <!-- Footer Top Section -->
+      <div class="footer-top">
+        <!-- Brand Section -->
+        <div class="footer-column brand-column">
+          <div class="footer-logo">JELLOF</div>
+          <p class="footer-description">
+            Elevating your style with timeless fashion pieces that blend elegance and contemporary design.
+          </p>
+          <div class="social-links">
+            <a *ngFor="let social of socialLinks" 
+               [href]="social.url" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               [attr.aria-label]="social.name"
+               class="social-icon">
+              <span class="icon-{{ social.icon }}"></span>
+            </a>
+          </div>
+        </div>
+  
+        <!-- Quick Links -->
+        <div class="footer-column">
+          <h3 class="footer-title">Quick Links</h3>
+          <ul class="footer-links">
+            <li *ngFor="let link of quickLinks">
+              <a [routerLink]="link.route">{{ link.name }}</a>
+            </li>
+          </ul>
+        </div>
+  
+        <!-- Customer Service -->
+        <div class="footer-column">
+          <h3 class="footer-title">Customer Service</h3>
+          <ul class="footer-links">
+            <li *ngFor="let service of customerService">
+              <a [routerLink]="service.route">{{ service.name }}</a>
+            </li>
+          </ul>
+        </div>
+  
+        <!-- Newsletter -->
+        <div class="footer-column newsletter-column">
+          <h3 class="footer-title">Stay Updated</h3>
+          <p class="newsletter-text">Subscribe to our newsletter for exclusive offers and updates.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Enter your email" class="newsletter-input" required>
+            <button type="submit" class="newsletter-button">Subscribe</button>
+          </form>
+        </div>
+      </div>
+  
+      <!-- Footer Bottom Section -->
+      <div class="footer-bottom">
+        <div class="footer-bottom-content">
+          <p class="copyright">© {{ currentYear }} JELLOF. All rights reserved.</p>
+          <div class="footer-bottom-links">
+            <a routerLink="/privacy-policy">Privacy Policy</a>
+            <span class="separator">|</span>
+            <a routerLink="/terms-conditions">Terms & Conditions</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>

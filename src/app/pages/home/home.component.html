@@ -1,0 +1,199 @@
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-slider">
+      <!-- Slides -->
+      <div class="slides-container">
+        <div 
+          *ngFor="let slide of heroSlides; let i = index" 
+          class="slide"
+          [class.active]="i === currentSlide"
+          [style.background-image]="'url(' + slide.image + ')'">
+          
+          <div class="slide-overlay"></div>
+          
+          <div class="slide-content">
+            <div class="content-wrapper">
+              <p class="subtitle">{{ slide.subtitle }}</p>
+              <h1 class="title">{{ slide.title }}</h1>
+              <p class="description">{{ slide.description }}</p>
+              <a [routerLink]="slide.buttonLink" class="cta-button">{{ slide.buttonText }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Navigation Arrows -->
+      <button class="nav-arrow prev-arrow" (click)="prevSlide()" aria-label="Previous slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      
+      <button class="nav-arrow next-arrow" (click)="nextSlide()" aria-label="Next slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+  
+      <!-- Slide Indicators -->
+      <div class="slide-indicators">
+        <button
+          *ngFor="let slide of heroSlides; let i = index"
+          class="indicator"
+          [class.active]="i === currentSlide"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Go to slide ' + (i + 1)">
+        </button>
+      </div>
+    </div>
+  
+    <!-- Scroll Down Indicator -->
+    <div class="scroll-indicator">
+      <div class="scroll-mouse">
+        <div class="scroll-wheel"></div>
+      </div>
+      <p>Scroll Down</p>
+    </div>
+  </section>
+  
+  <!-- Featured Collections Section -->
+  <section class="featured-collections">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured Collections</h2>
+        <p class="section-description">Discover our most popular collections this season</p>
+      </div>
+  
+      <div class="collections-grid">
+        <div *ngFor="let collection of featuredCollections" class="collection-card">
+          <div class="collection-image" [style.background-image]="'url(' + collection.image + ')'">
+            <div class="collection-overlay">
+              <a [routerLink]="collection.link" class="collection-button">Shop Now</a>
+            </div>
+          </div>
+          <div class="collection-info">
+            <h3 class="collection-title">{{ collection.title }}</h3>
+            <p class="collection-description">{{ collection.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Why Choose Us Section -->
+  <section class="why-choose-us">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Why Choose JELLOF</h2>
+        <p class="section-description">Excellence in every detail</p>
+      </div>
+  
+      <div class="features-grid">
+        <div *ngFor="let feature of features" class="feature-card">
+          <div class="feature-icon">{{ feature.icon }}</div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- New Arrivals Section -->
+  <section class="new-arrivals">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">New Arrivals</h2>
+        <p class="section-description">Fresh styles just added to our collection</p>
+      </div>
+  
+      <div class="products-grid">
+        <div *ngFor="let product of newArrivals" class="product-card">
+          <div class="product-image-wrapper">
+            <img [src]="product.image" [alt]="product.name" class="product-image">
+            <div class="product-badge" *ngIf="product.isNew">NEW</div>
+            <div class="product-overlay">
+              <button class="quick-view-btn">Quick View</button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-category">{{ product.category }}</p>
+            <p class="product-price">{{ product.price | currency:'USD':'symbol' }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="section-footer">
+        <a routerLink="/collections" class="view-all-button">View All Products</a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- About Preview Section -->
+  <section class="about-preview">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-text">
+          <h2 class="about-title">Timeless Fashion, Modern Style</h2>
+          <p class="about-description">
+            At JELLOF, we believe fashion is more than just clothing—it's a form of self-expression. 
+            Since our inception, we've been committed to creating pieces that blend timeless elegance 
+            with contemporary design, crafted with the finest materials and attention to detail.
+          </p>
+          <p class="about-description">
+            Our collections are designed for the modern individual who values quality, sustainability, 
+            and style. Each piece tells a story, and we invite you to be part of ours.
+          </p>
+          <a routerLink="/about" class="learn-more-button">Learn More About Us</a>
+        </div>
+        <div class="about-image" [style.background-image]="'url(' + aboutImage + ')'"></div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Newsletter Section -->
+  <section class="newsletter-section">
+    <div class="container">
+      <div class="newsletter-content">
+        <h2 class="newsletter-title">Join Our Fashion Community</h2>
+        <p class="newsletter-description">
+          Subscribe to get exclusive offers, style tips, and be the first to know about new arrivals.
+        </p>
+        <form class="newsletter-form" (submit)="onNewsletterSubmit($event)">
+          <input 
+            type="email" 
+            placeholder="Enter your email address" 
+            class="newsletter-input"
+            [(ngModel)]="newsletterEmail"
+            name="email"
+            required>
+          <button type="submit" class="newsletter-submit">Subscribe</button>
+        </form>
+        <p class="newsletter-note">We respect your privacy. Unsubscribe at any time.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Instagram Feed Section -->
+  <section class="instagram-section">
+    <div class="container-full">
+      <div class="section-header">
+        <h2 class="section-title">Follow Us @jellof</h2>
+        <p class="section-description">Get inspired by our community</p>
+      </div>
+  
+      <div class="instagram-grid">
+        <a 
+          *ngFor="let post of instagramPosts" 
+          [href]="post.link" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="instagram-post"
+          [style.background-image]="'url(' + post.image + ')'">
+          <div class="instagram-overlay">
+            <span class="instagram-icon">📷</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
