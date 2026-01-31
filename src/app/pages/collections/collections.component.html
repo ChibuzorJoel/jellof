@@ -1,1 +1,141 @@
-<p>collections works!</p>
+<!-- Hero Section -->
+<section class="collections-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Our Collections</h1>
+      <p class="hero-subtitle">Discover Timeless Fashion</p>
+    </div>
+  </section>
+  
+  <!-- Collections Section -->
+  <section class="collections-section">
+    <div class="container">
+      <!-- Category Filter -->
+      <div class="category-filter">
+        <button 
+          *ngFor="let category of categories"
+          class="category-btn"
+          [class.active]="selectedCategory === category.id"
+          (click)="filterByCategory(category.id)">
+          {{ category.name }} ({{ category.count }})
+        </button>
+      </div>
+  
+      <!-- Toolbar -->
+      <div class="collections-toolbar">
+        <!-- Search -->
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="Search products..."
+            [(ngModel)]="searchQuery"
+            (keyup)="onSearch()"
+            class="search-input">
+          <span class="search-icon">🔍</span>
+        </div>
+  
+        <!-- Sort -->
+        <div class="sort-box">
+          <label for="sort">Sort by:</label>
+          <select 
+            id="sort" 
+            [(ngModel)]="sortBy" 
+            (change)="onSortChange(sortBy)"
+            class="sort-select">
+            <option value="featured">Featured</option>
+            <option value="newest">Newest</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name: A-Z</option>
+          </select>
+        </div>
+  
+        <!-- View Mode Toggle -->
+        <div class="view-toggle">
+          <button 
+            class="view-btn"
+            [class.active]="viewMode === 'grid'"
+            (click)="toggleViewMode('grid')"
+            aria-label="Grid view">
+            ⊞
+          </button>
+          <button 
+            class="view-btn"
+            [class.active]="viewMode === 'list'"
+            (click)="toggleViewMode('list')"
+            aria-label="List view">
+            ☰
+          </button>
+        </div>
+  
+        <!-- Results Count -->
+        <div class="results-count">
+          {{ displayedProducts.length }} Products
+        </div>
+      </div>
+  
+      <!-- Clear Filters -->
+      <div class="active-filters" *ngIf="selectedCategory !== 'all' || searchQuery">
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          Clear All Filters ✕
+        </button>
+      </div>
+  
+      <!-- Products Grid -->
+      <div class="products-container" [class.grid-view]="viewMode === 'grid'" [class.list-view]="viewMode === 'list'">
+        <app-product-card 
+          *ngFor="let product of displayedProducts" 
+          [product]="product">
+        </app-product-card>
+      </div>
+  
+      <!-- No Results -->
+      <div class="no-results" *ngIf="displayedProducts.length === 0">
+        <div class="no-results-icon">🔍</div>
+        <h3>No products found</h3>
+        <p>Try adjusting your filters or search terms</p>
+        <button class="clear-filters-btn" (click)="clearFilters()">Clear Filters</button>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Featured Categories -->
+  <section class="featured-categories" *ngIf="selectedCategory === 'all'">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Shop By Category</h2>
+        <p class="section-description">Explore our curated collections</p>
+      </div>
+  
+      <div class="categories-grid">
+        <div 
+          *ngFor="let category of categories.slice(1)" 
+          class="category-card"
+          (click)="filterByCategory(category.id)">
+          <div class="category-image" [style.background-image]="'url(' + category.image + ')'">
+            <div class="category-overlay">
+              <h3 class="category-name">{{ category.name }}</h3>
+              <p class="category-count">{{ category.count }} items</p>
+              <button class="category-btn-action">Shop Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Newsletter CTA -->
+  <section class="newsletter-cta">
+    <div class="container">
+      <div class="newsletter-content">
+        <h2 class="newsletter-title">Stay Updated</h2>
+        <p class="newsletter-description">
+          Subscribe to get exclusive offers and updates on new arrivals.
+        </p>
+        <form class="newsletter-form">
+          <input type="email" placeholder="Enter your email" class="newsletter-input">
+          <button type="submit" class="newsletter-button">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>

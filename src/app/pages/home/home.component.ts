@@ -49,25 +49,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     {
       title: 'Summer Essentials',
       description: 'Light and breezy pieces perfect for warm days',
-      image: 'assets/images/collection-summer.jpg',
+      image: 'assets/images/ollection-summer.jpeg',
       link: '/collections/summer'
     },
     {
       title: 'Formal Wear',
       description: 'Sophisticated elegance for special occasions',
-      image: 'assets/images/collection-formal.jpg',
+      image: 'assets/images/collection-formal.jpeg',
       link: '/collections/formal'
     },
     {
       title: 'Casual Chic',
       description: 'Effortless style for everyday comfort',
-      image: 'assets/images/collection-casual.jpg',
+      image: 'assets/images/collection-casual.jpeg',
       link: '/collections/casual'
     },
     {
       title: 'Accessories',
       description: 'Complete your look with our curated selection',
-      image: 'assets/images/collection-accessories.jpg',
+      image: 'assets/images/collection-accessories.jpeg',
       link: '/collections/accessories'
     }
   ];
@@ -112,14 +112,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       name: 'Silk Summer Dress',
       category: 'Dresses',
       price: 189.99,
-      image: 'assets/images/product-1.jpg',
+      image: 'assets/images/product-1.jpeg',
       isNew: true
     },
     {
       name: 'Linen Blazer',
       category: 'Outerwear',
       price: 249.99,
-      image: 'assets/images/product-2.jpg',
+      image: '../../../assets/images/product-2.jpeg',
       isNew: true
     },
     {
@@ -161,22 +161,22 @@ export class HomeComponent implements OnInit, OnDestroy {
       name: 'Cashmere Sweater',
       category: 'Tops',
       price: 219.99,
-      image: 'assets/images/product-8.jpg',
+      image: 'assets/images/product-8.jpeg',
       isNew: true
     }
   ];
 
   // About Section Image
-  aboutImage = 'assets/images/about-preview.jpg';
+  aboutImage = 'assets/images/about-preview.jpeg';
 
   // Instagram Posts
   instagramPosts = [
-    { image: 'assets/images/instagram-1.jpg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-2.jpg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-3.jpg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-4.jpg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-5.jpg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-6.jpg', link: 'https://instagram.com/jellof' }
+    { image: 'assets/images/instagram-1.jpeg', link: 'https://instagram.com/jellof' },
+    { image: 'assets/images/instagram-2.jpeg', link: 'https://instagram.com/jellof' },
+    { image: 'assets/images/instagram-3.jpeg', link: 'https://instagram.com/jellof' },
+    { image: 'assets/images/instagram-4.jpeg', link: 'https://instagram.com/jellof' },
+    { image: 'assets/images/instagram-5.jpeg', link: 'https://instagram.com/jellof' },
+    { image: 'assets/images/instagram-6.jpeg', link: 'https://instagram.com/jellof' }
   ];
 
   ngOnInit(): void {

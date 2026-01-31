@@ -1,0 +1,29 @@
+<div class="product-card">
+    <div class="product-image-wrapper">
+      <img [src]="product.image" [alt]="product.name" class="product-image">
+      
+      <!-- NEW Badge -->
+      <div class="product-badge" *ngIf="product.isNew">NEW</div>
+      
+      <!-- Hover Overlay -->
+      <div class="product-overlay">
+        <button class="quick-view-btn" (click)="quickView()">Quick View</button>
+        <button class="whatsapp-btn" (click)="orderViaWhatsApp()">
+          <span class="whatsapp-icon">💬</span>
+          Order via WhatsApp
+        </button>
+      </div>
+    </div>
+    
+    <div class="product-info">
+      <h3 class="product-name">{{ product.name }}</h3>
+      <p class="product-category">{{ product.category }}</p>
+      <p class="product-price">${{ product.price.toFixed(2) }}</p>
+      
+      <!-- Mobile WhatsApp Button -->
+      <button class="whatsapp-btn-mobile" (click)="orderViaWhatsApp()">
+        <span class="whatsapp-icon">💬</span>
+        Order on WhatsApp
+      </button>
+    </div>
+  </div>

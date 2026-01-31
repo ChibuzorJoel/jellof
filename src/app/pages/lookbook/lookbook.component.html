@@ -1,0 +1,104 @@
+<!-- Hero Section -->
+<section class="lookbook-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Lookbook</h1>
+      <p class="hero-subtitle">{{ currentSeason }}</p>
+      <p class="hero-description">Discover how to style our latest collection</p>
+    </div>
+  </section>
+  
+  <!-- Lookbook Grid -->
+  <section class="lookbook-section">
+    <div class="container">
+      <div class="lookbook-grid">
+        <div 
+          *ngFor="let item of lookbookItems; let i = index" 
+          class="lookbook-item"
+          [class.large]="i === 0 || i === 4"
+          (click)="viewLookbookDetail(item)">
+          <div class="lookbook-image" [style.background-image]="'url(' + item.image + ')'">
+            <div class="lookbook-overlay">
+              <h3 class="lookbook-title">{{ item.title }}</h3>
+              <p class="lookbook-description">{{ item.description }}</p>
+              <button class="lookbook-btn">View Look</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Style Guide Section -->
+  <section class="style-guide">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Style Tips</h2>
+        <p class="section-description">Expert advice for creating timeless looks</p>
+      </div>
+  
+      <div class="tips-grid">
+        <div *ngFor="let tip of styleTips" class="tip-card">
+          <div class="tip-icon">{{ tip.icon }}</div>
+          <h3 class="tip-title">{{ tip.title }}</h3>
+          <p class="tip-description">{{ tip.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="lookbook-cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">Love What You See?</h2>
+        <p class="cta-description">
+          Shop our complete collection to create your own signature style
+        </p>
+        <div class="cta-buttons">
+          <a routerLink="/collections" class="cta-btn primary">Shop Collections</a>
+          <a routerLink="/contact" class="cta-btn secondary">Personal Styling</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Lookbook Detail Modal -->
+  <div class="modal-overlay" *ngIf="selectedItem" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeModal()">✕</button>
+      
+      <div class="modal-grid">
+        <!-- Image -->
+        <div class="modal-image" [style.background-image]="'url(' + selectedItem.image + ')'"></div>
+        
+        <!-- Details -->
+        <div class="modal-details">
+          <h2 class="modal-title">{{ selectedItem.title }}</h2>
+          <p class="modal-season">{{ selectedItem.season }}</p>
+          <p class="modal-description">{{ selectedItem.description }}</p>
+          
+          <div class="products-in-look">
+            <h3>Products in this look:</h3>
+            <ul class="product-list">
+              <li *ngFor="let product of selectedItem.products" class="product-item">
+                <span class="product-name">{{ product.name }}</span>
+                <span class="product-price">${{ product.price.toFixed(2) }}</span>
+              </li>
+            </ul>
+            
+            <div class="look-total">
+              <strong>Total Look:</strong>
+              <strong>${{ getTotalLookPrice(selectedItem).toFixed(2) }}</strong>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <a routerLink="/collections" class="modal-btn primary">Shop This Look</a>
+            <button class="modal-btn secondary" (click)="closeModal()">Browse More</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

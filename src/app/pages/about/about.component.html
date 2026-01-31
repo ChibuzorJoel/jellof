@@ -1,1 +1,146 @@
-<p>about works!</p>
+<!-- Hero Section -->
+<section class="about-hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">About JELLOF</h1>
+      <p class="hero-subtitle">Where Sustainable Fashion Meets Timeless Elegance</p>
+    </div>
+  </section>
+  
+  <!-- Brand Story Section -->
+  <section class="brand-story">
+    <div class="container">
+      <div class="story-content">
+        <div class="story-text">
+          <h2 class="section-title">{{ brandStory.title }}</h2>
+          <p class="story-description">{{ brandStory.description }}</p>
+          
+          <div class="mission-vision">
+            <div class="mission">
+              <h3>Our Mission</h3>
+              <p>{{ brandStory.mission }}</p>
+            </div>
+            <div class="vision">
+              <h3>Our Vision</h3>
+              <p>{{ brandStory.vision }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="story-image"></div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Core Values Section -->
+  <section class="core-values">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Our Core Values</h2>
+        <p class="section-description">The principles that guide everything we do</p>
+      </div>
+  
+      <div class="values-grid">
+        <div *ngFor="let value of coreValues" class="value-card">
+          <div class="value-icon">{{ value.icon }}</div>
+          <h3 class="value-title">{{ value.title }}</h3>
+          <p class="value-description">{{ value.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Statistics Section -->
+  <section class="statistics-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div *ngFor="let stat of statistics" class="stat-card">
+          <div class="stat-icon">{{ stat.icon }}</div>
+          <div class="stat-number">{{ stat.number }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Timeline Section -->
+  <section class="timeline-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Our Journey</h2>
+        <p class="section-description">Milestones that shaped who we are today</p>
+      </div>
+  
+      <div class="timeline">
+        <div *ngFor="let milestone of milestones; let i = index" 
+             class="timeline-item"
+             [class.left]="i % 2 === 0"
+             [class.right]="i % 2 !== 0">
+          <div class="timeline-content">
+            <div class="timeline-year">{{ milestone.year }}</div>
+            <h3 class="timeline-title">{{ milestone.title }}</h3>
+            <p class="timeline-description">{{ milestone.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Sustainability Section -->
+  <section class="sustainability-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Our Commitment to Sustainability</h2>
+        <p class="section-description">Fashion with a conscience, style with purpose</p>
+      </div>
+  
+      <div class="sustainability-grid">
+        <div *ngFor="let practice of sustainabilityPractices" class="sustainability-card">
+          <div class="sustainability-icon">{{ practice.icon }}</div>
+          <h3 class="sustainability-title">{{ practice.title }}</h3>
+          <p class="sustainability-description">{{ practice.description }}</p>
+        </div>
+      </div>
+  
+      <div class="sustainability-cta">
+        <h3>Want to learn more about our sustainability practices?</h3>
+        <a routerLink="/contact" class="sustainability-button">Get In Touch</a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Meet Our Team</h2>
+        <p class="section-description">The passionate people behind JELLOF</p>
+      </div>
+  
+      <div class="team-grid">
+        <div *ngFor="let member of teamMembers" class="team-member">
+          <div class="member-image" [style.background-image]="'url(' + member.image + ')'"></div>
+          <div class="member-info">
+            <h3 class="member-name">{{ member.name }}</h3>
+            <p class="member-position">{{ member.position }}</p>
+            <p class="member-bio">{{ member.bio }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">Join Our Journey</h2>
+        <p class="cta-description">
+          Be part of the sustainable fashion revolution. Explore our collections and discover timeless pieces that make a difference.
+        </p>
+        <div class="cta-buttons">
+          <a routerLink="/collections" class="cta-button primary">Shop Collections</a>
+          <a routerLink="/contact" class="cta-button secondary">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </section>

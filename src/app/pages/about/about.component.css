@@ -1,0 +1,746 @@
+/* ===========================
+   HERO SECTION
+   =========================== */
+   .about-hero {
+    position: relative;
+    height: 60vh;
+    min-height: 400px;
+    background:
+  linear-gradient(135deg, rgba(45, 80, 22, 0.8), rgba(0, 0, 0, 0.8)),
+  url('/assets/images/about-preview.jpeg');
+
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+  }
+  
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    padding: 0 2rem;
+  }
+  
+  .hero-title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+  
+  /* ===========================
+     COMMON STYLES
+     =========================== */
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #000000;
+  }
+  
+  .section-description {
+    font-size: 1.1rem;
+    color: #666666;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  /* ===========================
+     BRAND STORY SECTION
+     =========================== */
+  .brand-story {
+    padding: 6rem 0;
+    background: #ffffff;
+  }
+  
+  .story-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  
+  .story-text {
+    padding-right: 2rem;
+  }
+  
+  .story-description {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #333333;
+    margin-bottom: 3rem;
+  }
+  
+  .mission-vision {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  
+  .mission,
+  .vision {
+    padding: 2rem;
+    background: #f5f5f5;
+    border-left: 4px solid #2d5016;
+    border-radius: 4px;
+  }
+  
+  .mission h3,
+  .vision h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: #2d5016;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .mission p,
+  .vision p {
+    color: #666666;
+    line-height: 1.6;
+  }
+  
+  .story-image {
+    height: 500px;
+    background: linear-gradient(
+              135deg,
+              rgba(45, 80, 22, 0.3),
+              rgba(0, 0, 0, 0.3)
+            ),
+            url('/assets/images/about-story.jpeg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    background-color: #e0e0e0;
+  }
+  
+  /* ===========================
+     CORE VALUES SECTION
+     =========================== */
+  .core-values {
+    padding: 6rem 0;
+    background: #f5f5f5;
+  }
+  
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+  }
+  
+  .value-card {
+    background: #ffffff;
+    padding: 3rem 2rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .value-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .value-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .value-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #000000;
+  }
+  
+  .value-description {
+    color: #666666;
+    line-height: 1.6;
+  }
+  
+  /* ===========================
+     STATISTICS SECTION
+     =========================== */
+  .statistics-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #2d5016 0%, #1f3710 100%);
+    color: #ffffff;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 3rem;
+  }
+  
+  .stat-card {
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .stat-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  /* ===========================
+     TIMELINE SECTION
+     =========================== */
+  .timeline-section {
+    padding: 6rem 0;
+    background: #ffffff;
+  }
+  
+  .timeline {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    background: #2d5016;
+  }
+  
+  .timeline-item {
+    position: relative;
+    width: 50%;
+    padding: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .timeline-item.left {
+    left: 0;
+    padding-right: 4rem;
+    text-align: right;
+  }
+  
+  .timeline-item.right {
+    left: 50%;
+    padding-left: 4rem;
+    text-align: left;
+  }
+  
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    top: 2.5rem;
+    width: 20px;
+    height: 20px;
+    background: #2d5016;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px #2d5016;
+    z-index: 2;
+  }
+  
+  .timeline-item.left::before {
+    right: -10px;
+  }
+  
+  .timeline-item.right::before {
+    left: -10px;
+  }
+  
+  .timeline-content {
+    background: #f5f5f5;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .timeline-content:hover {
+    transform: scale(1.03);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  .timeline-year {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: #2d5016;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+  
+  .timeline-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #000000;
+  }
+  
+  .timeline-description {
+    color: #666666;
+    line-height: 1.6;
+  }
+  
+  /* ===========================
+     SUSTAINABILITY SECTION
+     =========================== */
+  .sustainability-section {
+    padding: 6rem 0;
+    background: #f5f5f5;
+  }
+  
+  .sustainability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
+    margin-bottom: 4rem;
+  }
+  
+  .sustainability-card {
+    background: #ffffff;
+    padding: 2.5rem 2rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .sustainability-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sustainability-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .sustainability-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #000000;
+  }
+  
+  .sustainability-description {
+    color: #666666;
+    line-height: 1.6;
+  }
+  
+  .sustainability-cta {
+    text-align: center;
+    padding: 3rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .sustainability-cta h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #000000;
+  }
+  
+  .sustainability-button {
+    display: inline-block;
+    padding: 1rem 3rem;
+    background: #2d5016;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .sustainability-button:hover {
+    background: #1f3710;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(45, 80, 22, 0.3);
+  }
+  
+  /* ===========================
+     TEAM SECTION
+     =========================== */
+  .team-section {
+    padding: 6rem 0;
+    background: #ffffff;
+  }
+  
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 3rem;
+  }
+  
+  .team-member {
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .team-member:hover {
+    transform: translateY(-10px);
+  }
+  
+  .member-image {
+    width: 100%;
+    height: 350px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    background-color: #e0e0e0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .member-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 60%, rgba(45, 80, 22, 0.8));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .team-member:hover .member-image::after {
+    opacity: 1;
+  }
+  
+  .member-info {
+    padding: 0 1rem;
+  }
+  
+  .member-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #000000;
+  }
+  
+  .member-position {
+    font-size: 1rem;
+    color: #2d5016;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .member-bio {
+    color: #666666;
+    line-height: 1.6;
+  }
+  
+  /* ===========================
+     CTA SECTION
+     =========================== */
+  .cta-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, #1f3710 0%, #2d5016 100%);
+    color: #ffffff;
+  }
+  
+  .cta-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .cta-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  .cta-description {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+  }
+  
+  .cta-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .cta-button {
+    display: inline-block;
+    padding: 1.2rem 3rem;
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  .cta-button.primary {
+    background: #ffffff;
+    color: #2d5016;
+  }
+  
+  .cta-button.primary:hover {
+    background: #f0f0f0;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+  }
+  
+  .cta-button.secondary {
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+  }
+  
+  .cta-button.secondary:hover {
+    background: #ffffff;
+    color: #2d5016;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+  }
+  
+  /* ===========================
+     RESPONSIVE DESIGN
+     =========================== */
+  
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .hero-title {
+      font-size: 3rem;
+    }
+  
+    .hero-subtitle {
+      font-size: 1.2rem;
+    }
+  
+    .section-title {
+      font-size: 2rem;
+    }
+  
+    .story-content {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  
+    .story-text {
+      padding-right: 0;
+    }
+  
+    .mission-vision {
+      grid-template-columns: 1fr;
+    }
+  
+    .timeline::before {
+      left: 20px;
+    }
+  
+    .timeline-item {
+      width: 100%;
+      padding-left: 4rem;
+      padding-right: 2rem;
+      text-align: left;
+    }
+  
+    .timeline-item.left,
+    .timeline-item.right {
+      left: 0;
+      padding-left: 4rem;
+      text-align: left;
+    }
+  
+    .timeline-item::before {
+      left: 10px !important;
+    }
+  
+    .cta-title {
+      font-size: 2.5rem;
+    }
+  }
+  
+  /* Mobile */
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 1.5rem;
+    }
+  
+    .about-hero {
+      height: 50vh;
+      min-height: 300px;
+    }
+  
+    .hero-content {
+      padding: 0 1.5rem;
+    }
+  
+    .hero-title {
+      font-size: 2.5rem;
+    }
+  
+    .hero-subtitle {
+      font-size: 1rem;
+    }
+  
+    .section-title {
+      font-size: 1.8rem;
+    }
+  
+    .section-description {
+      font-size: 1rem;
+    }
+  
+    .brand-story,
+    .core-values,
+    .timeline-section,
+    .sustainability-section,
+    .team-section,
+    .cta-section {
+      padding: 4rem 0;
+    }
+  
+    .section-header {
+      margin-bottom: 3rem;
+    }
+  
+    .story-description {
+      font-size: 1.1rem;
+    }
+  
+    .story-image {
+      height: 300px;
+    }
+  
+    .values-grid,
+    .sustainability-grid,
+    .team-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+  
+    .stat-number {
+      font-size: 2.5rem;
+    }
+  
+    .stat-label {
+      font-size: 0.9rem;
+    }
+  
+    .timeline::before {
+      left: 15px;
+    }
+  
+    .timeline-item {
+      padding-left: 3rem;
+    }
+  
+    .timeline-item.left,
+    .timeline-item.right {
+      padding-left: 3rem;
+    }
+  
+    .cta-title {
+      font-size: 2rem;
+    }
+  
+    .cta-description {
+      font-size: 1rem;
+    }
+  
+    .cta-buttons {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  
+    .cta-button {
+      width: 100%;
+    }
+  }
+  
+  /* Small Mobile */
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+  
+    .section-title {
+      font-size: 1.5rem;
+    }
+  
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .timeline-year {
+      font-size: 1rem;
+      padding: 0.4rem 1rem;
+    }
+  
+    .timeline-title {
+      font-size: 1.2rem;
+    }
+  }
