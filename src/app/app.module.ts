@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser'; 
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
@@ -14,6 +14,11 @@ import { CollectionsComponent } from './pages/collections/collections.component'
 import { LookbookComponent } from './pages/lookbook/lookbook.component';
 import { ProductCardComponent } from './shared/product-card/product-card.component';
 
+import { AdminProductComponent } from './admin/admin-product/admin-product.component';
+import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
+import { AdminOrderComponent } from './admin/admin-order/admin-order.component';
+import { ProductSearchComponent } from './pages/product-search/product-search.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,12 +29,18 @@ import { ProductCardComponent } from './shared/product-card/product-card.compone
     ContactComponent,
     CollectionsComponent,
     LookbookComponent,
-    ProductCardComponent
+    ProductCardComponent,
+    AdminProductComponent,
+    AdminDashboardComponent,
+    AdminOrderComponent,
+    ProductSearchComponent
+    // ❌ AdminLoginComponent REMOVED
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule, 
+    FormsModule,
+    ReactiveFormsModule,
     HttpClientModule
   ],
   providers: [],

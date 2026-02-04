@@ -1,0 +1,390 @@
+.orders-container {
+    padding: 2rem;
+    background: #f5f5f5;
+    min-height: 100vh;
+  }
+  
+  .page-header {
+    margin-bottom: 2rem;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+    color: #2d5016;
+    margin-bottom: 0.5rem;
+  }
+  
+  .page-header p {
+    color: #666;
+  }
+  
+  /* Messages */
+  .messages {
+    margin-bottom: 1rem;
+  }
+  
+  .alert {
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  .alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  /* Status Tabs */
+  .status-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .status-tabs button {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .status-tabs button:hover {
+    border-color: #2d5016;
+  }
+  
+  .status-tabs button.active {
+    background: #2d5016;
+    color: white;
+    border-color: #2d5016;
+  }
+  
+  .count {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+  }
+  
+  .status-tabs button.active .count {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Search Bar */
+  .search-bar {
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-bar input {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.8rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .search-bar input:focus {
+    outline: none;
+    border-color: #2d5016;
+  }
+  
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 4rem;
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  /* Table */
+  .orders-table {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  thead {
+    background: #2d5016;
+    color: white;
+  }
+  
+  th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    color: #666;
+  }
+  
+  tr:hover {
+    background: #f9f9f9;
+  }
+  
+  .price {
+    font-weight: 700;
+    color: #2d5016;
+    font-size: 1.1rem;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .btn-view {
+    padding: 0.5rem 1rem;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+  
+  .btn-view:hover {
+    background: #1976D2;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 4rem;
+    color: #999;
+    font-size: 1.2rem;
+  }
+  
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
+  }
+  
+  .modal-content {
+    background: white;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  .modal-header h2 {
+    margin: 0;
+    color: #2d5016;
+  }
+  
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .btn-close:hover {
+    color: #000;
+  }
+  
+  .modal-body {
+    padding: 2rem;
+  }
+  
+  .info-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .info-section:last-child {
+    border-bottom: none;
+  }
+  
+  .info-section h3 {
+    color: #2d5016;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .info-item label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .info-item span {
+    color: #333;
+    font-size: 1rem;
+  }
+  
+  .total-price {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #2d5016 !important;
+  }
+  
+  .status-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .status-buttons button {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid transparent;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+  
+  .status-buttons button:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+  }
+  
+  .status-buttons button.active {
+    border-color: #333;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-top: 2px solid #e0e0e0;
+  }
+  
+  .btn-delete {
+    padding: 0.8rem 1.5rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .btn-delete:hover {
+    background: #c82333;
+  }
+  
+  .btn-secondary {
+    padding: 0.8rem 1.5rem;
+    background: #666;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .btn-secondary:hover {
+    background: #555;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .orders-container {
+      padding: 1rem;
+    }
+  
+    .status-tabs {
+      overflow-x: auto;
+    }
+  
+    table {
+      font-size: 0.85rem;
+    }
+  
+    th, td {
+      padding: 0.75rem 0.5rem;
+    }
+  
+    .modal-content {
+      max-width: 100%;
+      margin: 0;
+      border-radius: 0;
+    }
+  
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .status-buttons {
+      flex-direction: column;
+    }
+  
+    .status-buttons button {
+      width: 100%;
+    }
+  }

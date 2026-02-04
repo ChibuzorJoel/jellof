@@ -1,0 +1,199 @@
+<!-- Admin Header -->
+<div class="admin-header">
+    <h1>📦 Product Management</h1>
+    <button class="btn-primary" (click)="showCreateForm()">+ Add New Product</button>
+  </div>
+  
+  <!-- Messages -->
+  <div class="messages">
+    <div class="alert alert-success" *ngIf="successMessage">
+      ✓ {{ successMessage }}
+    </div>
+    <div class="alert alert-error" *ngIf="errorMessage">
+      ✗ {{ errorMessage }}
+    </div>
+  </div>
+  
+  <!-- Filters and Search -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Search products..." 
+        [(ngModel)]="searchQuery"
+        (keyup)="onSearch()"
+        class="search-input">
+    </div>
+  
+    <div class="filter-box">
+      <select [(ngModel)]="filterCategory" (change)="onCategoryChange()" class="filter-select">
+        <option value="all">All Categories</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+  
+    <div class="results-count">
+      {{ filteredProducts.length }} Products
+    </div>
+  </div>
+  
+  <!-- Products Table -->
+  <div class="products-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of filteredProducts">
+          <td>
+            <img [src]="product.image" [alt]="product.name" class="product-thumb">
+          </td>
+          <td>
+            <strong>{{ product.name }}</strong>
+            <span class="badge badge-new" *ngIf="product.isNew">NEW</span>
+          </td>
+          <td>{{ product.category }}</td>
+          <td class="price">${{ product.price.toFixed(2) }}</td>
+          <td>{{ product.stockQuantity }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="product.inStock" [class.badge-danger]="!product.inStock">
+              {{ product.inStock ? 'In Stock' : 'Out of Stock' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-edit" (click)="editProduct(product)">Edit</button>
+            <button class="btn-delete" (click)="deleteProduct(product)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredProducts.length === 0">
+      <p>No products found</p>
+    </div>
+  </div>
+  
+  <!-- Product Form Modal -->
+  <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ isEditing ? 'Edit Product' : 'Add New Product' }}</h2>
+        <button class="btn-close" (click)="closeForm()">✕</button>
+      </div>
+  
+      <form class="product-form" (ngSubmit)="saveProduct()">
+        <!-- Basic Info -->
+        <div class="form-section">
+          <h3>Basic Information</h3>
+          
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" [(ngModel)]="newProduct.name" name="name" required class="form-input">
+          </div>
+  
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category *</label>
+              <select [(ngModel)]="newProduct.category" name="category" required class="form-input">
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+              </select>
+            </div>
+  
+            <div class="form-group">
+              <label>Price *</label>
+              <input type="number" [(ngModel)]="newProduct.price" name="price" required min="0" step="0.01" class="form-input">
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label>Description</label>
+            <textarea [(ngModel)]="newProduct.description" name="description" rows="3" class="form-input"></textarea>
+          </div>
+  
+          <div class="form-group">
+            <label>Main Image URL *</label>
+            <input type="text" [(ngModel)]="newProduct.image" name="image" required class="form-input">
+            <small>Enter image URL (e.g., assets/images/product-1.jpg)</small>
+          </div>
+        </div>
+  
+        <!-- Variants -->
+        <div class="form-section">
+          <h3>Product Variants</h3>
+  
+          <div class="form-group">
+            <label>Available Sizes</label>
+            <div class="size-selector">
+              <button 
+                type="button"
+                *ngFor="let size of availableSizes" 
+                class="size-btn"
+                [class.selected]="isSizeSelected(size)"
+                (click)="toggleSize(size)">
+                {{ size }}
+              </button>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label>Colors</label>
+            <div class="color-input-group">
+              <input type="text" #colorInput placeholder="Enter color name" class="form-input">
+              <button type="button" class="btn-add" (click)="addColor(colorInput.value); colorInput.value=''">
+                Add Color
+              </button>
+            </div>
+            <div class="color-tags">
+              <span *ngFor="let color of newProduct.colors" class="color-tag">
+                {{ color }}
+                <button type="button" class="remove-tag" (click)="removeColor(color)">✕</button>
+              </span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Inventory -->
+        <div class="form-section">
+          <h3>Inventory</h3>
+  
+          <div class="form-row">
+            <div class="form-group">
+              <label>Stock Quantity</label>
+              <input type="number" [(ngModel)]="newProduct.stockQuantity" name="stockQuantity" min="0" class="form-input">
+            </div>
+  
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="newProduct.inStock" name="inStock">
+                In Stock
+              </label>
+            </div>
+  
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="newProduct.isNew" name="isNew">
+                Mark as NEW
+              </label>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="closeForm()">Cancel</button>
+          <button type="submit" class="btn-primary">
+            {{ isEditing ? 'Update Product' : 'Create Product' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>

@@ -5,6 +5,8 @@ import { CollectionsComponent } from './pages/collections/collections.component'
 import { LookbookComponent } from './pages/lookbook/lookbook.component';
 import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
+import { AdminProductComponent } from './admin/admin-product/admin-product.component';
+import { adminAuthGuard } from './guards/admin-auth.guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -12,6 +14,30 @@ const routes: Routes = [
   { path: 'lookbook', component: LookbookComponent },
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
+  { path: 'admin/products', component: AdminProductComponent},
+  {
+    path: 'admin/login',
+    loadComponent: () =>
+      import('./admin/admin-login/admin-login.component')
+        .then(m => m.AdminLoginComponent)
+  },
+  {
+    path: 'admin/login',
+    loadComponent: () =>
+      import('./admin/admin-login/admin-login.component').then(m => m.AdminLoginComponent)
+  },
+  {
+    path: 'admin/dashboard',
+    loadComponent: () =>
+      import('./admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    canActivate: [adminAuthGuard]
+  },
+  {
+    path: 'admin/orders',
+    loadComponent: () =>
+      import('./admin/admin-order/admin-order.component').then(m => m.AdminOrderComponent),
+    canActivate: [adminAuthGuard]
+  },
   { path: '**', redirectTo: '', pathMatch: 'full' } // fallback
 ];
 

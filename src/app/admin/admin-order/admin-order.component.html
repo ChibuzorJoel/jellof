@@ -1,0 +1,226 @@
+<div class="orders-container">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>🛍️ Order Management</h1>
+      <p>Manage all WhatsApp orders</p>
+    </div>
+  
+    <!-- Messages -->
+    <div class="messages">
+      <div class="alert alert-success" *ngIf="successMessage">
+        ✓ {{ successMessage }}
+      </div>
+      <div class="alert alert-error" *ngIf="errorMessage">
+        ✗ {{ errorMessage }}
+      </div>
+    </div>
+  
+    <!-- Status Filter Tabs -->
+    <div class="status-tabs">
+      <button
+        *ngFor="let status of ['all','pending','confirmed','processing','shipped','delivered','cancelled']"
+        [class.active]="filterStatus === status"
+        (click)="filterByStatus(status)">
+        {{ status | titlecase }}
+        <span class="count">{{ statusCounts[status] }}</span>
+      </button>
+    </div>
+  
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search by customer name, phone, or product..."
+        [(ngModel)]="searchQuery"
+        (keyup)="onSearch()" />
+    </div>
+  
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      Loading orders...
+    </div>
+  
+    <!-- Orders Table -->
+    <div *ngIf="!isLoading" class="orders-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Phone</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          <tr *ngFor="let order of filteredOrders">
+            <td>
+              <strong>#{{ order._id?.slice(-6)?.toUpperCase() }}</strong>
+            </td>
+            <td>{{ order.customerName || 'N/A' }}</td>
+            <td>{{ order.customerPhone }}</td>
+            <td>{{ order.productName }}</td>
+            <td>{{ order.quantity || 1 }}</td>
+  
+            <!-- ✅ FIXED -->
+            <td class="price">
+              ${{ (order.totalPrice || order.productPrice).toFixed(2) }}
+            </td>
+  
+            <td>
+              <span
+                class="status-badge"
+                [style.background-color]="getStatusColor(order.status || 'pending')">
+                {{ order.status || 'pending' }}
+              </span>
+            </td>
+  
+            <td>{{ order.createdAt | date:'short' }}</td>
+  
+            <td>
+              <button class="btn-view" (click)="viewOrderDetails(order)">
+                View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <!-- Empty State -->
+      <div *ngIf="filteredOrders.length === 0" class="empty-state">
+        <p>No orders found</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Order Details Modal -->
+  <div
+    class="modal-overlay"
+    *ngIf="showOrderDetails"
+    (click)="closeOrderDetails()">
+  
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Order Details</h2>
+        <button class="btn-close" (click)="closeOrderDetails()">✕</button>
+      </div>
+  
+      <div class="modal-body" *ngIf="selectedOrder">
+  
+        <!-- Order Info -->
+        <div class="info-section">
+          <h3>Order Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Order ID:</label>
+              <span>#{{ selectedOrder._id?.slice(-8)?.toUpperCase() }}</span>
+            </div>
+            <div class="info-item">
+              <label>Date:</label>
+              <span>{{ selectedOrder.createdAt | date:'medium' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Status:</label>
+              <span
+                class="status-badge"
+                [style.background-color]="getStatusColor(selectedOrder.status || 'pending')">
+                {{ selectedOrder.status || 'pending' }}
+              </span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Customer Info -->
+        <div class="info-section">
+          <h3>Customer Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Name:</label>
+              <span>{{ selectedOrder.customerName || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Phone:</label>
+              <span>{{ selectedOrder.customerPhone }}</span>
+            </div>
+            <div class="info-item">
+              <label>Email:</label>
+              <span>{{ selectedOrder.customerEmail || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Product Info -->
+        <div class="info-section">
+          <h3>Product Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Product:</label>
+              <span>{{ selectedOrder.productName }}</span>
+            </div>
+  
+            <!-- ✅ FIXED -->
+            <div class="info-item">
+              <label>Price:</label>
+              <span>${{ selectedOrder.productPrice.toFixed(2) }}</span>
+            </div>
+  
+            <div class="info-item">
+              <label>Quantity:</label>
+              <span>{{ selectedOrder.quantity || 1 }}</span>
+            </div>
+            <div class="info-item">
+              <label>Size:</label>
+              <span>{{ selectedOrder.size || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Color:</label>
+              <span>{{ selectedOrder.color || 'N/A' }}</span>
+            </div>
+  
+            <!-- ✅ FIXED -->
+            <div class="info-item">
+              <label>Total:</label>
+              <span class="total-price">
+                ${{ (selectedOrder.totalPrice ?? 0).toFixed(2) }}
+              </span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Notes -->
+        <div class="info-section" *ngIf="selectedOrder.notes">
+          <h3>Notes</h3>
+          <p>{{ selectedOrder.notes }}</p>
+        </div>
+  
+        <!-- Update Status -->
+        <div class="info-section">
+          <h3>Update Status</h3>
+          <div class="status-buttons">
+            <button
+              *ngFor="let status of ['pending','confirmed','processing','shipped','delivered','cancelled']"
+              [class.active]="selectedOrder.status === status"
+              (click)="updateStatus(selectedOrder, status)"
+              [style.background-color]="getStatusColor(status)">
+              {{ status | titlecase }}
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <div class="modal-footer">
+        <button class="btn-delete" (click)="deleteOrder(selectedOrder!)">
+          Delete Order
+        </button>
+        <button class="btn-secondary" (click)="closeOrderDetails()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  

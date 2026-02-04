@@ -1,0 +1,142 @@
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <h1>📊 Dashboard Overview</h1>
+      <p class="subtitle">Welcome to JELLOF Admin</p>
+    </div>
+  
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading">
+      <p>Loading dashboard...</p>
+    </div>
+  
+    <!-- Stats Cards -->
+    <div *ngIf="!isLoading" class="stats-grid">
+      <!-- Total Products -->
+      <div class="stat-card">
+        <div class="stat-icon products">📦</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalProducts }}</h3>
+          <p>Total Products</p>
+        </div>
+      </div>
+  
+      <!-- Total Orders -->
+      <div class="stat-card">
+        <div class="stat-icon orders">🛒</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalOrders }}</h3>
+          <p>Total Orders</p>
+        </div>
+      </div>
+  
+      <!-- Total Contacts -->
+      <div class="stat-card">
+        <div class="stat-icon contacts">✉️</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalContacts }}</h3>
+          <p>Messages</p>
+        </div>
+      </div>
+  
+      <!-- Total Subscribers -->
+      <div class="stat-card">
+        <div class="stat-icon subscribers">👥</div>
+        <div class="stat-content">
+          <h3>{{ stats.totalSubscribers }}</h3>
+          <p>Subscribers</p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Orders Timeline -->
+    <div *ngIf="!isLoading" class="orders-timeline">
+      <div class="timeline-card">
+        <h4>{{ stats.ordersToday }}</h4>
+        <p>Today</p>
+      </div>
+      <div class="timeline-card">
+        <h4>{{ stats.ordersThisWeek }}</h4>
+        <p>This Week</p>
+      </div>
+      <div class="timeline-card">
+        <h4>{{ stats.ordersThisMonth }}</h4>
+        <p>This Month</p>
+      </div>
+    </div>
+  
+    <!-- Recent Activity -->
+    <div *ngIf="!isLoading" class="activity-section">
+      <!-- Recent Orders -->
+      <div class="activity-card">
+        <div class="card-header">
+          <h2>🛍️ Recent Orders</h2>
+          <a routerLink="/admin/orders" class="view-all">View All</a>
+        </div>
+        
+        <div class="table-responsive">
+          <table *ngIf="stats.recentOrders.length > 0">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of stats.recentOrders">
+                <td>{{ order.customerName || order.customerPhone }}</td>
+                <td>{{ order.productName }}</td>
+                <td>${{ order.totalPrice?.toFixed(2) || order.productPrice?.toFixed(2) }}</td>
+                <td>
+                  <span class="status-badge" [style.background-color]="getStatusColor(order.status)">
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>{{ order.createdAt | date:'short' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p *ngIf="stats.recentOrders.length === 0" class="no-data">No orders yet</p>
+        </div>
+      </div>
+  
+      <!-- Recent Contacts -->
+      <div class="activity-card">
+        <div class="card-header">
+          <h2>💬 Recent Messages</h2>
+          <a routerLink="/admin/contacts" class="view-all">View All</a>
+        </div>
+        
+        <div class="messages-list">
+          <div *ngFor="let contact of stats.recentContacts" class="message-item">
+            <div class="message-header">
+              <strong>{{ contact.name }}</strong>
+              <span class="status-badge" [style.background-color]="getStatusColor(contact.status)">
+                {{ contact.status }}
+              </span>
+            </div>
+            <p class="message-subject">{{ contact.subject || 'No subject' }}</p>
+            <p class="message-preview">{{ contact.message.substring(0, 100) }}...</p>
+            <small>{{ contact.createdAt | date:'short' }}</small>
+          </div>
+          <p *ngIf="stats.recentContacts.length === 0" class="no-data">No messages yet</p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Popular Products -->
+    <div *ngIf="!isLoading && stats.popularProducts.length > 0" class="popular-products">
+      <h2>🔥 Popular Products</h2>
+      <div class="products-grid">
+        <div *ngFor="let product of stats.popularProducts" class="product-mini">
+          <img [src]="product.image" [alt]="product.name">
+          <h4>{{ product.name }}</h4>
+          <p class="price">${{ product.price.toFixed(2) }}</p>
+          <span class="badge" *ngIf="product.isNew">NEW</span>
+        </div>
+      </div>
+    </div>
+  </div>

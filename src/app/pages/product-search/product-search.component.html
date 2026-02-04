@@ -1,0 +1,31 @@
+<!-- Toolbar -->
+<div class="collections-toolbar">
+  <!-- Search -->
+  <div class="search-box">
+    <input 
+      type="text" 
+      placeholder="Search products..."
+      [(ngModel)]="searchQuery"
+      (keyup)="onSearch()"
+      class="search-input">
+    <span class="search-icon">🔍</span>
+  </div>
+
+  <!-- Sort -->
+  <div class="sort-box">
+    <label for="sort">Sort by:</label>
+    <select id="sort" class="sort-select">
+      <option value="featured">Featured</option>
+      <option value="newest">Newest</option>
+      <option value="price-low">Price: Low to High</option>
+      <option value="price-high">Price: High to Low</option>
+      <option value="name">Name: A-Z</option>
+    </select>
+  </div>
+
+  <!-- View Mode Toggle -->
+  <div class="view-toggle">
+    <button class="view-btn" aria-label="Grid view">⊞</button>
+    <button class="view-btn" aria-label="List view">☰</button>
+  </div>
+</div>

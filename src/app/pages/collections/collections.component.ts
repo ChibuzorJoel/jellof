@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 /* =======================
    Interfaces (Models)
@@ -88,9 +89,17 @@ export class CollectionsComponent implements OnInit {
   searchQuery = '';
   viewMode: 'grid' | 'list' = 'grid';
 
+  constructor(private route: ActivatedRoute) {}
+
   /* ---------- Lifecycle ---------- */
 
   ngOnInit(): void {
+    // Read search query from URL
+    this.route.queryParams.subscribe(params => {
+      this.searchQuery = params['search'] || '';
+      this.applyFilters();
+    });
+
     this.updateCategoryCounts();
     this.applyFilters();
   }
@@ -114,14 +123,17 @@ export class CollectionsComponent implements OnInit {
   applyFilters(): void {
     let filtered = [...this.allProducts];
 
+    // Category filter
     if (this.selectedCategory !== 'all') {
       filtered = filtered.filter(p => p.category === this.selectedCategory);
     }
 
+    // Price filter
     filtered = filtered.filter(
       p => p.price >= this.priceRange.min && p.price <= this.priceRange.max
     );
 
+    // Search filter (from input OR URL)
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -131,7 +143,9 @@ export class CollectionsComponent implements OnInit {
       );
     }
 
+    // Sorting
     this.sortProducts(filtered);
+
     this.displayedProducts = filtered;
   }
 
