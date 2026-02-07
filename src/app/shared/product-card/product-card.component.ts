@@ -1,75 +1,112 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CartService } from '../../services/cart.service';
+import { Product } from '../../models/product-model';
 
-
-export interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  image: string;
-  isNew?: boolean;
-}
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css']
 })
-
 export class ProductCardComponent {
+
+  /* ================= INPUTS & OUTPUTS ================= */
   @Input() product!: Product;
-  
-  // WhatsApp Business Number (update with your actual number)
-  // Format: country code + number (no + sign, no spaces)
-  // Example: 15551234567 for +1 (555) 123-4567
-  private whatsappNumber = '+2349062307424';
+  @Output() quickView = new EventEmitter<Product>();
 
-  constructor() { }
+  /* ================= UI STATE ================= */
+  selectedSize: string = '';
+  selectedColor: string = '';
+  showSizeSelector = false;
+  addedToCart = false;
 
-  /**
-   * Opens WhatsApp with pre-filled order message
-   */
+  /* ================= CONFIG ================= */
+  // WhatsApp Business Number (NO +, NO spaces)
+  private whatsappNumber = '2349062307424';
+
+  constructor(private cartService: CartService) {}
+
+  /* ================= CART LOGIC ================= */
+
+  addToCart(): void {
+    // Require size if sizes exist
+    if (this.product.sizes?.length && !this.selectedSize) {
+      this.showSizeSelector = true;
+      return;
+    }
+
+    this.cartService.addToCart(
+      this.product,
+      1,
+      this.selectedSize,
+      this.selectedColor
+    );
+
+    this.feedbackAfterAdd();
+  }
+
+  private feedbackAfterAdd(): void {
+    this.addedToCart = true;
+
+    setTimeout(() => {
+      this.addedToCart = false;
+      this.showSizeSelector = false;
+    }, 2000);
+  }
+
+  /* ================= SELECTION ================= */
+
+  selectSize(size: string): void {
+    this.selectedSize = size;
+  }
+
+  selectColor(color: string): void {
+    this.selectedColor = color;
+  }
+
+  /* ================= QUICK VIEW ================= */
+
+  openQuickView(): void {
+    this.quickView.emit(this.product);
+  }
+
+  /* ================= WHATSAPP ================= */
+
   orderViaWhatsApp(): void {
-    // Create the message
     const message = this.createWhatsAppMessage();
-    
-    // Encode the message for URL
     const encodedMessage = encodeURIComponent(message);
-    
-    // Create WhatsApp URL
+
     const whatsappUrl = `https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`;
-    
-    // Open in new tab
     window.open(whatsappUrl, '_blank');
   }
 
-  /**
-   * Creates formatted WhatsApp message
-   */
   private createWhatsAppMessage(): string {
     return `Hello JELLOF! 👋
 
-I'm interested in ordering:
+I'm interested in this product:
 
-Product: ${this.product.name}
-Price: $${this.product.price.toFixed(2)}
-Category: ${this.product.category}
+🛍 Product: ${this.product.name}
+💰 Price: $${this.product.price.toFixed(2)}
+📂 Category: ${this.product.category}
+${this.selectedSize ? `📏 Size: ${this.selectedSize}` : ''}
+${this.selectedColor ? `🎨 Color: ${this.selectedColor}` : ''}
 
-Please let me know about:
+Please let me know:
 - Availability
-- Size options
 - Delivery time
-- Payment methods
+- Payment options
 
 Thank you!`;
   }
 
-  /**
-   * Quick view functionality (optional)
-   */
-  quickView(): void {
-    // Implement quick view modal if needed
-    console.log('Quick view:', this.product);
+  /* ================= CART HELPERS ================= */
+
+  isInCart(): boolean {
+    const id = this.product._id ?? this.product.id;
+    return id ? this.cartService.isInCart(id) : false;
   }
   
-
+  getCartQuantity(): number {
+    const id = this.product._id ?? this.product.id;
+    return id ? this.cartService.getProductQuantity(id) : 0;
+  }
 }

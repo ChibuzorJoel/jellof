@@ -1,22 +1,98 @@
-<div class="overlay" [class.active]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
+<!-- Overlay for mobile menu -->
+<div 
+  class="overlay" 
+  [class.active]="isMenuOpen" 
+  (click)="closeMenu()">
+</div>
 
-<header class="header">
-  <div class="header-container">
-    <div class="logo" routerLink="/">JELLOF</div>
-    
-    <nav [class.active]="isMobileMenuOpen">
-      <a routerLink="/" routerLinkActive="active" (click)="closeMobileMenu()">Home</a>
-      <a routerLink="/collections" routerLinkActive="active" (click)="closeMobileMenu()">Collections</a>
-      <a routerLink="/lookbook" routerLinkActive="active" (click)="closeMobileMenu()">Lookbook</a>
-      <a routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()">About</a>
-      <a routerLink="/contact" routerLinkActive="active" (click)="closeMobileMenu()">Contact</a>
-      <a routerLink="/admin/login">Admin Dashboard</a>
+<header class="main-header">
+  <div class="container header-content">
+
+    <!-- LOGO -->
+    <div class="logo" routerLink="/">
+      <h1>JELLOF</h1>
+      <span class="tagline">Sustainable Fashion</span>
+    </div>
+
+    <!-- DESKTOP NAV -->
+    <nav class="desktop-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/collections" routerLinkActive="active">Collections</a>
+      <a routerLink="/lookbook" routerLinkActive="active">Lookbook</a>
+      <a routerLink="/about" routerLinkActive="active">About</a>
+      <a routerLink="/contact" routerLinkActive="active">Contact</a>
+      <a routerLink="/admin/login" class="admin-link">Admin</a>
     </nav>
 
-    <div class="hamburger" [class.active]="isMobileMenuOpen" (click)="toggleMobileMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
+    <!-- HEADER ACTIONS -->
+    <div class="header-actions">
+
+      <!-- CART -->
+      <div class="cart-wrapper">
+        <button 
+          class="cart-btn" 
+          (click)="toggleCartDropdown()"
+          [class.has-items]="cartItemCount > 0">
+
+          🛒
+          <span class="cart-count" *ngIf="cartItemCount > 0">
+            {{ cartItemCount }}
+          </span>
+        </button>
+
+        <!-- CART DROPDOWN -->
+        <div class="cart-dropdown" *ngIf="isCartDropdownOpen">
+
+          <!-- Empty Cart -->
+          <div *ngIf="cartItemCount === 0" class="empty-cart">
+            <p>Your cart is empty</p>
+            <button routerLink="/collections" (click)="closeCartDropdown()">
+              Continue Shopping
+            </button>
+          </div>
+
+          <!-- Cart Items -->
+          <div *ngIf="cartItemCount > 0">
+            <div 
+              class="cart-item"
+              *ngFor="let item of getCartItems(); let i = index">
+
+              <img [src]="item.product.image" />
+              
+              <div>
+                <h4>{{ item.product.name }}</h4>
+                <p>{{ item.quantity }} × ${{ item.product.price }}</p>
+              </div>
+
+              <button (click)="removeItem(i)">✕</button>
+            </div>
+
+            <div class="cart-footer">
+              <strong>Total: ${{ getCartTotal() }}</strong>
+              <button (click)="goToCart()">Checkout</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- MOBILE MENU BUTTON -->
+      <div class="hamburger" (click)="toggleMenu()" [class.active]="isMenuOpen">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
     </div>
   </div>
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-nav" [class.open]="isMenuOpen">
+    <a routerLink="/" (click)="closeMenu()">Home</a>
+    <a routerLink="/collections" (click)="closeMenu()">Collections</a>
+    <a routerLink="/lookbook" (click)="closeMenu()">Lookbook</a>
+    <a routerLink="/about" (click)="closeMenu()">About</a>
+    <a routerLink="/contact" (click)="closeMenu()">Contact</a>
+    <a routerLink="/admin/login" (click)="closeMenu()">Admin</a>
+  </nav>
 </header>

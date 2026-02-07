@@ -1,0 +1,145 @@
+<div class="modal-overlay" *ngIf="isOpen && product" (click)="onBackgroundClick($event)">
+    <div class="modal-content">
+      <!-- Close Button -->
+      <button class="modal-close" (click)="closeModal()">✕</button>
+  
+      <div class="quick-view-container">
+        <!-- Image Gallery Section -->
+        <div class="image-section">
+          <!-- Main Image -->
+          <div class="main-image-wrapper">
+            <img [src]="images[currentImageIndex]" [alt]="product.name" class="main-image">
+            
+            <!-- Image Navigation -->
+            <button class="image-nav prev" (click)="previousImage()" *ngIf="images.length > 1">
+              ❮
+            </button>
+            <button class="image-nav next" (click)="nextImage()" *ngIf="images.length > 1">
+              ❯
+            </button>
+  
+            <!-- Image Indicators -->
+            <div class="image-indicators" *ngIf="images.length > 1">
+              <span 
+                *ngFor="let img of images; let i = index"
+                class="indicator"
+                [class.active]="currentImageIndex === i"
+                (click)="selectImage(i)">
+              </span>
+            </div>
+          </div>
+  
+          <!-- Thumbnail Gallery -->
+          <div class="thumbnail-gallery" *ngIf="images.length > 1">
+            <img 
+              *ngFor="let img of images; let i = index"
+              [src]="img"
+              [alt]="product.name"
+              class="thumbnail"
+              [class.active]="currentImageIndex === i"
+              (click)="selectImage(i)">
+          </div>
+        </div>
+  
+        <!-- Product Details Section -->
+        <div class="details-section">
+          <!-- Product Info -->
+          <div class="product-header">
+            <span class="product-category">{{ product.category }}</span>
+            <h2 class="product-title">{{ product.name }}</h2>
+            <div class="product-price-section">
+              <span class="product-price">${{ product.price.toFixed(2) }}</span>
+              <span class="badge badge-new" *ngIf="product.isNew">NEW</span>
+              <span class="badge badge-cart" *ngIf="isInCart()">In Cart ({{ getCartQuantity() }})</span>
+            </div>
+          </div>
+  
+          <!-- Product Description -->
+          <div class="product-description" *ngIf="product.description">
+            <p>{{ product.description }}</p>
+          </div>
+  
+          <!-- Colors -->
+          <div class="option-group" *ngIf="product.colors && product.colors.length > 0">
+            <label class="option-label">Color: <strong>{{ selectedColor }}</strong></label>
+            <div class="color-options">
+              <button
+                *ngFor="let color of product.colors"
+                class="color-btn"
+                [class.selected]="selectedColor === color"
+                [style.background-color]="color.toLowerCase()"
+                [title]="color"
+                (click)="selectColor(color)">
+                <span class="checkmark" *ngIf="selectedColor === color">✓</span>
+              </button>
+            </div>
+          </div>
+  
+          <!-- Sizes -->
+          <div class="option-group" *ngIf="product.sizes && product.sizes.length > 0">
+            <label class="option-label">Size: <strong>{{ selectedSize }}</strong></label>
+            <div class="size-options">
+              <button
+                *ngFor="let size of product.sizes"
+                class="size-btn"
+                [class.selected]="selectedSize === size"
+                (click)="selectSize(size)">
+                {{ size }}
+              </button>
+            </div>
+          </div>
+  
+          <!-- Quantity -->
+          <div class="option-group">
+            <label class="option-label">Quantity:</label>
+            <div class="quantity-selector">
+              <button class="qty-btn" (click)="decreaseQuantity()">−</button>
+              <input type="number" [value]="quantity" readonly class="qty-input">
+              <button class="qty-btn" (click)="increaseQuantity()">+</button>
+            </div>
+          </div>
+  
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button 
+              class="btn-add-cart"
+              [class.added]="addedToCart"
+              [disabled]="!product.inStock"
+              (click)="addToCart()">
+              <span *ngIf="!addedToCart">🛒 Add to Cart</span>
+              <span *ngIf="addedToCart">✓ Added to Cart!</span>
+            </button>
+  
+            <button 
+              class="btn-whatsapp"
+              [disabled]="!product.inStock"
+              (click)="orderViaWhatsApp()">
+              📱 Order via WhatsApp
+            </button>
+          </div>
+  
+          <!-- Stock Status -->
+          <div class="stock-status">
+            <span *ngIf="product.inStock" class="in-stock">✓ In Stock</span>
+            <span *ngIf="!product.inStock" class="out-of-stock">✗ Out of Stock</span>
+          </div>
+  
+          <!-- Additional Info -->
+          <div class="additional-info">
+            <div class="info-item">
+              <span class="info-icon">🚚</span>
+              <span class="info-text">Free shipping on orders over $100</span>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">🔄</span>
+              <span class="info-text">30-day easy returns</span>
+            </div>
+            <div class="info-item">
+              <span class="info-icon">🌿</span>
+              <span class="info-text">Sustainably sourced materials</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

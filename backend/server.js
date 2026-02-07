@@ -2,8 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
+/* ======================
+   ENV DEBUG (IMPORTANT)
+====================== */
+console.log('ENV CHECK → MONGODB_URI:', process.env.MONGODB_URI);
+
+/* ======================
+   APP SETUP
+====================== */
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -18,19 +27,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// MongoDB Connection
-if (process.env.MONGODB_URI) {
-  mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => console.log('✓ MongoDB Connected'))
-  .catch(err => console.log('✗ MongoDB Error:', err.message));
+/* ======================
+   MONGODB CONNECTION
+====================== */
+if (!process.env.MONGODB_URI) {
+  console.error('❌ MONGODB_URI is missing in .env');
 } else {
-  console.log('⚠ MongoDB not configured - using in-memory storage');
+  mongoose
+    .connect(process.env.MONGODB_URI)
+    .then(() => console.log('✓ MongoDB Connected'))
+    .catch(err => {
+      console.error('✗ MongoDB Connection Error:', err.message);
+      process.exit(1);
+    });
 }
 
-// Import Routes
+/* ======================
+   ROUTES
+====================== */
 const contactRoutes = require('./routes/contact');
 const newsletterRoutes = require('./routes/newsletter');
 const productsRoutes = require('./routes/products');
@@ -38,7 +52,6 @@ const collectionsRoutes = require('./routes/collections');
 const lookbookRoutes = require('./routes/lookbook');
 const ordersRoutes = require('./routes/orders');
 
-// API Routes
 app.use('/api/contact', contactRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/products', productsRoutes);
@@ -46,36 +59,38 @@ app.use('/api/collections', collectionsRoutes);
 app.use('/api/lookbook', lookbookRoutes);
 app.use('/api/orders', ordersRoutes);
 
-// Health Check
+/* ======================
+   HEALTH CHECK
+====================== */
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     message: 'JELLOF API is running',
     timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
-    email: process.env.EMAIL_USER ? 'Configured' : 'Not configured'
+    mongodb:
+      mongoose.connection.readyState === 1
+        ? 'Connected'
+        : 'Disconnected',
+    env: process.env.NODE_ENV || 'development'
   });
 });
 
-// Root Endpoint
+/* ======================
+   ROOT
+====================== */
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to JELLOF API',
-    version: '1.0.0',
     endpoints: {
       health: '/api/health',
-      contact: '/api/contact',
-      newsletter: '/api/newsletter',
-      products: '/api/products',
-      collections: '/api/collections',
-      lookbook: '/api/lookbook',
-      orders: '/api/orders'
+      products: '/api/products'
     }
   });
 });
 
-// 404 Handler
+/* ======================
+   ERRORS
+====================== */
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -83,17 +98,17 @@ app.use((req, res) => {
   });
 });
 
-// Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
     success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: 'Internal server error'
   });
 });
 
-// Start Server
+/* ======================
+   START SERVER
+====================== */
 app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
@@ -102,9 +117,8 @@ app.listen(PORT, () => {
 ║  Port: ${PORT.toString().padEnd(33)}║
 ║  Environment: ${(process.env.NODE_ENV || 'development').padEnd(26)}║
 ║  MongoDB: ${(mongoose.connection.readyState === 1 ? 'Connected' : 'Not configured').padEnd(30)}║
-║  Email: ${(process.env.EMAIL_USER ? 'Configured' : 'Not configured').padEnd(32)}║
 ╚════════════════════════════════════════╝
-  `);
+`);
 });
 
 module.exports = app;

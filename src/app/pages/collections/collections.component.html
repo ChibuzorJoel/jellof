@@ -1,141 +1,175 @@
-<!-- Hero Section -->
+<!-- ================= HERO SECTION ================= -->
 <section class="collections-hero">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <h1 class="hero-title">Our Collections</h1>
-      <p class="hero-subtitle">Discover Timeless Fashion</p>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1 class="hero-title">Our Collections</h1>
+    <p class="hero-subtitle">Discover Timeless Fashion</p>
+  </div>
+</section>
+
+<!-- ================= COLLECTIONS ================= -->
+<section class="collections-section">
+  <div class="container">
+
+    <!-- ===== Category Filter Tabs ===== -->
+    <div class="category-filter">
+      <button
+        *ngFor="let category of categories"
+        class="category-btn"
+        [class.active]="selectedCategory === category.id"
+        (click)="filterByCategory(category.id)">
+        {{ category.name }} ({{ category.count }})
+      </button>
     </div>
-  </section>
-  
-  <!-- Collections Section -->
-  <section class="collections-section">
-    <div class="container">
-      <!-- Category Filter -->
-      <div class="category-filter">
-        <button 
-          *ngFor="let category of categories"
-          class="category-btn"
-          [class.active]="selectedCategory === category.id"
-          (click)="filterByCategory(category.id)">
-          {{ category.name }} ({{ category.count }})
+
+    <!-- ===== Toolbar ===== -->
+    <div class="collections-toolbar">
+
+      <!-- Search -->
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Search products..."
+          [(ngModel)]="searchQuery"
+          (keyup)="onSearch()"
+          class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Sort -->
+      <div class="sort-box">
+        <label for="sort">Sort by:</label>
+        <select
+          id="sort"
+          [(ngModel)]="sortBy"
+          (change)="onSortChange(sortBy)"
+          class="sort-select">
+          <option value="featured">Featured</option>
+          <option value="newest">Newest</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="name">Name: A–Z</option>
+        </select>
+      </div>
+
+      <!-- View Mode -->
+      <div class="view-toggle">
+        <button
+          class="view-btn"
+          [class.active]="viewMode === 'grid'"
+          (click)="toggleViewMode('grid')">
+          ⊞
+        </button>
+        <button
+          class="view-btn"
+          [class.active]="viewMode === 'list'"
+          (click)="toggleViewMode('list')">
+          ☰
         </button>
       </div>
-  
-      <!-- Toolbar -->
-      <div class="collections-toolbar">
-        <!-- Search -->
-        <div class="search-box">
-          <input 
-            type="text" 
-            placeholder="Search products..."
-            [(ngModel)]="searchQuery"
-            (keyup)="onSearch()"
-            class="search-input">
-          <span class="search-icon">🔍</span>
-        </div>
-  
-        <!-- Sort -->
-        <div class="sort-box">
-          <label for="sort">Sort by:</label>
-          <select 
-            id="sort" 
-            [(ngModel)]="sortBy" 
-            (change)="onSortChange(sortBy)"
-            class="sort-select">
-            <option value="featured">Featured</option>
-            <option value="newest">Newest</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="name">Name: A-Z</option>
-          </select>
-        </div>
-  
-        <!-- View Mode Toggle -->
-        <div class="view-toggle">
-          <button 
-            class="view-btn"
-            [class.active]="viewMode === 'grid'"
-            (click)="toggleViewMode('grid')"
-            aria-label="Grid view">
-            ⊞
-          </button>
-          <button 
-            class="view-btn"
-            [class.active]="viewMode === 'list'"
-            (click)="toggleViewMode('list')"
-            aria-label="List view">
-            ☰
-          </button>
-        </div>
-  
-        <!-- Results Count -->
-        <div class="results-count">
-          {{ displayedProducts.length }} Products
-        </div>
-      </div>
-  
-      <!-- Clear Filters -->
-      <div class="active-filters" *ngIf="selectedCategory !== 'all' || searchQuery">
-        <button class="clear-filters-btn" (click)="clearFilters()">
-          Clear All Filters ✕
-        </button>
-      </div>
-  
-      <!-- Products Grid -->
-      <div class="products-container" [class.grid-view]="viewMode === 'grid'" [class.list-view]="viewMode === 'list'">
-        <app-product-card 
-          *ngFor="let product of displayedProducts" 
-          [product]="product">
-        </app-product-card>
-      </div>
-  
-      <!-- No Results -->
-      <div class="no-results" *ngIf="displayedProducts.length === 0">
-        <div class="no-results-icon">🔍</div>
-        <h3>No products found</h3>
-        <p>Try adjusting your filters or search terms</p>
-        <button class="clear-filters-btn" (click)="clearFilters()">Clear Filters</button>
+
+      <!-- Results Count -->
+      <div class="results-count">
+        {{ displayedProducts.length }} Products
       </div>
     </div>
-  </section>
-  
-  <!-- Featured Categories -->
-  <section class="featured-categories" *ngIf="selectedCategory === 'all'">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Shop By Category</h2>
-        <p class="section-description">Explore our curated collections</p>
+
+    <!-- ===== Active Filters ===== -->
+    <div class="active-filters" *ngIf="selectedCategory !== 'all' || searchQuery">
+      <div class="filter-tags">
+        <span class="filter-tag" *ngIf="searchQuery">
+          🔍 "{{ searchQuery }}"
+        </span>
+        <span class="filter-tag" *ngIf="selectedCategory !== 'all'">
+          📁 {{ selectedCategory }}
+        </span>
       </div>
-  
-      <div class="categories-grid">
-        <div 
-          *ngFor="let category of categories.slice(1)" 
-          class="category-card"
-          (click)="filterByCategory(category.id)">
-          <div class="category-image" [style.background-image]="'url(' + category.image + ')'">
-            <div class="category-overlay">
-              <h3 class="category-name">{{ category.name }}</h3>
-              <p class="category-count">{{ category.count }} items</p>
-              <button class="category-btn-action">Shop Now</button>
-            </div>
+      <button class="clear-filters-btn" (click)="clearFilters()">
+        Clear Filters ✕
+      </button>
+    </div>
+
+    <!-- ===== Loading ===== -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="loading-spinner"></div>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- ===== Error ===== -->
+    <div class="error-state" *ngIf="errorMessage && !isLoading">
+      <h3>Something went wrong</h3>
+      <p>{{ errorMessage }}</p>
+      <button class="retry-btn" (click)="retryLoad()">Try Again</button>
+    </div>
+
+    <!-- ===== Products ===== -->
+    <div
+      *ngIf="!isLoading && !errorMessage"
+      class="products-container"
+      [class.grid-view]="viewMode === 'grid'"
+      [class.list-view]="viewMode === 'list'">
+
+      <app-product-card
+        *ngFor="let product of displayedProducts"
+        [product]="product"
+        (quickView)="openQuickView($event)"
+        [attr.id]="'product-' + (product._id || product.id)">
+      </app-product-card>
+
+    </div>
+
+    <!-- ===== No Results ===== -->
+    <div
+      class="no-results"
+      *ngIf="!isLoading && !errorMessage && displayedProducts.length === 0">
+
+      <h3>No products found</h3>
+      <button class="clear-filters-btn" (click)="clearFilters()">
+        Clear Filters
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= FEATURED CATEGORIES ================= -->
+<section
+  class="featured-categories"
+  *ngIf="selectedCategory === 'all' && !searchQuery && !isLoading">
+
+  <div class="container">
+    <div class="section-header">
+      <h2>Shop By Category</h2>
+      <p>Explore our curated collections</p>
+    </div>
+
+    <div class="categories-grid">
+      <div
+        *ngFor="let category of categories.slice(1)"
+        class="category-card"
+        (click)="filterByCategory(category.id)">
+
+        <div
+          class="category-image"
+          [style.background-image]="'url(' + category.image + ')'">
+
+          <div class="category-overlay">
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.count }} items</p>
+            <button>Shop Now</button>
           </div>
+
         </div>
       </div>
     </div>
-  </section>
-  
-  <!-- Newsletter CTA -->
-  <section class="newsletter-cta">
-    <div class="container">
-      <div class="newsletter-content">
-        <h2 class="newsletter-title">Stay Updated</h2>
-        <p class="newsletter-description">
-          Subscribe to get exclusive offers and updates on new arrivals.
-        </p>
-        <form class="newsletter-form">
-          <input type="email" placeholder="Enter your email" class="newsletter-input">
-          <button type="submit" class="newsletter-button">Subscribe</button>
-        </form>
-      </div>
-    </div>
-  </section>
+  </div>
+</section>
+
+<!-- ================= QUICK VIEW ================= -->
+<app-quick-view
+  [product]="quickViewProduct"
+  [isOpen]="showQuickView"
+  (close)="closeQuickView()">
+</app-quick-view>
+
+

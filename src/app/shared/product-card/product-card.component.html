@@ -1,29 +1,117 @@
 <div class="product-card">
-    <div class="product-image-wrapper">
-      <img [src]="product.image" [alt]="product.name" class="product-image">
-      
-      <!-- NEW Badge -->
-      <div class="product-badge" *ngIf="product.isNew">NEW</div>
-      
-      <!-- Hover Overlay -->
-      <div class="product-overlay">
-        <button class="quick-view-btn" (click)="quickView()">Quick View</button>
-        <button class="whatsapp-btn" (click)="orderViaWhatsApp()">
-          <span class="whatsapp-icon">💬</span>
-          Order via WhatsApp
+
+  <!-- ================= IMAGE AREA ================= -->
+  <div class="product-image-wrapper">
+
+    <img
+      [src]="product.image"
+      [alt]="product.name"
+      class="product-image"
+    />
+
+    <!-- ===== Badges ===== -->
+    <div class="product-badges">
+      <span class="badge badge-new" *ngIf="product.isNew">NEW</span>
+      <span class="badge badge-stock" *ngIf="!product.inStock">
+        Out of Stock
+      </span>
+      <span class="badge badge-cart" *ngIf="isInCart()">
+        In Cart ({{ getCartQuantity() }})
+      </span>
+    </div>
+
+    <!-- ===== Hover Overlay ===== -->
+    <div class="product-overlay">
+
+      <!-- Quick View -->
+      <button
+        class="quick-view-btn"
+        (click)="openQuickView()">
+        👁️ Quick View
+      </button>
+
+      <!-- WhatsApp (Desktop) -->
+      <button
+        class="whatsapp-btn"
+        [disabled]="!product.inStock"
+        (click)="orderViaWhatsApp()">
+        💬 Order via WhatsApp
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ================= PRODUCT INFO ================= -->
+  <div class="product-info">
+
+    <p class="product-category">{{ product.category }}</p>
+    <h3 class="product-name">{{ product.name }}</h3>
+    <p class="product-price">
+      ${{ product.price.toFixed(2) }}
+    </p>
+
+    <!-- ===== Colors ===== -->
+    <div
+      class="product-colors"
+      *ngIf="product.colors?.length">
+
+      <div class="color-options">
+        <button
+          *ngFor="let color of product.colors"
+          class="color-btn"
+          [class.selected]="selectedColor === color"
+          [style.backgroundColor]="color.toLowerCase()"
+          [title]="color"
+          (click)="selectColor(color)">
         </button>
       </div>
     </div>
-    
-    <div class="product-info">
-      <h3 class="product-name">{{ product.name }}</h3>
-      <p class="product-category">{{ product.category }}</p>
-      <p class="product-price">${{ product.price.toFixed(2) }}</p>
-      
-      <!-- Mobile WhatsApp Button -->
-      <button class="whatsapp-btn-mobile" (click)="orderViaWhatsApp()">
-        <span class="whatsapp-icon">💬</span>
-        Order on WhatsApp
+
+    <!-- ===== Sizes ===== -->
+    <div
+      class="size-selector"
+      *ngIf="showSizeSelector && product.sizes?.length">
+
+      <p class="size-label">Select Size:</p>
+      <div class="size-options">
+        <button
+          *ngFor="let size of product.sizes"
+          class="size-btn"
+          [class.selected]="selectedSize === size"
+          (click)="selectSize(size)">
+          {{ size }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= ACTIONS ================= -->
+    <div class="product-actions">
+
+      <!-- Add to Cart -->
+      <button
+        class="btn-add-cart"
+        [class.added]="addedToCart"
+        [disabled]="!product.inStock"
+        (click)="addToCart()">
+
+        <span *ngIf="!addedToCart && !isInCart()">🛒 Add to Cart</span>
+        <span *ngIf="!addedToCart && isInCart()">➕ Add More</span>
+        <span *ngIf="addedToCart">✓ Added!</span>
+      </button>
+
+      <!-- WhatsApp (Mobile) -->
+      <button
+        class="btn-whatsapp mobile-only"
+        [disabled]="!product.inStock"
+        (click)="orderViaWhatsApp()">
+        📱 WhatsApp
       </button>
     </div>
+
+    <!-- ===== Out of Stock Message ===== -->
+    <p class="out-of-stock-msg" *ngIf="!product.inStock">
+      This item is currently out of stock
+    </p>
+
   </div>
+</div>
