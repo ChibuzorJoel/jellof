@@ -83,7 +83,7 @@ export class AdminDashboardComponent implements OnInit {
     return new Promise((resolve) => {
       this.orderService.getAllOrders().subscribe({
         next: (response) => {
-          this.stats.totalOrders = response.count;
+          this.stats.totalOrders = response.orders.length;
           this.stats.recentOrders = response.orders.slice(0, 5);
           
           // Calculate time-based stats

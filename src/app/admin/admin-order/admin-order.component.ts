@@ -1,5 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { OrderService, Order } from '../../services/order.service';
+import { OrderService } from '../../services/order.service';
+import { Order } from 'src/app/models/order-model';
+
+interface StatusCounts {
+  [key: string]: number; // <-- Allow dynamic indexing
+  all: number;
+  pending: number;
+  confirmed: number;
+  processing: number;
+  shipped: number;
+  delivered: number;
+  cancelled: number;
+}
 
 @Component({
   selector: 'app-admin-order',
@@ -7,15 +19,16 @@ import { OrderService, Order } from '../../services/order.service';
   styleUrls: ['./admin-order.component.css']
 })
 export class AdminOrderComponent implements OnInit {
+
   orders: Order[] = [];
   filteredOrders: Order[] = [];
-  
-  // Filter states
+
+  // Filters
   filterStatus: string = 'all';
   searchQuery: string = '';
-  
+
   // Stats
-  statusCounts: any = {
+  statusCounts: StatusCounts = {
     all: 0,
     pending: 0,
     confirmed: 0,
@@ -24,25 +37,26 @@ export class AdminOrderComponent implements OnInit {
     delivered: 0,
     cancelled: 0
   };
-  
-  // Loading & messages
+
+  // UI states
   isLoading = false;
   successMessage = '';
   errorMessage = '';
-  
-  // Selected order for details
+
+  // Selected order
   selectedOrder: Order | null = null;
   showOrderDetails = false;
 
-  constructor(private orderService: OrderService) { }
+  constructor(private orderService: OrderService) {}
 
   ngOnInit(): void {
     this.loadOrders();
   }
 
+  /* ================= LOAD ORDERS ================= */
   loadOrders(): void {
     this.isLoading = true;
-    
+
     this.orderService.getAllOrders().subscribe({
       next: (response) => {
         this.orders = response.orders || [];
@@ -58,31 +72,34 @@ export class AdminOrderComponent implements OnInit {
     });
   }
 
+  /* ================= STATS ================= */
   calculateStatusCounts(): void {
     this.statusCounts.all = this.orders.length;
-    this.statusCounts.pending = this.orders.filter(o => o.status === 'pending').length;
-    this.statusCounts.confirmed = this.orders.filter(o => o.status === 'confirmed').length;
-    this.statusCounts.processing = this.orders.filter(o => o.status === 'processing').length;
-    this.statusCounts.shipped = this.orders.filter(o => o.status === 'shipped').length;
-    this.statusCounts.delivered = this.orders.filter(o => o.status === 'delivered').length;
-    this.statusCounts.cancelled = this.orders.filter(o => o.status === 'cancelled').length;
+    this.statusCounts.pending = this.orders.filter(o => o.orderStatus === 'pending').length;
+    this.statusCounts.confirmed = this.orders.filter(o => o.orderStatus === 'confirmed').length;
+    this.statusCounts.processing = this.orders.filter(o => o.orderStatus === 'processing').length;
+    this.statusCounts.shipped = this.orders.filter(o => o.orderStatus === 'shipped').length;
+    this.statusCounts.delivered = this.orders.filter(o => o.orderStatus === 'delivered').length;
+    this.statusCounts.cancelled = this.orders.filter(o => o.orderStatus === 'cancelled').length;
   }
 
+  /* ================= FILTERS ================= */
   applyFilters(): void {
     let filtered = [...this.orders];
 
     // Status filter
     if (this.filterStatus !== 'all') {
-      filtered = filtered.filter(o => o.status === this.filterStatus);
+      filtered = filtered.filter(o => o.orderStatus === this.filterStatus);
     }
 
     // Search filter
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(o =>
-        (o.customerName && o.customerName.toLowerCase().includes(query)) ||
-        (o.customerPhone && o.customerPhone.toLowerCase().includes(query)) ||
-        (o.productName && o.productName.toLowerCase().includes(query))
+        o.customer.firstName.toLowerCase().includes(query) ||
+        o.customer.lastName.toLowerCase().includes(query) ||
+        o.customer.phone.includes(query) ||
+        o.items.some(item => item.productName.toLowerCase().includes(query))
       );
     }
 
@@ -98,6 +115,7 @@ export class AdminOrderComponent implements OnInit {
     this.applyFilters();
   }
 
+  /* ================= DETAILS ================= */
   viewOrderDetails(order: Order): void {
     this.selectedOrder = order;
     this.showOrderDetails = true;
@@ -108,16 +126,14 @@ export class AdminOrderComponent implements OnInit {
     this.showOrderDetails = false;
   }
 
+  /* ================= ACTIONS ================= */
   updateStatus(order: Order, newStatus: string): void {
     if (!order._id) return;
 
     this.orderService.updateOrderStatus(order._id, newStatus).subscribe({
-      next: (response) => {
+      next: () => {
         this.showSuccess(`Order status updated to ${newStatus}`);
         this.loadOrders();
-        if (this.selectedOrder && this.selectedOrder._id === order._id) {
-          this.selectedOrder.status = newStatus as any;
-        }
       },
       error: (error) => {
         console.error('Error updating status:', error);
@@ -127,8 +143,8 @@ export class AdminOrderComponent implements OnInit {
   }
 
   deleteOrder(order: Order): void {
-    if (!confirm('Are you sure you want to delete this order?')) return;
     if (!order._id) return;
+    if (!confirm('Are you sure you want to delete this order?')) return;
 
     this.orderService.deleteOrder(order._id).subscribe({
       next: () => {
@@ -143,8 +159,9 @@ export class AdminOrderComponent implements OnInit {
     });
   }
 
+  /* ================= HELPERS ================= */
   getStatusColor(status: string): string {
-    const colors: any = {
+    const colors: Record<string, string> = {
       pending: '#FFA500',
       confirmed: '#4CAF50',
       processing: '#2196F3',
@@ -154,17 +171,18 @@ export class AdminOrderComponent implements OnInit {
     };
     return colors[status] || '#666';
   }
-
+  getStatusCount(status: string): number {
+    return this.statusCounts[status as keyof StatusCounts] || 0;
+  }
   showSuccess(message: string): void {
     this.successMessage = message;
     this.errorMessage = '';
-    setTimeout(() => this.successMessage = '', 3000);
+    setTimeout(() => (this.successMessage = ''), 3000);
   }
 
   showError(message: string): void {
     this.errorMessage = message;
     this.successMessage = '';
-    setTimeout(() => this.errorMessage = '', 5000);
+    setTimeout(() => (this.errorMessage = ''), 5000);
   }
-
 }

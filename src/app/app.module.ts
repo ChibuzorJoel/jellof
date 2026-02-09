@@ -19,6 +19,7 @@ import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard
 import { AdminOrderComponent } from './admin/admin-order/admin-order.component';
 import { ProductSearchComponent } from './pages/product-search/product-search.component';
 import { QuickViewComponent } from './pages/quick-view/quick-view.component';
+import { CheckoutComponent } from './pages/checkout/checkout.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { QuickViewComponent } from './pages/quick-view/quick-view.component';
     AdminDashboardComponent,
     AdminOrderComponent,
     ProductSearchComponent,
-    QuickViewComponent
+    QuickViewComponent,
+    CheckoutComponent
     // ❌ AdminLoginComponent REMOVED
   ],
   imports: [

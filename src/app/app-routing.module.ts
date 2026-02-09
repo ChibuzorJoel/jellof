@@ -7,6 +7,7 @@ import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { AdminProductComponent } from './admin/admin-product/admin-product.component';
 import { adminAuthGuard } from './guards/admin-auth.guard';
+import { CheckoutComponent } from './pages/checkout/checkout.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -15,6 +16,8 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'admin/products', component: AdminProductComponent},
+  { path: 'checkout', component: CheckoutComponent},
+
   {
     path: 'admin/login',
     loadComponent: () =>
