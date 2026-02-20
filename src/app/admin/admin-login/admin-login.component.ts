@@ -1,79 +1,67 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-admin-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './admin-login.component.html',
   styleUrls: ['./admin-login.component.css']
 })
 export class AdminLoginComponent implements OnInit {
-  loginForm!: FormGroup;
-  isLoading = false;
-  errorMessage = '';
-  returnUrl = '/admin/dashboard';
-  showPassword = false;
+  // Simple form properties
+  email: string = '';
+  password: string = '';
+  showPassword: boolean = false;
+  errorMessage: string = '';
+  isLoading: boolean = false;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
-    private authService: AuthService
-  ) {
-    // Redirect to dashboard if already logged in
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/admin/dashboard']);
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    // Redirect if already logged in as admin
+    if (this.authService.isLoggedIn) {
+      const user = this.authService.currentUserValue;
+      if (user?.role === 'admin') {
+        this.router.navigate(['/admin/dashboard']);
+      }
     }
   }
 
-  ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-
-    this.returnUrl =
-      this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
-  }
-
-  get f() {
-    return this.loginForm.controls;
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit(): void {
-    if (this.loginForm.invalid) {
-      this.errorMessage = 'Please fill in all fields correctly';
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Please enter email and password';
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    const { email, password } = this.loginForm.value;
-
-    this.authService.login(email, password).subscribe({
+    this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
+        this.isLoading = false;
         if (response.success) {
-          this.router.navigate([this.returnUrl]);
+          // Check if user is admin
+          if (response.user?.role === 'admin') {
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            this.errorMessage = 'Access denied. Admin account required.';
+            this.authService.logout();
+          }
         } else {
           this.errorMessage = response.message || 'Login failed';
-          this.isLoading = false;
         }
       },
       error: (error) => {
-        console.error('Login error:', error);
-        this.errorMessage =
-          error.error?.message || 'Invalid email or password';
         this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Login failed. Please try again.';
       }
     });
-  }
-
-  togglePassword(): void {
-    this.showPassword = !this.showPassword;
   }
 }

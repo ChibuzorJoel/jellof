@@ -1,31 +1,54 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../environments/environment'; 
+import { Router } from '@angular/router';
+
+/* =======================
+   MODELS / INTERFACES
+======================= */
+
+export interface Address {
+  _id?: string;
+  label: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  isDefault: boolean;
+}
 
 export interface User {
-  _id: string;
-  name: string;
+  _id?: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  role: string;
+  phone?: string;
+  role?: 'user' | 'admin';   // ✅ IMPORTANT
+  addresses?: Address[];
+  createdAt?: Date;
 }
 
 export interface AuthResponse {
   success: boolean;
-  message?: string;
-  token?: string;
+  message: string;
   user?: User;
+  token?: string;
 }
+
+/* =======================
+   SERVICE
+======================= */
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl + '/auth';
+
+  private apiUrl = 'http://localhost:3000/api';
   private currentUserSubject: BehaviorSubject<User | null>;
-  public currentUser: Observable<User | null>;
+  public currentUser$: Observable<User | null>;
 
   constructor(
     private http: HttpClient,
@@ -35,122 +58,156 @@ export class AuthService {
     this.currentUserSubject = new BehaviorSubject<User | null>(
       storedUser ? JSON.parse(storedUser) : null
     );
-    this.currentUser = this.currentUserSubject.asObservable();
+    this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
-  public get currentUserValue(): User | null {
+  /* =======================
+     GETTERS
+  ======================= */
+
+  get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
 
-  /**
-   * Login user
-   */
-  login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
+  get isLoggedIn(): boolean {
+    return !!this.currentUserValue;
+  }
+
+  get isAdmin(): boolean {
+    return this.currentUserValue?.role === 'admin';
+  }
+
+  /* =======================
+     AUTH
+  ======================= */
+
+  register(userData: any): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/auth/register`, userData)
       .pipe(map(response => {
-        if (response.success && response.token && response.user) {
-          // Store token and user info
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
+        if (response.success && response.user && response.token) {
+          this.setSession(response);
         }
         return response;
       }));
   }
 
-  /**
-   * Register new user
-   */
-  register(name: string, email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, {
-      name,
-      email,
-      password
-    });
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password })
+      .pipe(map(response => {
+        if (response.success && response.user && response.token) {
+          this.setSession(response);
+        }
+        return response;
+      }));
   }
 
-  /**
-   * Logout user
-   */
   logout(): void {
-    // Remove user from local storage
-    localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
     this.currentUserSubject.next(null);
-    
-    // Navigate to login
-    this.router.navigate(['/admin/login']);
+    this.router.navigate(['/login']);
   }
 
-  /**
-   * Check if user is logged in
-   */
-  isLoggedIn(): boolean {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return false;
-    }
+  /* =======================
+     PROFILE
+  ======================= */
 
-    // Check if token is expired
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const expiry = payload.exp * 1000; // Convert to milliseconds
-      
-      if (Date.now() >= expiry) {
-        this.logout();
-        return false;
-      }
-      
-      return true;
-    } catch (error) {
-      this.logout();
-      return false;
-    }
+  getProfile(): Observable<AuthResponse> {
+    return this.http.get<AuthResponse>(`${this.apiUrl}/auth/profile`);
   }
 
-  /**
-   * Get auth token
-   */
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  updateProfile(userData: any): Observable<AuthResponse> {
+    return this.http
+      .put<AuthResponse>(`${this.apiUrl}/auth/profile`, userData)
+      .pipe(map(response => {
+        if (response.success && response.user) {
+          this.updateUser(response.user);
+        }
+        return response;
+      }));
   }
 
-  /**
-   * Check if user is admin
-   */
-  isAdmin(): boolean {
-    const user = this.currentUserValue;
-    return user?.role === 'admin';
+  /* =======================
+     ADDRESSES
+  ======================= */
+
+  addAddress(address: Address): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/auth/addresses`, address)
+      .pipe(map(response => {
+        if (response.success && response.user) {
+          this.updateUser(response.user);
+        }
+        return response;
+      }));
   }
 
-  /**
-   * Verify token with backend
-   */
-  verifyToken(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/verify`);
+  updateAddress(addressId: string, address: Address): Observable<AuthResponse> {
+    return this.http
+      .put<AuthResponse>(`${this.apiUrl}/auth/addresses/${addressId}`, address)
+      .pipe(map(response => {
+        if (response.success && response.user) {
+          this.updateUser(response.user);
+        }
+        return response;
+      }));
   }
 
-  /**
-   * Change password
-   */
-  changePassword(currentPassword: string, newPassword: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/change-password`, {
-      currentPassword,
+  deleteAddress(addressId: string): Observable<AuthResponse> {
+    return this.http
+      .delete<AuthResponse>(`${this.apiUrl}/auth/addresses/${addressId}`)
+      .pipe(map(response => {
+        if (response.success && response.user) {
+          this.updateUser(response.user);
+        }
+        return response;
+      }));
+  }
+
+  /* =======================
+     PASSWORD
+  ======================= */
+
+  changePassword(oldPassword: string, newPassword: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/change-password`, {
+      oldPassword,
       newPassword
     });
   }
 
-  /**
-   * Get user profile
-   */
-  getProfile(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/profile`);
+  requestPasswordReset(email: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/forgot-password`, { email });
   }
 
-  /**
-   * Update user profile
-   */
-  updateProfile(data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/profile`, data);
+  resetPassword(token: string, newPassword: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/reset-password`, {
+      token,
+      newPassword
+    });
+  }
+
+  /* =======================
+     TOKEN
+  ======================= */
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  /* =======================
+     HELPERS
+  ======================= */
+
+  private setSession(response: AuthResponse): void {
+    localStorage.setItem('currentUser', JSON.stringify(response.user));
+    localStorage.setItem('token', response.token!);
+    this.currentUserSubject.next(response.user!);
+  }
+
+  private updateUser(user: User): void {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSubject.next(user);
   }
 }

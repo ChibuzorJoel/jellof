@@ -1,252 +1,415 @@
+/* ===================================
+   MODERN ADMIN LOGIN PAGE
+=================================== */
+
+.admin-login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated background circles */
+.admin-login-page::before,
+.admin-login-page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 20s infinite ease-in-out;
+}
+
+.admin-login-page::before {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: -200px;
+}
+
+.admin-login-page::after {
+  width: 400px;
+  height: 400px;
+  bottom: -100px;
+  right: -100px;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+/* Login Container */
 .login-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #2d5016 0%, #4a7c2a 100%);
-    padding: 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 480px;
+  padding: 3rem;
+  position: relative;
+  z-index: 1;
+  animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-  
-  .login-box {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 450px;
-    padding: 3rem;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .login-header {
-    text-align: center;
+}
+
+/* Admin Logo */
+.admin-logo {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.admin-logo h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: 1px;
+}
+
+.admin-logo p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Alert */
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.alert-error {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.alert svg {
+  flex-shrink: 0;
+}
+
+/* Form */
+.login-form {
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.form-group input::placeholder {
+  color: #999;
+}
+
+/* Password Input */
+.password-input {
+  position: relative;
+}
+
+.password-input input {
+  padding-right: 3.5rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.toggle-password:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 1.1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.submit-btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+  background: linear-gradient(135deg, #ccc 0%, #999 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Back to Site */
+.back-to-site {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 1.5rem;
+}
+
+.back-to-site a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.back-to-site a:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: translateX(-4px);
+}
+
+.back-to-site svg {
+  transition: transform 0.3s ease;
+}
+
+.back-to-site a:hover svg {
+  transform: translateX(-4px);
+}
+
+/* Loading State */
+.submit-btn span {
+  display: inline-block;
+}
+
+.submit-btn:disabled span {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .admin-login-page {
+    padding: 1rem;
+  }
+
+  .login-container {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .admin-logo h1 {
+    font-size: 2rem;
+  }
+
+  .form-group input {
+    padding: 0.875rem 1rem;
+  }
+
+  .submit-btn {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1.5rem;
+  }
+
+  .admin-logo {
     margin-bottom: 2rem;
   }
-  
-  .login-header h1 {
-    font-size: 2.5rem;
-    color: #2d5016;
-    margin: 0 0 0.5rem 0;
+
+  .admin-logo h1 {
+    font-size: 1.75rem;
   }
-  
-  .login-header p {
-    color: #666;
-    font-size: 1.1rem;
-    margin: 0;
-  }
-  
-  /* Alert */
-  .alert {
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
-  
-  .alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-  }
-  
-  /* Form */
-  .login-form {
-    margin-bottom: 2rem;
-  }
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-group label {
-    display: block;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-  }
-  
-  .form-input {
-    width: 100%;
-    padding: 0.9rem 1rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-  }
-  
-  .form-input:focus {
-    outline: none;
-    border-color: #2d5016;
-    box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
-  }
-  
-  .form-input.is-invalid {
-    border-color: #dc3545;
-  }
-  
-  .form-input.is-invalid:focus {
-    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
-  }
-  
-  /* Password Input */
-  .password-input {
-    position: relative;
-  }
-  
-  .password-input input {
-    padding-right: 3rem;
-  }
-  
-  .toggle-password {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-  }
-  
-  .toggle-password:hover {
-    opacity: 0.7;
-  }
-  
-  /* Error Text */
-  .error-text {
-    color: #dc3545;
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-  }
-  
-  /* Form Options */
-  .form-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-  
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #666;
-  }
-  
-  .checkbox-label input {
-    margin-right: 0.5rem;
-    cursor: pointer;
-  }
-  
-  .forgot-link {
-    color: #2d5016;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-  
-  .forgot-link:hover {
-    text-decoration: underline;
-  }
-  
-  /* Submit Button */
-  .btn-submit {
-    width: 100%;
-    padding: 1rem;
-    background: #2d5016;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .btn-submit:hover:not(:disabled) {
-    background: #1f3710;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
-  }
-  
-  .btn-submit:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-  }
-  
-  /* Footer */
-  .login-footer {
-    text-align: center;
-    padding-top: 2rem;
-    border-top: 1px solid #e0e0e0;
-  }
-  
-  .login-footer p {
-    margin: 0.5rem 0;
-    color: #666;
+
+  .admin-logo p {
     font-size: 0.9rem;
   }
-  
-  .login-footer a {
-    color: #2d5016;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  
-  .login-footer a:hover {
-    text-decoration: underline;
-  }
-  
-  .default-creds {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background: #f9f9f9;
-    border-radius: 4px;
-  }
-  
-  .default-creds small {
-    font-family: monospace;
-    color: #999;
-  }
-  
-  /* Responsive */
-  @media (max-width: 480px) {
-    .login-container {
-      padding: 1rem;
-    }
-  
-    .login-box {
-      padding: 2rem 1.5rem;
-    }
-  
-    .login-header h1 {
-      font-size: 2rem;
-    }
-  
-    .form-options {
-      flex-direction: column;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-  }
-  
-  /* Animations */
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .login-box {
-    animation: slideIn 0.5s ease-out;
-  }
+}
+
+/* Additional Features */
+
+/* Remember Me Checkbox */
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.remember-me input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.remember-me label {
+  cursor: pointer;
+  color: #666;
+  font-size: 0.95rem;
+  user-select: none;
+}
+
+/* Forgot Password Link */
+.forgot-password {
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.forgot-password a {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.forgot-password a:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* Security Badge */
+.security-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.security-badge svg {
+  color: #667eea;
+}
+
+/* Form Focus Glow Effect */
+.form-group input:focus {
+  box-shadow: 
+    0 0 0 4px rgba(102, 126, 234, 0.1),
+    0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+/* Success State (for later use) */
+.alert-success {
+  background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(81, 207, 102, 0.3);
+}

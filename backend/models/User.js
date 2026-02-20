@@ -1,74 +1,107 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema({
-  name: {
+const addressSchema = new mongoose.Schema({
+  label: {
     type: String,
-    required: [true, 'Name is required'],
+    required: true,
     trim: true
   },
-  email: {
+  address: {
     type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email']
+    required: true,
+    trim: true
   },
-  password: {
+  city: {
     type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters']
+    required: true,
+    trim: true
   },
-  role: {
+  state: {
     type: String,
-    enum: ['admin', 'user'],
-    default: 'admin'
+    trim: true
   },
-  isActive: {
+  zipCode: {
+    type: String,
+    trim: true
+  },
+  country: {
+    type: String,
+    default: 'Nigeria',
+    trim: true
+  },
+  isDefault: {
     type: Boolean,
-    default: true
-  },
-  lastLogin: {
-    type: Date
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+    default: false
   }
 });
 
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  // Only hash if password is modified
-  if (!this.isModified('password')) {
-    return next();
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: [true, 'First name is required'],
+      trim: true
+    },
+    lastName: {
+      type: String,
+      required: [true, 'Last name is required'],
+      trim: true
+    },
+    email: {
+      type: String,
+      required: [true, 'Email is required'],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
+    },
+    phone: {
+      type: String,
+      trim: true
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required'],
+      minlength: [6, 'Password must be at least 6 characters'],
+      select: false
+    },
+    addresses: [addressSchema],
+    role: {
+      type: String,
+      enum: ['customer', 'admin'],
+      default: 'customer'
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    }
+  },
+  {
+    timestamps: true
   }
+);
 
-  try {
-    // Generate salt and hash password
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+// ✅ FIXED: async pre-save hook (NO next)
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Method to compare passwords
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  try {
-    return await bcrypt.compare(candidatePassword, this.password);
-  } catch (error) {
-    throw error;
-  }
+// Compare passwords
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove password from JSON output
-userSchema.methods.toJSON = function() {
+// Remove password from JSON responses
+userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
   return user;
 };
 
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports =
+  mongoose.models.User ||
+  mongoose.model('User', userSchema);

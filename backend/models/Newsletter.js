@@ -23,8 +23,9 @@ const newsletterSchema = new mongoose.Schema({
   }
 });
 
-// Index for faster queries
-newsletterSchema.index({ email: 1 });
+// Index for faster queries (keep ONLY non-duplicate ones)
 newsletterSchema.index({ status: 1 });
 
-module.exports = mongoose.models.Newsletter || mongoose.model('Newsletter', newsletterSchema);
+module.exports =
+  mongoose.models.Newsletter ||
+  mongoose.model('Newsletter', newsletterSchema);

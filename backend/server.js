@@ -1,124 +1,105 @@
 const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const cors = require('cors');
+const dotenv = require('dotenv');
 
-/* ======================
-   ENV DEBUG (IMPORTANT)
-====================== */
-console.log('ENV CHECK → MONGODB_URI:', process.env.MONGODB_URI);
+// Load environment variables
+dotenv.config();
 
-/* ======================
-   APP SETUP
-====================== */
+// Initialize express
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Request logging
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+  credentials: true
+}));
 
-/* ======================
-   MONGODB CONNECTION
-====================== */
-if (!process.env.MONGODB_URI) {
-  console.error('❌ MONGODB_URI is missing in .env');
-} else {
-  mongoose
-    .connect(process.env.MONGODB_URI)
-    .then(() => console.log('✓ MongoDB Connected'))
-    .catch(err => {
-      console.error('✗ MongoDB Connection Error:', err.message);
-      process.exit(1);
-    });
-}
+// MongoDB connection
+const connectDB = async () => {
+  try {
+    await mongoose.connect(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/jellof-clothing'
+    );
+    
+    
+    console.log('✅ MongoDB Connected');
+  } catch (error) {
+    console.error('❌ MongoDB Connection Error:', error);
+    process.exit(1);
+  }
+};
 
-/* ======================
-   ROUTES
-====================== */
-const contactRoutes = require('./routes/contact');
+connectDB();
+
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/products');
+const orderRoutes = require('./routes/orders');
 const newsletterRoutes = require('./routes/newsletter');
-const productsRoutes = require('./routes/products');
-const collectionsRoutes = require('./routes/collections');
-const lookbookRoutes = require('./routes/lookbook');
-const ordersRoutes = require('./routes/orders');
+const contactRoutes = require('./routes/contact');
 
-app.use('/api/contact', contactRoutes);
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes); // ✅ FIXED
+app.use('/api/orders', orderRoutes);
 app.use('/api/newsletter', newsletterRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/collections', collectionsRoutes);
-app.use('/api/lookbook', lookbookRoutes);
-app.use('/api/orders', ordersRoutes);
+app.use('/api/contact', contactRoutes);
 
-/* ======================
-   HEALTH CHECK
-====================== */
+// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
-    status: 'OK',
-    message: 'JELLOF API is running',
-    timestamp: new Date().toISOString(),
-    mongodb:
-      mongoose.connection.readyState === 1
-        ? 'Connected'
-        : 'Disconnected',
-    env: process.env.NODE_ENV || 'development'
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date()
   });
 });
 
-/* ======================
-   ROOT
-====================== */
+// Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to JELLOF API',
+    success: true,
+    message: 'JELLOF Clothing API',
+    version: '1.0.0',
     endpoints: {
-      health: '/api/health',
-      products: '/api/products'
+      auth: '/api/auth',
+      products: '/api/products',
+      orders: '/api/orders',
+      newsletter: '/api/newsletter',
+      contact: '/api/contact'
     }
   });
 });
 
-/* ======================
-   ERRORS
-====================== */
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal Server Error',
+    error: process.env.NODE_ENV === 'development' ? err : {}
+  });
+});
+
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: 'API endpoint not found',
+    path: req.path
   });
 });
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error'
-  });
-});
-
-/* ======================
-   START SERVER
-====================== */
+// Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`
-╔════════════════════════════════════════╗
-║   🌿 JELLOF API Server Running 🌿     ║
-╠════════════════════════════════════════╣
-║  Port: ${PORT.toString().padEnd(33)}║
-║  Environment: ${(process.env.NODE_ENV || 'development').padEnd(26)}║
-║  MongoDB: ${(mongoose.connection.readyState === 1 ? 'Connected' : 'Not configured').padEnd(30)}║
-╚════════════════════════════════════════╝
-`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📡 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:4200'}`);
+  console.log(`🔗 API URL: http://localhost:${PORT}`);
 });
 
 module.exports = app;

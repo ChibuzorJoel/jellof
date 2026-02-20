@@ -1,23 +1,32 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-export const adminAuthGuard: CanActivateFn = (route, state) => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
+@Injectable({
+  providedIn: 'root'
+})
+export class AdminAuthGuard implements CanActivate {
+  
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-  // Not logged in → redirect to admin login
-  if (!authService.isLoggedIn()) {
-    router.navigate(['/admin/login'], { queryParams: { returnUrl: state.url } });
-    return false;
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    const currentUser = this.authService.currentUserValue;
+    
+    // Check if user is logged in
+    if (!this.authService.isLoggedIn) { // ✅ Fixed: Remove ()
+      this.router.navigate(['/admin/login']);
+      return false;
+    }
+
+    // Check if user is admin
+    if (currentUser?.role !== 'admin') { // ✅ Fixed: Check role directly
+      this.router.navigate(['/admin/login']);
+      return false;
+    }
+
+    return true;
   }
-
-  // Logged in but not admin → redirect home
-  if (state.url.startsWith('/admin') && !authService.isAdmin()) {
-    router.navigate(['/']);
-    return false;
-  }
-
-  // Logged in & admin → allow
-  return true;
-};
+}

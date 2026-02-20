@@ -1,6 +1,6 @@
-import {Component,Input,Output,EventEmitter, OnChanges} from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
-import { Product } from '../../models/product-model';
 
 @Component({
   selector: 'app-quick-view',
@@ -8,76 +8,60 @@ import { Product } from '../../models/product-model';
   styleUrls: ['./quick-view.component.css']
 })
 export class QuickViewComponent implements OnChanges {
-
-  /* ================= INPUTS / OUTPUTS ================= */
-  @Input() product: Product | null = null;
-  @Input() isOpen = false;
+  @Input() product: any = null;
+  @Input() isOpen: boolean = false;
   @Output() close = new EventEmitter<void>();
 
-  /* ================= IMAGE GALLERY ================= */
-  currentImageIndex = 0;
   images: string[] = [];
+  currentImageIndex: number = 0;
+  selectedSize: string = '';
+  selectedColor: string = '';
+  quantity: number = 1;
+  showSuccessMessage: boolean = false;
 
-  /* ================= SELECTION ================= */
-  selectedSize = '';
-  selectedColor = '';
-  quantity = 1;
+  constructor(
+    private cartService: CartService,
+    private router: Router
+  ) {}
 
-  /* ================= STATE ================= */
-  addedToCart = false;
-
-  constructor(private cartService: CartService) {}
-
-  /* ================= LIFECYCLE ================= */
-
-  ngOnChanges(): void {
-    if (this.product) {
-      this.initializeGallery();
-      this.resetSelections();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['product'] && this.product) {
+      this.initializeProduct();
     }
   }
 
-  /* ================= GALLERY ================= */
-
-  private initializeGallery(): void {
-    this.images = [];
-
-    if (this.product?.image) {
-      this.images.push(this.product.image);
-    }
-
-    if (this.product?.images?.length) {
-      this.images.push(...this.product.images);
-    }
-
+  initializeProduct(): void {
+    // Initialize images
+    this.images = this.product.images || [this.product.image];
     this.currentImageIndex = 0;
+
+    // Auto-select first available size
+    if (this.product.sizes && this.product.sizes.length > 0) {
+      this.selectedSize = this.product.sizes[0];
+    }
+
+    // Auto-select first available color
+    if (this.product.colors && this.product.colors.length > 0) {
+      this.selectedColor = this.product.colors[0];
+    }
+
+    this.quantity = 1;
   }
 
   previousImage(): void {
-    this.currentImageIndex =
-      this.currentImageIndex === 0
-        ? this.images.length - 1
-        : this.currentImageIndex - 1;
+    if (this.currentImageIndex > 0) {
+      this.currentImageIndex--;
+    }
   }
 
   nextImage(): void {
-    this.currentImageIndex =
-      this.currentImageIndex === this.images.length - 1
-        ? 0
-        : this.currentImageIndex + 1;
+    if (this.currentImageIndex < this.images.length - 1) {
+      this.currentImageIndex++;
+    }
   }
 
   selectImage(index: number): void {
     this.currentImageIndex = index;
-  }
-
-  /* ================= SELECTION ================= */
-
-  private resetSelections(): void {
-    this.selectedSize = this.product?.sizes?.[0] ?? '';
-    this.selectedColor = this.product?.colors?.[0] ?? '';
-    this.quantity = 1;
-    this.addedToCart = false;
   }
 
   selectSize(size: string): void {
@@ -88,10 +72,10 @@ export class QuickViewComponent implements OnChanges {
     this.selectedColor = color;
   }
 
-  /* ================= QUANTITY ================= */
-
   increaseQuantity(): void {
-    this.quantity++;
+    if (this.quantity < 99) {
+      this.quantity++;
+    }
   }
 
   decreaseQuantity(): void {
@@ -99,8 +83,6 @@ export class QuickViewComponent implements OnChanges {
       this.quantity--;
     }
   }
-
-  /* ================= CART ================= */
 
   addToCart(): void {
     if (!this.product) return;
@@ -112,60 +94,37 @@ export class QuickViewComponent implements OnChanges {
       this.selectedColor
     );
 
-    this.addedToCart = true;
-    setTimeout(() => (this.addedToCart = false), 2000);
+    this.showSuccessMessage = true;
+    setTimeout(() => {
+      this.showSuccessMessage = false;
+    }, 2000);
   }
 
-  isInCart(): boolean {
-    const id = this.product?._id ?? this.product?.id;
-    return id ? this.cartService.isInCart(id) : false;
+  addToWishlist(): void {
+    // Implement wishlist functionality
+    console.log('Added to wishlist:', this.product);
+    alert('Added to wishlist!');
   }
-
-  getCartQuantity(): number {
-    const id = this.product?._id ?? this.product?.id;
-    return id ? this.cartService.getProductQuantity(id) : 0;
-  }
-
-  /* ================= WHATSAPP ================= */
-
-  orderViaWhatsApp(): void {
-    if (!this.product) return;
-
-    const message = this.createWhatsAppMessage();
-    const whatsappNumber = '2349062307424'; // NO +
-
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      message
-    )}`;
-
-    window.open(whatsappUrl, '_blank');
-  }
-
-  private createWhatsAppMessage(): string {
-    return `Hello JELLOF! 👋
-
-I'm interested in this product:
-
-🛍 Product: ${this.product?.name}
-💰 Price: $${this.product?.price.toFixed(2)}
-📦 Quantity: ${this.quantity}
-${this.selectedSize ? `📏 Size: ${this.selectedSize}` : ''}
-${this.selectedColor ? `🎨 Color: ${this.selectedColor}` : ''}
-
-Please let me know about availability and delivery.
-
-Thank you!`;
-  }
-
-  /* ================= MODAL ================= */
 
   closeModal(): void {
     this.close.emit();
   }
 
-  onBackgroundClick(event: MouseEvent): void {
-    if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
-      this.closeModal();
-    }
+  buyNow(): void {
+    if (!this.product) return;
+
+    // Add to cart
+    this.cartService.addToCart(
+      this.product,
+      this.quantity,
+      this.selectedSize,
+      this.selectedColor
+    );
+
+    // Close modal
+    this.closeModal();
+
+    // Navigate to checkout
+    this.router.navigate(['/checkout']);
   }
 }

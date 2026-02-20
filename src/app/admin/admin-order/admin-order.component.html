@@ -60,11 +60,11 @@
       <tbody>
         <tr *ngFor="let order of filteredOrders">
           <td><strong>#{{ order._id?.slice(-6)?.toUpperCase() }}</strong></td>
-          <td>{{ order.customer?.firstName }} {{ order.customer?.lastName }}</td>
-          <td>{{ order.customer?.phone }}</td>
-          <td>{{ order.items[0]?.productName }}</td>
-          <td>{{ order.items[0]?.quantity }}</td>
-          <td class="price">${{ order.totalAmount?.toFixed(2) }}</td>
+          <td>{{ order.customer.firstName }} {{ order.customer.lastName }}</td>
+          <td>{{ order.customer.phone }}</td>
+          <td>{{ order.items[0].productName }}</td>
+          <td>{{ order.items[0].quantity }}</td>
+          <td class="price">${{ order.totalAmount.toFixed(2) }}</td>
           <td>
             <span class="status-badge" [style.backgroundColor]="getStatusColor(order.orderStatus)">
               {{ order.orderStatus | titlecase }}
@@ -120,15 +120,15 @@
         <div class="info-grid">
           <div class="info-item">
             <label>Name:</label>
-            <span>{{ selectedOrder.customer?.firstName }} {{ selectedOrder.customer?.lastName }}</span>
+            <span>{{ selectedOrder.customer.firstName }} {{ selectedOrder.customer.lastName }}</span>
           </div>
           <div class="info-item">
             <label>Phone:</label>
-            <span>{{ selectedOrder.customer?.phone }}</span>
+            <span>{{ selectedOrder.customer.phone }}</span>
           </div>
           <div class="info-item">
             <label>Email:</label>
-            <span>{{ selectedOrder.customer?.email }}</span>
+            <span>{{ selectedOrder.customer.email }}</span>
           </div>
         </div>
       </div>
@@ -150,23 +150,23 @@
           <tbody>
             <tr *ngFor="let item of selectedOrder.items">
               <td>{{ item.productName }}</td>
-              <td>${{ item.price?.toFixed(2) }}</td>
+              <td>${{ item.price.toFixed(2) }}</td>
               <td>{{ item.quantity }}</td>
               <td>{{ item.size || 'N/A' }}</td>
               <td>{{ item.color || 'N/A' }}</td>
-              <td>${{ (item.price * item.quantity)?.toFixed(2) }}</td>
+              <td>${{ (item.price * item.quantity).toFixed(2) }}</td>
             </tr>
           </tbody>
         </table>
         <div class="order-total">
-          <strong>Total:</strong> ${{ selectedOrder.totalAmount?.toFixed(2) }}
+          <strong>Total:</strong> ${{ selectedOrder.totalAmount.toFixed(2) }}
         </div>
       </div>
 
       <!-- Notes -->
       <div class="info-section" *ngIf="selectedOrder?.notes">
         <h3>Notes</h3>
-        <p>{{ selectedOrder?.notes }}</p>
+        <p>{{ selectedOrder.notes }}</p>
       </div>
 
       <!-- Update Status -->

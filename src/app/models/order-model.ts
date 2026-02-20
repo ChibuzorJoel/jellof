@@ -21,6 +21,7 @@ export interface Customer {
 
 export interface Order {
   _id?: string;
+  userId?: string; 
   customer: Customer;
   items: OrderItem[];
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';

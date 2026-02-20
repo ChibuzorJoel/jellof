@@ -401,7 +401,337 @@
     max-width: 500px;
     margin: 0 auto;
   }
-  
+  /* ===================================
+   USER ACCOUNT DROPDOWN (JUMIA STYLE)
+=================================== */
+
+.account-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Account Button */
+.account-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  color: #333;
+  height: 40px;
+}
+
+.account-btn:hover {
+  background: #f5f5f5;
+  border-color: #2d5016;
+}
+
+/* User Icon */
+.user-icon {
+  color: #666;
+  flex-shrink: 0;
+}
+
+/* Account Text */
+.account-text {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.greeting {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Arrow Icon */
+.arrow-icon {
+  color: #666;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.arrow-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  z-index: 1000;
+  animation: slideDown 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown Content */
+.dropdown-content {
+  padding: 0;
+}
+
+/* Dropdown Header */
+.dropdown-header {
+  padding: 1.25rem 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.welcome-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 0.25rem 0;
+}
+
+.subtitle-text {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Logged In Header */
+.dropdown-header.logged-in {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #2d5016 0%, #4a7c2a 100%);
+  color: white;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  border: 2px solid white;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  color: white;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Auth Buttons */
+.auth-buttons {
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-login,
+.btn-register {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-login {
+  background: #2d5016;
+  color: white;
+}
+
+.btn-login:hover {
+  background: #1f3710;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+}
+
+.btn-register {
+  background: white;
+  color: #2d5016;
+  border: 2px solid #2d5016;
+}
+
+.btn-register:hover {
+  background: #f0f7ed;
+}
+
+/* Dropdown Divider */
+.dropdown-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 0;
+}
+
+/* Dropdown Section */
+.dropdown-section {
+  padding: 0.75rem 0;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #999;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5rem 0;
+  padding: 0 1rem;
+}
+
+/* Dropdown Items */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #333;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+  color: #2d5016;
+}
+
+.dropdown-item svg {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.dropdown-item:hover svg {
+  color: #2d5016;
+}
+
+/* Logout Button */
+.logout-btn {
+  color: #dc3545;
+}
+
+.logout-btn:hover {
+  background: #fff5f5;
+  color: #c82333;
+}
+
+.logout-btn svg {
+  color: #dc3545;
+}
+
+.logout-btn:hover svg {
+  color: #c82333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dropdown-menu {
+    right: -10px;
+    min-width: 260px;
+  }
+
+  .account-btn {
+    padding: 0.4rem 0.75rem;
+  }
+
+  .greeting {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dropdown-menu {
+    position: fixed;
+    top: 60px !important;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    min-width: auto;
+  }
+
+  .account-text {
+    gap: 0.15rem;
+  }
+
+  .greeting {
+    font-size: 0.85rem;
+  }
+}
+
+/* Mobile Menu Override */
+@media (max-width: 640px) {
+  .account-btn {
+    border: none;
+    padding: 0.5rem;
+  }
+
+  .user-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .arrow-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Focus States */
+.account-btn:focus,
+.dropdown-item:focus,
+.btn-login:focus,
+.btn-register:focus {
+  outline: 2px solid #2d5016;
+  outline-offset: 2px;
+}
+
+/* Active State */
+.account-btn:active {
+  transform: scale(0.98);
+}
+
+/* Smooth Transitions */
+* {
+  transition: all 0.3s ease;
+}
   .newsletter-input {
     flex: 1;
     padding: 1rem 1.5rem;

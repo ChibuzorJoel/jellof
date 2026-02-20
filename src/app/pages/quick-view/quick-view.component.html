@@ -1,145 +1,143 @@
-<div class="modal-overlay" *ngIf="isOpen && product" (click)="onBackgroundClick($event)">
+<div class="quick-view-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="quick-view-modal" (click)="$event.stopPropagation()" *ngIf="product">
+    
+    <!-- Close Button -->
+    <button class="close-btn" (click)="closeModal()">✕</button>
+
     <div class="modal-content">
-      <!-- Close Button -->
-      <button class="modal-close" (click)="closeModal()">✕</button>
-  
-      <div class="quick-view-container">
-        <!-- Image Gallery Section -->
-        <div class="image-section">
-          <!-- Main Image -->
-          <div class="main-image-wrapper">
-            <img [src]="images[currentImageIndex]" [alt]="product.name" class="main-image">
-            
-            <!-- Image Navigation -->
-            <button class="image-nav prev" (click)="previousImage()" *ngIf="images.length > 1">
-              ❮
-            </button>
-            <button class="image-nav next" (click)="nextImage()" *ngIf="images.length > 1">
-              ❯
-            </button>
-  
-            <!-- Image Indicators -->
-            <div class="image-indicators" *ngIf="images.length > 1">
-              <span 
-                *ngFor="let img of images; let i = index"
-                class="indicator"
-                [class.active]="currentImageIndex === i"
-                (click)="selectImage(i)">
-              </span>
-            </div>
-          </div>
-  
-          <!-- Thumbnail Gallery -->
-          <div class="thumbnail-gallery" *ngIf="images.length > 1">
-            <img 
-              *ngFor="let img of images; let i = index"
-              [src]="img"
-              [alt]="product.name"
-              class="thumbnail"
-              [class.active]="currentImageIndex === i"
-              (click)="selectImage(i)">
+      
+      <!-- Left: Images -->
+      <div class="product-images">
+        <div class="main-image-container">
+          <img [src]="images[currentImageIndex]" [alt]="product.name || 'Product'" class="main-image">
+          
+          <!-- Navigation Arrows -->
+          <button 
+            class="nav-btn prev" 
+            (click)="previousImage()"
+            *ngIf="images.length > 1 && currentImageIndex > 0">
+            ‹
+          </button>
+          <button 
+            class="nav-btn next" 
+            (click)="nextImage()"
+            *ngIf="images.length > 1 && currentImageIndex < images.length - 1">
+            ›
+          </button>
+        </div>
+
+        <!-- Thumbnail Images -->
+        <div class="thumbnail-images" *ngIf="images.length > 1">
+          <img 
+            *ngFor="let image of images; let i = index"
+            [src]="image" 
+            [alt]="product.name || 'Product thumbnail'"
+            class="thumbnail"
+            [class.active]="i === currentImageIndex"
+            (click)="selectImage(i)">
+        </div>
+      </div>
+
+      <!-- Right: Product Details -->
+      <div class="product-details">
+        
+        <!-- Category & Title -->
+        <div class="product-header">
+          <span class="product-category">{{ product.category || 'Product' }}</span>
+          <h2 class="product-title">{{ product.name || 'Product Name' }}</h2>
+          <div class="product-price-container">
+            <span class="product-price">${{ product.price ? product.price.toFixed(2) : '0.00' }}</span>
           </div>
         </div>
-  
-        <!-- Product Details Section -->
-        <div class="details-section">
-          <!-- Product Info -->
-          <div class="product-header">
-            <span class="product-category">{{ product.category }}</span>
-            <h2 class="product-title">{{ product.name }}</h2>
-            <div class="product-price-section">
-              <span class="product-price">${{ product.price.toFixed(2) }}</span>
-              <span class="badge badge-new" *ngIf="product.isNew">NEW</span>
-              <span class="badge badge-cart" *ngIf="isInCart()">In Cart ({{ getCartQuantity() }})</span>
-            </div>
-          </div>
-  
-          <!-- Product Description -->
-          <div class="product-description" *ngIf="product.description">
-            <p>{{ product.description }}</p>
-          </div>
-  
-          <!-- Colors -->
-          <div class="option-group" *ngIf="product.colors && product.colors.length > 0">
-            <label class="option-label">Color: <strong>{{ selectedColor }}</strong></label>
-            <div class="color-options">
-              <button
-                *ngFor="let color of product.colors"
-                class="color-btn"
-                [class.selected]="selectedColor === color"
-                [style.background-color]="color.toLowerCase()"
-                [title]="color"
-                (click)="selectColor(color)">
-                <span class="checkmark" *ngIf="selectedColor === color">✓</span>
-              </button>
-            </div>
-          </div>
-  
-          <!-- Sizes -->
-          <div class="option-group" *ngIf="product.sizes && product.sizes.length > 0">
-            <label class="option-label">Size: <strong>{{ selectedSize }}</strong></label>
-            <div class="size-options">
-              <button
-                *ngFor="let size of product.sizes"
-                class="size-btn"
-                [class.selected]="selectedSize === size"
-                (click)="selectSize(size)">
-                {{ size }}
-              </button>
-            </div>
-          </div>
-  
-          <!-- Quantity -->
-          <div class="option-group">
-            <label class="option-label">Quantity:</label>
-            <div class="quantity-selector">
-              <button class="qty-btn" (click)="decreaseQuantity()">−</button>
-              <input type="number" [value]="quantity" readonly class="qty-input">
-              <button class="qty-btn" (click)="increaseQuantity()">+</button>
-            </div>
-          </div>
-  
-          <!-- Action Buttons -->
-          <div class="action-buttons">
+
+        <!-- Description -->
+        <div class="product-description">
+          <p>{{ product.description || 'No description available' }}</p>
+        </div>
+
+        <!-- Color Selection -->
+        <div class="product-options" *ngIf="product.colors && product.colors.length > 0">
+          <label class="option-label">Color:</label>
+          <div class="color-options">
             <button 
-              class="btn-add-cart"
-              [class.added]="addedToCart"
-              [disabled]="!product.inStock"
-              (click)="addToCart()">
-              <span *ngIf="!addedToCart">🛒 Add to Cart</span>
-              <span *ngIf="addedToCart">✓ Added to Cart!</span>
-            </button>
-  
-            <button 
-              class="btn-whatsapp"
-              [disabled]="!product.inStock"
-              (click)="orderViaWhatsApp()">
-              📱 Order via WhatsApp
+              *ngFor="let color of product.colors"
+              class="color-btn"
+              [class.selected]="selectedColor === color"
+              [style.background-color]="color"
+              [title]="color"
+              (click)="selectColor(color)">
             </button>
           </div>
-  
-          <!-- Stock Status -->
-          <div class="stock-status">
-            <span *ngIf="product.inStock" class="in-stock">✓ In Stock</span>
-            <span *ngIf="!product.inStock" class="out-of-stock">✗ Out of Stock</span>
+        </div>
+
+        <!-- Size Selection -->
+        <div class="product-options" *ngIf="product.sizes && product.sizes.length > 0">
+          <label class="option-label">Size:</label>
+          <div class="size-options">
+            <button 
+              *ngFor="let size of product.sizes"
+              class="size-btn"
+              [class.selected]="selectedSize === size"
+              (click)="selectSize(size)">
+              {{ size }}
+            </button>
           </div>
-  
-          <!-- Additional Info -->
-          <div class="additional-info">
-            <div class="info-item">
-              <span class="info-icon">🚚</span>
-              <span class="info-text">Free shipping on orders over $100</span>
-            </div>
-            <div class="info-item">
-              <span class="info-icon">🔄</span>
-              <span class="info-text">30-day easy returns</span>
-            </div>
-            <div class="info-item">
-              <span class="info-icon">🌿</span>
-              <span class="info-text">Sustainably sourced materials</span>
-            </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="quantity-section">
+          <label class="option-label">Quantity:</label>
+          <div class="quantity-controls">
+            <button class="qty-btn" (click)="decreaseQuantity()">−</button>
+            <input type="number" [(ngModel)]="quantity" min="1" max="99" class="qty-input" name="quantity">
+            <button class="qty-btn" (click)="increaseQuantity()">+</button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button 
+            class="btn-add-to-cart" 
+            (click)="addToCart()"
+            [disabled]="!product.inStock">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            {{ product.inStock ? 'Add to Cart' : 'Out of Stock' }}
+          </button>
+          
+          <button 
+            class="btn-buy-now" 
+            (click)="buyNow()"
+            [disabled]="!product.inStock">
+            Buy Now
+          </button>
+          
+          <button class="btn-wishlist" (click)="addToWishlist()" title="Add to Wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message" *ngIf="showSuccessMessage">
+          ✓ Added to cart successfully!
+        </div>
+
+        <!-- Product Meta -->
+        <div class="product-meta">
+          <div class="meta-item" *ngIf="product.sku">
+            <strong>SKU:</strong> {{ product.sku }}
+          </div>
+          <div class="meta-item" *ngIf="product.category">
+            <strong>Category:</strong> {{ product.category }}
           </div>
         </div>
       </div>
+
     </div>
   </div>
+</div>
