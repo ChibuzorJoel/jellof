@@ -39,6 +39,7 @@ import { CartService } from './services/cart.service';
 import { OrderService } from './services/order.service';
 import { ProductService } from './services/product.service';
 import { CartComponent } from './pages/cart/cart.component';
+import { LiveChatComponent } from './components/live-chat/live-chat.component';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,8 @@ import { CartComponent } from './pages/cart/cart.component';
     AdminProductComponent,
     AdminDashboardComponent,
     AdminOrderComponent,
-    CartComponent
+    CartComponent,
+    LiveChatComponent
   ],
   imports: [
     BrowserModule,

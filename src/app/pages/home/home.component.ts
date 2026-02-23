@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -6,224 +7,215 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  currentSlide = 0;
-  autoplayInterval: any;
-  newsletterEmail = '';
+  
+  // Hero Section - Split Layout (Floxi Style)
+  // Left: 6 rotating images with zoom
+  leftHeroImages = [
+    'assets/images/8.jpeg',
+    'assets/images/9.jpeg',
+    'assets/images/10.jpeg',
+    'assets/images/1.jpeg',
+    'assets/images/5.jpeg',
+    'assets/images/7.jpeg'
+  ];
 
-  // Hero Slides Data
-  heroSlides = [
+  // Right Top: 2 featured images
+  topRightImages = [
+    'assets/images/instagram-1.jpeg',
+    'assets/images/instagram-2.jpeg'
+  ];
+
+  // Right Bottom: 2 featured images
+  bottomRightImages = [
+    'assets/images/2.jpeg',
+    'assets/images/5.jpeg'
+  ];
+
+  currentLeftImageIndex = 0;
+  currentTopRightIndex = 0;
+  currentBottomRightIndex = 0;
+
+  private heroSubscription?: Subscription;
+
+  // Recent Products - Randomized on page load
+  allProducts = [
     {
       id: 1,
-      title: 'New Collection',
-      subtitle: 'Spring/Summer 2026',
-      description: 'Discover the latest trends in sustainable fashion',
-      buttonText: 'Shop Now',
-      buttonLink: '/collections',
-      image: '../../../assets/images/hero-1.jpg',
-      imageAlt: 'Spring Summer Collection'
+      name: 'Elegant Black Dress',
+      price: 89.99,
+      image: 'assets/images/product-1.jpeg',
+      category: 'Dresses',
+      inStock: true
     },
     {
       id: 2,
-      title: 'Timeless Elegance',
-      subtitle: 'Classic Pieces',
-      description: 'Elevate your wardrobe with our signature styles',
-      buttonText: 'Explore',
-      buttonLink: '/lookbook',
-      image: 'assets/images/hero-2.jpg',
-      imageAlt: 'Classic Fashion Collection'
+      name: 'Casual Brown Jacket',
+      price: 129.99,
+      image: 'assets/images/product-2.jpg',
+      category: 'Outerwear',
+      inStock: true
     },
     {
       id: 3,
-      title: 'Limited Edition',
-      subtitle: 'Exclusive Designs',
-      description: 'Be unique with our one-of-a-kind pieces',
-      buttonText: 'View Collection',
-      buttonLink: '/collections',
-      image: 'assets/images/hero-3.jpg',
-      imageAlt: 'Limited Edition Collection'
-    }
-  ];
-
-  // Featured Collections
-  featuredCollections = [
-    {
-      title: 'Summer Essentials',
-      description: 'Light and breezy pieces perfect for warm days',
-      image: 'assets/images/ollection-summer.jpeg',
-      link: '/collections/summer'
-    },
-    {
-      title: 'Formal Wear',
-      description: 'Sophisticated elegance for special occasions',
-      image: 'assets/images/collection-formal.jpeg',
-      link: '/collections/formal'
-    },
-    {
-      title: 'Casual Chic',
-      description: 'Effortless style for everyday comfort',
-      image: 'assets/images/collection-casual.jpeg',
-      link: '/collections/casual'
-    },
-    {
-      title: 'Accessories',
-      description: 'Complete your look with our curated selection',
-      image: 'assets/images/collection-accessories.jpeg',
-      link: '/collections/accessories'
-    }
-  ];
-
-  // Why Choose Us Features
-  features = [
-    {
-      icon: '🌿',
-      title: 'Sustainable Fashion',
-      description: 'Ethically sourced materials and eco-friendly production processes'
-    },
-    {
-      icon: '✨',
-      title: 'Premium Quality',
-      description: 'Handcrafted with attention to detail and finest materials'
-    },
-    {
-      icon: '🚚',
-      title: 'Free Shipping',
-      description: 'Complimentary shipping on orders over $100 worldwide'
-    },
-    {
-      icon: '🔄',
-      title: 'Easy Returns',
-      description: '30-day hassle-free returns and exchanges policy'
-    },
-    {
-      icon: '💎',
-      title: 'Exclusive Designs',
-      description: 'Unique pieces you won\'t find anywhere else'
-    },
-    {
-      icon: '🎁',
-      title: 'Gift Wrapping',
-      description: 'Complimentary luxury gift wrapping on all orders'
-    }
-  ];
-
-  // New Arrivals
-  newArrivals = [
-    {
-      name: 'Silk Summer Dress',
-      category: 'Dresses',
-      price: 189.99,
-      image: 'assets/images/product-1.jpeg',
-      isNew: true
-    },
-    {
-      name: 'Linen Blazer',
-      category: 'Outerwear',
-      price: 249.99,
-      image: '../../../assets/images/product-2.jpeg',
-      isNew: true
-    },
-    {
-      name: 'Cotton Palazzo Pants',
-      category: 'Bottoms',
-      price: 129.99,
-      image: 'assets/images/product-3.jpg',
-      isNew: true
-    },
-    {
-      name: 'Statement Necklace',
-      category: 'Accessories',
-      price: 79.99,
-      image: 'assets/images/product-4.jpg',
-      isNew: true
-    },
-    {
-      name: 'Leather Tote Bag',
-      category: 'Bags',
-      price: 299.99,
-      image: 'assets/images/product-5.jpg',
-      isNew: true
-    },
-    {
-      name: 'Silk Scarf',
-      category: 'Accessories',
-      price: 59.99,
-      image: 'assets/images/product-6.jpg',
-      isNew: true
-    },
-    {
-      name: 'Tailored Trousers',
-      category: 'Bottoms',
-      price: 159.99,
-      image: 'assets/images/product-7.jpg',
-      isNew: true
-    },
-    {
-      name: 'Cashmere Sweater',
-      category: 'Tops',
-      price: 219.99,
+      name: 'Designer Denim Jacket',
+      price: 149.99,
       image: 'assets/images/product-8.jpeg',
-      isNew: true
+      category: 'Jackets',
+      inStock: true
+    },
+    {
+      id: 4,
+      name: 'Classic White Tee',
+      price: 39.99,
+      image: 'assets/images/instagram-6.jpeg',
+      category: 'Tops',
+      inStock: true
+    },
+    {
+      id: 5,
+      name: 'Formal Collection',
+      price: 199.99,
+      image: 'assets/images/collection-formal.jpeg',
+      category: 'Formal',
+      inStock: true
+    },
+    {
+      id: 6,
+      name: 'Summer Collection',
+      price: 159.99,
+      image: 'assets/images/ollection-summer.jpeg',
+      category: 'Summer',
+      inStock: true
+    },
+    {
+      id: 7,
+      name: 'Casual Collection',
+      price: 94.99,
+      image: 'assets/images/collection-casual.jpeg',
+      category: 'Casual',
+      inStock: true
+    },
+    {
+      id: 8,
+      name: 'Instagram Style 3',
+      price: 79.99,
+      image: 'assets/images/instagram-3.jpeg',
+      category: 'Trending',
+      inStock: true
+    },
+    {
+      id: 9,
+      name: 'Instagram Style 4',
+      price: 89.99,
+      image: 'assets/images/instagram-4.jpeg',
+      category: 'Trending',
+      inStock: true
+    },
+    {
+      id: 10,
+      name: 'Instagram Style 5',
+      price: 69.99,
+      image: 'assets/images/instagram-5.jpeg',
+      category: 'Trending',
+      inStock: true
     }
   ];
 
-  // About Section Image
-  aboutImage = 'assets/images/about-preview.jpeg';
-
-  // Instagram Posts
-  instagramPosts = [
-    { image: 'assets/images/instagram-1.jpeg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-2.jpeg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-3.jpeg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-4.jpeg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-5.jpeg', link: 'https://instagram.com/jellof' },
-    { image: 'assets/images/instagram-6.jpeg', link: 'https://instagram.com/jellof' }
-  ];
+  recentProducts: any[] = [];
+  featuredProducts: any[] = [];
 
   ngOnInit(): void {
-    this.startAutoplay();
+    this.startHeroRotation();
+    this.loadRandomProducts();
   }
 
   ngOnDestroy(): void {
-    this.stopAutoplay();
+    if (this.heroSubscription) {
+      this.heroSubscription.unsubscribe();
+    }
   }
 
-  // Hero Slider Methods
-  startAutoplay(): void {
-    this.autoplayInterval = setInterval(() => {
-      this.nextSlide();
+  // Hero Image Rotation
+  startHeroRotation(): void {
+    // Rotate left section every 3 seconds
+    this.heroSubscription = interval(3000).subscribe(() => {
+      this.rotateLeftImage();
+    });
+
+    // Rotate top right section every 4 seconds
+    setInterval(() => {
+      this.rotateTopRightImages();
+    }, 4000);
+
+    // Rotate bottom right section every 5 seconds
+    setInterval(() => {
+      this.rotateBottomRightImages();
     }, 5000);
   }
 
-  stopAutoplay(): void {
-    if (this.autoplayInterval) {
-      clearInterval(this.autoplayInterval);
+  rotateLeftImage(): void {
+    this.currentLeftImageIndex = (this.currentLeftImageIndex + 1) % this.leftHeroImages.length;
+  }
+
+  rotateTopRightImages(): void {
+    this.currentTopRightIndex = (this.currentTopRightIndex + 1) % this.topRightImages.length;
+  }
+
+  rotateBottomRightImages(): void {
+    this.currentBottomRightIndex = (this.currentBottomRightIndex + 1) % this.bottomRightImages.length;
+  }
+
+  // Random Products (Changes on page load)
+  loadRandomProducts(): void {
+    // Shuffle products
+    const shuffled = this.shuffleArray([...this.allProducts]);
+    
+    // Pick 2 random products for "Recent" section
+    this.recentProducts = shuffled.slice(0, 2);
+    
+    // Pick 4 different random products for "Featured" section
+    this.featuredProducts = shuffled.slice(2, 6);
+  }
+
+  shuffleArray(array: any[]): any[] {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
+    return newArray;
   }
 
-  nextSlide(): void {
-    this.currentSlide = (this.currentSlide + 1) % this.heroSlides.length;
+  // Helper Methods
+  getCurrentLeftImage(): string {
+    return this.leftHeroImages[this.currentLeftImageIndex];
   }
 
-  prevSlide(): void {
-    this.currentSlide = this.currentSlide === 0 ? this.heroSlides.length - 1 : this.currentSlide - 1;
+  getCurrentTopRightImage(): string {
+    return this.topRightImages[this.currentTopRightIndex];
   }
 
-  goToSlide(index: number): void {
-    this.currentSlide = index;
-    this.stopAutoplay();
-    this.startAutoplay();
+  getCurrentBottomRightImage(): string {
+    return this.bottomRightImages[this.currentBottomRightIndex];
   }
 
-  // Newsletter Submission
-  onNewsletterSubmit(event: Event): void {
-    event.preventDefault();
-    if (this.newsletterEmail) {
-      console.log('Newsletter subscription:', this.newsletterEmail);
-      // TODO: Implement newsletter subscription logic
-      // You would typically call an API service here
-      alert('Thank you for subscribing!');
-      this.newsletterEmail = '';
+  // Newsletter
+  newsletterEmail = '';
+
+  subscribeNewsletter(): void {
+    if (!this.newsletterEmail.trim()) {
+      alert('Please enter your email address');
+      return;
     }
-  }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.newsletterEmail)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    console.log('Newsletter subscription:', this.newsletterEmail);
+    alert('Thank you for subscribing!');
+    this.newsletterEmail = '';
+  }
 }
