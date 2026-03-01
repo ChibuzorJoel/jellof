@@ -9,9 +9,13 @@ import { Product } from '../../models/product-model';
 })
 export class ProductCardComponent {
 
-  /* ================= INPUTS & OUTPUTS ================= */
+  /* ================= INPUTS ================= */
   @Input() product!: Product;
+  @Input() isLoading = false;
+
+  /* ================= OUTPUTS ================= */
   @Output() quickView = new EventEmitter<Product>();
+  @Output() addToWishlist = new EventEmitter<Product>();
 
   /* ================= UI STATE ================= */
   selectedSize: string = '';
@@ -25,10 +29,21 @@ export class ProductCardComponent {
 
   constructor(private cartService: CartService) {}
 
-  /* ================= CART LOGIC ================= */
+  /* ================= QUICK VIEW ================= */
 
-  addToCart(): void {
-    // Require size if sizes exist
+  onQuickView(event?: Event): void {
+    event?.stopPropagation();
+    this.quickView.emit(this.product);
+  }
+
+  /* ================= CART ================= */
+
+  addToCart(event?: Event): void {
+    event?.stopPropagation();
+
+    if (!this.product.inStock) return;
+
+    // Require size selection if available
     if (this.product.sizes?.length && !this.selectedSize) {
       this.showSizeSelector = true;
       return;
@@ -41,10 +56,10 @@ export class ProductCardComponent {
       this.selectedColor
     );
 
-    this.feedbackAfterAdd();
+    this.afterAddFeedback();
   }
 
-  private feedbackAfterAdd(): void {
+  private afterAddFeedback(): void {
     this.addedToCart = true;
 
     setTimeout(() => {
@@ -63,20 +78,25 @@ export class ProductCardComponent {
     this.selectedColor = color;
   }
 
-  /* ================= QUICK VIEW ================= */
+  /* ================= WISHLIST ================= */
 
-  openQuickView(): void {
-    this.quickView.emit(this.product);
+  toggleWishlist(event: Event): void {
+    event.stopPropagation();
+    this.addToWishlist.emit(this.product);
   }
 
   /* ================= WHATSAPP ================= */
 
-  orderViaWhatsApp(): void {
+  orderViaWhatsApp(event?: Event): void {
+    event?.stopPropagation();
+
+    if (!this.product.inStock) return;
+
     const message = this.createWhatsAppMessage();
     const encodedMessage = encodeURIComponent(message);
 
-    const whatsappUrl = `https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    const url = `https://wa.me/${this.whatsappNumber}?text=${encodedMessage}`;
+    window.open(url, '_blank');
   }
 
   private createWhatsAppMessage(): string {
@@ -98,15 +118,54 @@ Please let me know:
 Thank you!`;
   }
 
-  /* ================= CART HELPERS ================= */
+  /* ================= HELPERS ================= */
 
   isInCart(): boolean {
     const id = this.product._id ?? this.product.id;
-    return id ? this.cartService.isInCart(id) : false;
+    return !!id && this.cartService.isInCart(id);
   }
-  
+
   getCartQuantity(): number {
     const id = this.product._id ?? this.product.id;
     return id ? this.cartService.getProductQuantity(id) : 0;
+  }
+
+  getDiscountPercent(): number {
+    if (this.product.originalPrice && this.product.price) {
+      const discount =
+        ((this.product.originalPrice - this.product.price) /
+          this.product.originalPrice) *
+        100;
+      return Math.round(discount);
+    }
+    return 0;
+  }
+
+  getColorCode(colorName: string): string {
+    const colorMap: Record<string, string> = {
+      Black: '#000000',
+      White: '#FFFFFF',
+      Red: '#E74C3C',
+      Blue: '#3498DB',
+      Green: '#2ECC71',
+      Yellow: '#F1C40F',
+      Pink: '#E91E63',
+      Purple: '#9B59B6',
+      Orange: '#E67E22',
+      Gray: '#95A5A6',
+      Brown: '#8D6E63',
+      Navy: '#34495E',
+      Beige: '#F5F5DC',
+      Cream: '#FFFDD0',
+      Olive: '#808000',
+      Burgundy: '#800020',
+      Camel: '#C19A6B',
+      Charcoal: '#36454F',
+      Emerald: '#50C878',
+      Multi:
+        'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #FFA07A)'
+    };
+
+    return colorMap[colorName] || colorName.toLowerCase();
   }
 }

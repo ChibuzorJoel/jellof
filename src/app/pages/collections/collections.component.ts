@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
+import { CartService } from '../../services/cart.service';
 import { Product } from 'src/app/models/product-model';
 
 /* =======================
@@ -43,7 +44,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Floral Maxi Dress',
       category: 'Dresses',
       price: 149.99,
-      image: 'assets/images/product-2.jpeg',
+      image: 'assets/images/instagram-1.jpeg',
       description: 'Beautiful floral print maxi dress with flowing fabric',
       isNew: true,
       inStock: true,
@@ -55,7 +56,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Midi Wrap Dress',
       category: 'Dresses',
       price: 129.99,
-      image: 'assets/images/product-3.jpeg',
+      image: 'assets/images/instagram-2.jpeg',
       description: 'Elegant wrap dress with adjustable tie',
       isNew: false,
       inStock: true,
@@ -67,7 +68,7 @@ export class CollectionsComponent implements OnInit {
       name: 'A-Line Cocktail Dress',
       category: 'Dresses',
       price: 199.99,
-      image: 'assets/images/product-4.jpeg',
+      image: 'assets/images/instagram-3.jpeg',
       description: 'Sophisticated cocktail dress for special occasions',
       isNew: false,
       inStock: true,
@@ -79,7 +80,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Linen Shirt Dress',
       category: 'Dresses',
       price: 119.99,
-      image: 'assets/images/product-5.jpeg',
+      image: 'assets/images/instagram-4.jpeg',
       description: 'Casual linen shirt dress for everyday wear',
       isNew: false,
       inStock: true,
@@ -91,7 +92,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Pleated Midi Dress',
       category: 'Dresses',
       price: 159.99,
-      image: 'assets/images/product-6.jpeg',
+      image: 'assets/images/6.jpeg',
       description: 'Elegant pleated dress with modern silhouette',
       isNew: true,
       inStock: true,
@@ -103,7 +104,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Off-Shoulder Dress',
       category: 'Dresses',
       price: 139.99,
-      image: 'assets/images/product-7.jpeg',
+      image: 'assets/images/7.jpeg',
       description: 'Romantic off-shoulder dress with ruffle details',
       isNew: false,
       inStock: true,
@@ -115,7 +116,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Bodycon Mini Dress',
       category: 'Dresses',
       price: 89.99,
-      image: 'assets/images/product-8.jpeg',
+      image: 'assets/images/8.jpeg',
       description: 'Sleek bodycon dress for night out',
       isNew: false,
       inStock: true,
@@ -127,7 +128,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Bohemian Maxi Dress',
       category: 'Dresses',
       price: 169.99,
-      image: 'assets/images/product-9.jpeg',
+      image: 'assets/images/9.jpeg',
       description: 'Free-spirited bohemian style maxi dress',
       isNew: true,
       inStock: true,
@@ -139,7 +140,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Satin Slip Dress',
       category: 'Dresses',
       price: 109.99,
-      image: 'assets/images/product-10.jpeg',
+      image: 'assets/images/10.jpeg',
       description: 'Luxe satin slip dress with delicate straps',
       isNew: false,
       inStock: true,
@@ -153,7 +154,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Silk Blouse',
       category: 'Tops',
       price: 89.99,
-      image: 'assets/images/product-11.jpeg',
+      image: 'assets/images/11.jpeg',
       description: 'Classic silk blouse perfect for office or evening',
       isNew: true,
       inStock: true,
@@ -165,7 +166,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Cotton T-Shirt',
       category: 'Tops',
       price: 39.99,
-      image: 'assets/images/product-12.jpeg',
+      image: 'assets/images/12.jpeg',
       description: 'Soft organic cotton basic tee',
       isNew: false,
       inStock: true,
@@ -177,7 +178,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Knit Sweater',
       category: 'Tops',
       price: 79.99,
-      image: 'assets/images/product-13.jpeg',
+      image: 'assets/images/13.jpeg',
       description: 'Cozy knit sweater for cool days',
       isNew: true,
       inStock: true,
@@ -189,7 +190,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Peplum Top',
       category: 'Tops',
       price: 69.99,
-      image: 'assets/images/product-14.jpeg',
+      image: 'assets/images/14.jpeg',
       description: 'Feminine peplum top with fitted waist',
       isNew: false,
       inStock: true,
@@ -201,7 +202,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Linen Button-Up',
       category: 'Tops',
       price: 74.99,
-      image: 'assets/images/product-15.jpeg',
+      image: 'assets/images/15.jpeg',
       description: 'Breathable linen shirt for summer',
       isNew: false,
       inStock: true,
@@ -213,7 +214,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Crop Top',
       category: 'Tops',
       price: 49.99,
-      image: 'assets/images/product-16.jpeg',
+      image: 'assets/images/16.jpeg',
       description: 'Modern crop top with clean lines',
       isNew: true,
       inStock: true,
@@ -225,7 +226,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Turtleneck Sweater',
       category: 'Tops',
       price: 84.99,
-      image: 'assets/images/product-17.jpeg',
+      image: 'assets/images/17.jpeg',
       description: 'Warm turtleneck sweater in soft cashmere blend',
       isNew: false,
       inStock: true,
@@ -237,7 +238,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Striped T-Shirt',
       category: 'Tops',
       price: 44.99,
-      image: 'assets/images/product-18.jpeg',
+      image: 'assets/images/18.jpeg',
       description: 'Classic striped tee in organic cotton',
       isNew: false,
       inStock: true,
@@ -251,7 +252,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Cotton Palazzo Pants',
       category: 'Bottoms',
       price: 129.99,
-      image: 'assets/images/product-19.jpeg',
+      image: 'assets/images/19.jpeg',
       description: 'Flowing palazzo pants in soft cotton',
       isNew: true,
       inStock: true,
@@ -263,7 +264,7 @@ export class CollectionsComponent implements OnInit {
       name: 'High-Waist Jeans',
       category: 'Bottoms',
       price: 99.99,
-      image: 'assets/images/product-20.jpeg',
+      image: 'assets/images/20.jpeg',
       description: 'Classic high-waist denim jeans',
       isNew: false,
       inStock: true,
@@ -275,7 +276,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Wide Leg Trousers',
       category: 'Bottoms',
       price: 119.99,
-      image: 'assets/images/product-21.jpeg',
+      image: 'assets/images/21.jpeg',
       description: 'Elegant wide-leg trousers for office',
       isNew: true,
       inStock: true,
@@ -287,7 +288,7 @@ export class CollectionsComponent implements OnInit {
       name: 'Midi Skirt',
       category: 'Bottoms',
       price: 89.99,
-      image: 'assets/images/product-22.jpeg',
+      image: 'assets/images/22.jpeg',
       description: 'Versatile midi skirt with elastic waist',
       isNew: false,
       inStock: true,
@@ -531,9 +532,15 @@ export class CollectionsComponent implements OnInit {
   errorMessage = '';
   showQuickView = false;
 
+  /* ---------- Cart Notification (FLOXI STYLE) ---------- */
+  showCartNotification = false;
+  addedProduct: Product | null = null;
+
   /* ---------- Constructor ---------- */
   constructor(
     private productService: ProductService,
+    private cartService: CartService,
+    private router: Router,
     private route: ActivatedRoute
   ) {}
 
@@ -579,6 +586,26 @@ export class CollectionsComponent implements OnInit {
 
   retryLoad(): void {
     this.loadProducts();
+  }
+
+  /* ---------- Add to Cart (FLOXI STYLE POPUP) ---------- */
+  addToCart(product: Product): void {
+    // Add to cart service
+    this.cartService.addToCart(product, 1);
+    
+    // Show Floxi-style popup notification
+    this.addedProduct = product;
+    this.showCartNotification = true;
+  }
+
+  closeCartNotification(): void {
+    this.showCartNotification = false;
+    this.addedProduct = null;
+  }
+
+  goToCart(): void {
+    this.router.navigate(['/cart']);
+    this.closeCartNotification();
   }
 
   /* ---------- Filters ---------- */

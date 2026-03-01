@@ -60,6 +60,7 @@ const routes: Routes = [
     // canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
   },
   
+  
   // Wildcard Route (404)
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

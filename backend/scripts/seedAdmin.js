@@ -1,64 +1,35 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const User = require('./models/User');
+const User = require('../models/User');
 require('dotenv').config();
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/jellof', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/jellof');
 
 async function seedAdminUser() {
   try {
     console.log('🌱 Seeding admin user...');
 
-    // Check if admin already exists
-    const existingAdmin = await User.findOne({ email: 'admin@jellof.com' });
-    
-    if (existingAdmin) {
-      console.log('✓ Admin user already exists');
-      console.log('Email: admin@jellof.com');
-      console.log('If you forgot the password, delete the user and run this script again.');
-      process.exit(0);
-    }
+    await User.deleteOne({ email: 'admin@jellof.com' }); // 🔥 remove old broken admin
 
-    // Create admin user
-    const hashedPassword = await bcrypt.hash('Admin@123', 10);
-    
     const admin = new User({
-      name: 'Admin',
+      firstName: 'Super',
+      lastName: 'Admin',
       email: 'admin@jellof.com',
-      password: hashedPassword,
+      password: 'Admin@124', // ✅ PLAIN PASSWORD
       role: 'admin',
       isActive: true
     });
 
-    await admin.save();
+    await admin.save(); // 🔐 hashing happens here automatically
 
-    console.log('\n✓ Admin user created successfully!');
-    console.log('═══════════════════════════════════════');
-    console.log('📧 Email:    admin@jellof.com');
-    console.log('🔐 Password: Admin@123');
-    console.log('═══════════════════════════════════════');
-    console.log('\n⚠️  IMPORTANT: Change this password after first login!');
-    console.log('\nYou can now login at: http://localhost:4200/admin/login\n');
-    
+    console.log('✅ Admin user created');
+    console.log('Email: admin@jellof.com');
+    console.log('Password: Admin@124');
+
     process.exit(0);
-
   } catch (error) {
-    console.error('❌ Error creating admin user:', error);
+    console.error('❌ Seed error:', error);
     process.exit(1);
   }
 }
 
-// Handle connection events
-mongoose.connection.on('connected', () => {
-  console.log('✓ Connected to MongoDB');
-  seedAdminUser();
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('✗ MongoDB connection error:', err);
-  process.exit(1);
-});
+mongoose.connection.once('connected', seedAdminUser);

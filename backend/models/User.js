@@ -1,52 +1,61 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const addressSchema = new mongoose.Schema({
-  label: {
-    type: String,
-    required: true,
-    trim: true
+/* =========================
+   ADDRESS SCHEMA
+========================= */
+const addressSchema = new mongoose.Schema(
+  {
+    label: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    address: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    city: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    state: {
+      type: String,
+      trim: true,
+    },
+    zipCode: {
+      type: String,
+      trim: true,
+    },
+    country: {
+      type: String,
+      default: 'Nigeria',
+      trim: true,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
   },
-  address: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  city: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  state: {
-    type: String,
-    trim: true
-  },
-  zipCode: {
-    type: String,
-    trim: true
-  },
-  country: {
-    type: String,
-    default: 'Nigeria',
-    trim: true
-  },
-  isDefault: {
-    type: Boolean,
-    default: false
-  }
-});
+  { _id: true }
+);
 
+/* =========================
+   USER SCHEMA
+========================= */
 const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
       required: [true, 'First name is required'],
-      trim: true
+      trim: true,
     },
     lastName: {
       type: String,
       required: [true, 'Last name is required'],
-      trim: true
+      trim: true,
     },
     email: {
       type: String,
@@ -54,35 +63,42 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
+      index: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
     },
     phone: {
       type: String,
-      trim: true
+      trim: true,
     },
     password: {
       type: String,
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
-      select: false
+      select: false,
     },
-    addresses: [addressSchema],
+    addresses: {
+      type: [addressSchema],
+      default: [],
+    },
     role: {
       type: String,
       enum: ['customer', 'admin'],
-      default: 'customer'
+      default: 'customer',
+      immutable: true, // prevents role changes by update
     },
     isActive: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-// ✅ FIXED: async pre-save hook (NO next)
+/* =========================
+   PASSWORD HASHING
+========================= */
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
 
@@ -90,18 +106,22 @@ userSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare passwords
+/* =========================
+   METHODS
+========================= */
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove password from JSON responses
+// Hide sensitive fields
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
   return user;
 };
 
+/* =========================
+   MODEL EXPORT
+========================= */
 module.exports =
-  mongoose.models.User ||
-  mongoose.model('User', userSchema);
+  mongoose.models.User || mongoose.model('User', userSchema);

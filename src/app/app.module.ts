@@ -40,6 +40,10 @@ import { OrderService } from './services/order.service';
 import { ProductService } from './services/product.service';
 import { CartComponent } from './pages/cart/cart.component';
 import { LiveChatComponent } from './components/live-chat/live-chat.component';
+import { CartNotificationComponent } from './pages/components/cart-notification/cart-notification.component';
+import { ScrollAnimationDirective } from './directives/scroll-animation.directive';
+import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.component';
+
 
 @NgModule({
   declarations: [
@@ -69,7 +73,11 @@ import { LiveChatComponent } from './components/live-chat/live-chat.component';
     AdminDashboardComponent,
     AdminOrderComponent,
     CartComponent,
-    LiveChatComponent
+    LiveChatComponent,
+    CartNotificationComponent,
+    ScrollAnimationDirective,
+    AdminLayoutComponent,
+    
   ],
   imports: [
     BrowserModule,

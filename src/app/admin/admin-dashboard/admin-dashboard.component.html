@@ -1,142 +1,224 @@
-<div class="dashboard-container">
-    <!-- Header -->
-    <div class="dashboard-header">
-      <h1>📊 Dashboard Overview</h1>
-      <p class="subtitle">Welcome to JELLOF Admin</p>
+<!-- Admin Dashboard Content Only (No Navigation) -->
+
+<!-- Loading State -->
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+  <p>Loading Dashboard...</p>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="dashboard-content" *ngIf="!isLoading">
+  
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="header-title">
+      <h1>Dashboard Overview</h1>
+      <p class="header-subtitle">Monitor your store performance and manage operations</p>
     </div>
-  
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading">
-      <p>Loading dashboard...</p>
+    <div class="header-actions">
+      <button class="refresh-btn" (click)="refreshData()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        Refresh
+      </button>
+      <button class="export-btn" (click)="exportReport()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Export
+      </button>
     </div>
-  
-    <!-- Stats Cards -->
-    <div *ngIf="!isLoading" class="stats-grid">
-      <!-- Total Products -->
-      <div class="stat-card">
-        <div class="stat-icon products">📦</div>
-        <div class="stat-content">
-          <h3>{{ stats.totalProducts }}</h3>
-          <p>Total Products</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    
+    <!-- Products Card -->
+    <div class="stat-card products-card">
+      <div class="stat-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
         </div>
       </div>
-  
-      <!-- Total Orders -->
-      <div class="stat-card">
-        <div class="stat-icon orders">🛒</div>
-        <div class="stat-content">
-          <h3>{{ stats.totalOrders }}</h3>
-          <p>Total Orders</p>
+      <p class="stat-label">Total Products</p>
+      <h2 class="stat-value">{{ stats.totalProducts | number }}</h2>
+      <span class="stat-change positive" *ngIf="stats.productsChange > 0">
+        ↑ {{ stats.productsChange }}% Growth
+      </span>
+      <span class="stat-change negative" *ngIf="stats.productsChange < 0">
+        ↓ {{ Math.abs(stats.productsChange) }}% Decline
+      </span>
+    </div>
+
+    <!-- Orders Card -->
+    <div class="stat-card orders-card">
+      <div class="stat-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
         </div>
       </div>
-  
-      <!-- Total Contacts -->
-      <div class="stat-card">
-        <div class="stat-icon contacts">✉️</div>
-        <div class="stat-content">
-          <h3>{{ stats.totalContacts }}</h3>
-          <p>Messages</p>
-        </div>
-      </div>
-  
-      <!-- Total Subscribers -->
-      <div class="stat-card">
-        <div class="stat-icon subscribers">👥</div>
-        <div class="stat-content">
-          <h3>{{ stats.totalSubscribers }}</h3>
-          <p>Subscribers</p>
-        </div>
+      <p class="stat-label">Total Orders</p>
+      <h2 class="stat-value">{{ stats.totalOrders | number }}</h2>
+      <span class="stat-change positive" *ngIf="stats.ordersChange > 0">
+        ↑ {{ stats.ordersChange }}% Growth
+      </span>
+      <div class="stat-breakdown">
+        <span>Today: {{ stats.ordersToday }}</span>
+        <span>Week: {{ stats.ordersThisWeek }}</span>
       </div>
     </div>
-  
-    <!-- Orders Timeline -->
-    <div *ngIf="!isLoading" class="orders-timeline">
-      <div class="timeline-card">
-        <h4>{{ stats.ordersToday }}</h4>
-        <p>Today</p>
+
+    <!-- Messages Card -->
+    <div class="stat-card customers-card">
+      <div class="stat-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
       </div>
-      <div class="timeline-card">
-        <h4>{{ stats.ordersThisWeek }}</h4>
-        <p>This Week</p>
-      </div>
-      <div class="timeline-card">
-        <h4>{{ stats.ordersThisMonth }}</h4>
-        <p>This Month</p>
-      </div>
+      <p class="stat-label">Messages</p>
+      <h2 class="stat-value">{{ stats.totalContacts | number }}</h2>
+      <p style="font-size: 0.85rem; color: #b0b0b0; margin-top: 0.5rem;">
+        Subscribers: {{ stats.totalSubscribers | number }}
+      </p>
     </div>
-  
-    <!-- Recent Activity -->
-    <div *ngIf="!isLoading" class="activity-section">
-      <!-- Recent Orders -->
-      <div class="activity-card">
-        <div class="card-header">
-          <h2>🛍️ Recent Orders</h2>
-          <a routerLink="/admin/orders" class="view-all">View All</a>
-        </div>
-        
-        <div class="table-responsive">
-          <table *ngIf="stats.recentOrders.length > 0">
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Product</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let order of stats.recentOrders">
-                <td>{{ order.customerName || order.customerPhone }}</td>
-                <td>{{ order.productName }}</td>
-                <td>${{ order.totalPrice?.toFixed(2) || order.productPrice?.toFixed(2) }}</td>
-                <td>
-                  <span class="status-badge" [style.background-color]="getStatusColor(order.status)">
-                    {{ order.status }}
-                  </span>
-                </td>
-                <td>{{ order.createdAt | date:'short' }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p *ngIf="stats.recentOrders.length === 0" class="no-data">No orders yet</p>
+
+    <!-- Sales Card -->
+    <div class="stat-card sales-card">
+      <div class="stat-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
         </div>
       </div>
-  
-      <!-- Recent Contacts -->
-      <div class="activity-card">
-        <div class="card-header">
-          <h2>💬 Recent Messages</h2>
-          <a routerLink="/admin/contacts" class="view-all">View All</a>
-        </div>
-        
-        <div class="messages-list">
-          <div *ngFor="let contact of stats.recentContacts" class="message-item">
-            <div class="message-header">
-              <strong>{{ contact.name }}</strong>
-              <span class="status-badge" [style.background-color]="getStatusColor(contact.status)">
-                {{ contact.status }}
-              </span>
-            </div>
-            <p class="message-subject">{{ contact.subject || 'No subject' }}</p>
-            <p class="message-preview">{{ contact.message.substring(0, 100) }}...</p>
-            <small>{{ contact.createdAt | date:'short' }}</small>
+      <p class="stat-label">Total Sales</p>
+      <h2 class="stat-value">{{ formatCurrency(stats.totalSales) }}</h2>
+      <span class="stat-change positive" *ngIf="stats.salesChange > 0">
+        ↑ {{ stats.salesChange }}% Growth
+      </span>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <h3>Quick Actions</h3>
+    <div class="actions-grid">
+      <button class="action-btn" (click)="navigateTo('products/add')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Product
+      </button>
+      <button class="action-btn" (click)="navigateTo('orders')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        View Orders
+      </button>
+      <button class="action-btn" (click)="navigateTo('categories')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Categories
+      </button>
+      <button class="action-btn" (click)="navigateTo('contacts')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+        Messages
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent Orders & Low Stock Grid -->
+  <div class="dashboard-grid">
+    
+    <!-- Recent Orders -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>Recent Orders</h3>
+        <a routerLink="/admin/orders" class="view-all">View All</a>
+      </div>
+      <div class="orders-list">
+        <div class="order-item" *ngFor="let order of recentOrders">
+          <div class="order-info">
+            <p class="order-id">#{{ order.id || order._id }}</p>
+            <p class="order-customer">{{ order.customerName }}</p>
           </div>
-          <p *ngIf="stats.recentContacts.length === 0" class="no-data">No messages yet</p>
+          <div class="order-details">
+            <p class="order-amount">{{ formatCurrency(order.total) }}</p>
+            <span class="order-status" [style.background-color]="getStatusColor(order.status)">
+              {{ getOrderStatusLabel(order.status) }}
+            </span>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="recentOrders.length === 0">
+          <p>No Recent Orders</p>
         </div>
       </div>
     </div>
-  
-    <!-- Popular Products -->
-    <div *ngIf="!isLoading && stats.popularProducts.length > 0" class="popular-products">
-      <h2>🔥 Popular Products</h2>
-      <div class="products-grid">
-        <div *ngFor="let product of stats.popularProducts" class="product-mini">
-          <img [src]="product.image" [alt]="product.name">
-          <h4>{{ product.name }}</h4>
-          <p class="price">${{ product.price.toFixed(2) }}</p>
-          <span class="badge" *ngIf="product.isNew">NEW</span>
+
+    <!-- Low Stock Alerts -->
+    <div class="dashboard-card alert-card">
+      <div class="card-header">
+        <h3>Low Stock Alerts</h3>
+        <span class="alert-badge">{{ lowStockProducts.length }}</span>
+      </div>
+      <div class="stock-list">
+        <div class="stock-item" *ngFor="let product of lowStockProducts">
+          <div class="stock-info">
+            <img [src]="product.image" [alt]="product.name" class="stock-image">
+            <div>
+              <p class="stock-name">{{ product.name }}</p>
+              <p class="stock-category">{{ product.category }}</p>
+            </div>
+          </div>
+          <div class="stock-quantity warning">
+            {{ product.stock }} LEFT
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="lowStockProducts.length === 0">
+          <p>✓ All In Stock</p>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Sales Chart -->
+  <div class="dashboard-card chart-card">
+    <div class="card-header">
+      <h3>Sales Overview</h3>
+      <div class="chart-filters">
+        <button class="filter-btn" [class.active]="selectedPeriod === 'week'" (click)="changePeriod('week')">Week</button>
+        <button class="filter-btn" [class.active]="selectedPeriod === 'month'" (click)="changePeriod('month')">Month</button>
+        <button class="filter-btn" [class.active]="selectedPeriod === 'year'" (click)="changePeriod('year')">Year</button>
+      </div>
+    </div>
+    <div class="chart-placeholder">
+      <p>Sales Chart</p>
+      <small style="color: #808080; font-weight: 600;">Integrate Chart.js or ngx-charts</small>
+    </div>
+  </div>
+
+</div>

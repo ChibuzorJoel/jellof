@@ -1,4 +1,4 @@
-<div class="product-card">
+<div class="product-card" [class.loading]="isLoading">
 
   <!-- ================= IMAGE AREA ================= -->
   <div class="product-image-wrapper">
@@ -7,35 +7,48 @@
       [src]="product.image"
       [alt]="product.name"
       class="product-image"
+      loading="lazy"
     />
 
     <!-- ===== Badges ===== -->
     <div class="product-badges">
       <span class="badge badge-new" *ngIf="product.isNew">NEW</span>
-      <span class="badge badge-stock" *ngIf="!product.inStock">
-        Out of Stock
-      </span>
+      <span class="badge badge-sale" *ngIf="product.originalPrice">SALE</span>
+      <span class="badge badge-out" *ngIf="!product.inStock">Out of Stock</span>
       <span class="badge badge-cart" *ngIf="isInCart()">
         In Cart ({{ getCartQuantity() }})
       </span>
     </div>
 
-    <!-- ===== Hover Overlay ===== -->
+    <!-- ===== Wishlist ===== -->
+    <button
+      class="wishlist-btn"
+      (click)="toggleWishlist($event)"
+      title="Add to Wishlist">
+      ❤
+    </button>
+
+    <!-- ===== Hover Actions ===== -->
     <div class="product-overlay">
 
-      <!-- Quick View -->
       <button
-        class="quick-view-btn"
-        (click)="openQuickView()">
-        👁️ Quick View
+        class="quick-action-btn"
+        (click)="onQuickView($event)">
+        👁 Quick View
       </button>
 
-      <!-- WhatsApp (Desktop) -->
       <button
-        class="whatsapp-btn"
+        class="quick-action-btn"
+        [disabled]="!product.inStock"
+        (click)="addToCart()">
+        🛒 Add to Cart
+      </button>
+
+      <button
+        class="quick-action-btn whatsapp"
         [disabled]="!product.inStock"
         (click)="orderViaWhatsApp()">
-        💬 Order via WhatsApp
+        💬 WhatsApp
       </button>
 
     </div>
@@ -44,74 +57,76 @@
   <!-- ================= PRODUCT INFO ================= -->
   <div class="product-info">
 
+    <!-- Category -->
     <p class="product-category">{{ product.category }}</p>
+
+    <!-- Name -->
     <h3 class="product-name">{{ product.name }}</h3>
-    <p class="product-price">
-      ${{ product.price.toFixed(2) }}
-    </p>
 
-    <!-- ===== Colors ===== -->
-    <div
-      class="product-colors"
-      *ngIf="product.colors?.length">
-
-      <div class="color-options">
-        <button
-          *ngFor="let color of product.colors"
-          class="color-btn"
-          [class.selected]="selectedColor === color"
-          [style.backgroundColor]="color.toLowerCase()"
-          [title]="color"
-          (click)="selectColor(color)">
-        </button>
-      </div>
+    <!-- Rating -->
+    <div class="product-rating" *ngIf="product.rating">
+      <span *ngFor="let star of [1,2,3,4,5]">
+        {{ star <= product.rating ? '★' : '☆' }}
+      </span>
+      <span class="rating-count" *ngIf="product.reviewCount">
+        ({{ product.reviewCount }})
+      </span>
     </div>
 
-    <!-- ===== Sizes ===== -->
+    <!-- Price -->
+    <div class="product-price-row">
+      <span class="product-price">${{ product.price.toFixed(2) }}</span>
+
+      <span
+        class="price-original"
+        *ngIf="product.originalPrice">
+        ${{ product.originalPrice.toFixed(2) }}
+      </span>
+
+      <span
+        class="price-discount"
+        *ngIf="getDiscountPercent() > 0">
+        -{{ getDiscountPercent() }}%
+      </span>
+    </div>
+
+    <!-- Colors -->
+    <div class="product-colors" *ngIf="product.colors?.length">
+      <button
+        *ngFor="let color of product.colors"
+        class="color-btn"
+        [class.selected]="selectedColor === color"
+        [style.backgroundColor]="getColorCode(color)"
+        [title]="color"
+        (click)="selectColor(color)">
+      </button>
+    </div>
+
+    <!-- Sizes -->
     <div
       class="size-selector"
-      *ngIf="showSizeSelector && product.sizes?.length">
+      *ngIf="product.sizes?.length && showSizeSelector">
 
-      <p class="size-label">Select Size:</p>
-      <div class="size-options">
-        <button
-          *ngFor="let size of product.sizes"
-          class="size-btn"
-          [class.selected]="selectedSize === size"
-          (click)="selectSize(size)">
-          {{ size }}
-        </button>
-      </div>
-    </div>
+      <p class="size-label">Select Size</p>
 
-    <!-- ================= ACTIONS ================= -->
-    <div class="product-actions">
-
-      <!-- Add to Cart -->
       <button
-        class="btn-add-cart"
-        [class.added]="addedToCart"
-        [disabled]="!product.inStock"
-        (click)="addToCart()">
-
-        <span *ngIf="!addedToCart && !isInCart()">🛒 Add to Cart</span>
-        <span *ngIf="!addedToCart && isInCart()">➕ Add More</span>
-        <span *ngIf="addedToCart">✓ Added!</span>
-      </button>
-
-      <!-- WhatsApp (Mobile) -->
-      <button
-        class="btn-whatsapp mobile-only"
-        [disabled]="!product.inStock"
-        (click)="orderViaWhatsApp()">
-        📱 WhatsApp
+        *ngFor="let size of product.sizes"
+        class="size-btn"
+        [class.selected]="selectedSize === size"
+        (click)="selectSize(size)">
+        {{ size }}
       </button>
     </div>
 
-    <!-- ===== Out of Stock Message ===== -->
-    <p class="out-of-stock-msg" *ngIf="!product.inStock">
-      This item is currently out of stock
-    </p>
+    <!-- Stock Status -->
+    <div
+      class="stock-status"
+      [class.in-stock]="product.inStock"
+      [class.out-of-stock]="!product.inStock">
+
+      <span class="dot"></span>
+      {{ product.inStock ? 'In Stock' : 'Out of Stock' }}
+    </div>
 
   </div>
 </div>
