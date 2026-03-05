@@ -1,16 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { OrderService } from '../../services/order.service';
-import { Order } from 'src/app/models/order-model';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
-interface StatusCounts {
-  [key: string]: number; // <-- Allow dynamic indexing
-  all: number;
-  pending: number;
-  confirmed: number;
-  processing: number;
-  shipped: number;
-  delivered: number;
-  cancelled: number;
+interface Order {
+  _id?: string;
+  customer: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+  };
+  items: Array<{
+    productName: string;
+    price: number;
+    quantity: number;
+    size?: string;
+    color?: string;
+  }>;
+  totalAmount: number;
+  orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  createdAt?: Date | string;
+  notes?: string;
 }
 
 @Component({
@@ -19,71 +29,128 @@ interface StatusCounts {
   styleUrls: ['./admin-order.component.css']
 })
 export class AdminOrderComponent implements OnInit {
-
+  // Navigation properties
+  adminName = 'Admin';
+  notificationCount = 5;
+  
+  // Orders
   orders: Order[] = [];
   filteredOrders: Order[] = [];
-
-  // Filters
+  
+  // Filter & Search
+  searchQuery = '';
   filterStatus: string = 'all';
-  searchQuery: string = '';
-
-  // Stats
-  statusCounts: StatusCounts = {
-    all: 0,
-    pending: 0,
-    confirmed: 0,
-    processing: 0,
-    shipped: 0,
-    delivered: 0,
-    cancelled: 0
-  };
-
-  // UI states
-  isLoading = false;
+  
+  // Modal
+  showOrderDetails = false;
+  selectedOrder: Order | null = null;
+  
+  // Messages
   successMessage = '';
   errorMessage = '';
+  
+  // Loading
+  isLoading = true;
+  
+  // API URL
+  private apiUrl = 'http://localhost:3000/api/orders';
 
-  // Selected order
-  selectedOrder: Order | null = null;
-  showOrderDetails = false;
-
-  constructor(private orderService: OrderService) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
+    // Add demo orders first
+    this.addDemoOrders();
+    // Then load real orders
     this.loadOrders();
   }
 
-  /* ================= LOAD ORDERS ================= */
-  loadOrders(): void {
-    this.isLoading = true;
+  addDemoOrders(): void {
+    // Add 2 demo orders
+    this.orders = [
+      {
+        _id: 'ORDER001',
+        customer: {
+          firstName: 'Sarah',
+          lastName: 'Johnson',
+          phone: '+1 (555) 123-4567',
+          email: 'sarah.johnson@example.com'
+        },
+        items: [
+          {
+            productName: 'Floral Summer Dress',
+            price: 89.99,
+            quantity: 2,
+            size: 'M',
+            color: 'Pink'
+          },
+          {
+            productName: 'Cotton T-Shirt',
+            price: 29.99,
+            quantity: 1,
+            size: 'S',
+            color: 'White'
+          }
+        ],
+        totalAmount: 209.97,
+        orderStatus: 'processing',
+        createdAt: new Date('2024-03-01T10:30:00'),
+        notes: 'Please deliver before weekend'
+      },
+      {
+        _id: 'ORDER002',
+        customer: {
+          firstName: 'Michael',
+          lastName: 'Chen',
+          phone: '+1 (555) 987-6543',
+          email: 'michael.chen@example.com'
+        },
+        items: [
+          {
+            productName: 'Classic Denim Jeans',
+            price: 69.99,
+            quantity: 1,
+            size: 'L',
+            color: 'Blue'
+          }
+        ],
+        totalAmount: 69.99,
+        orderStatus: 'delivered',
+        createdAt: new Date('2024-02-28T15:45:00'),
+        notes: ''
+      }
+    ];
+    
+    this.filteredOrders = [...this.orders];
+    this.isLoading = false;
+  }
 
-    this.orderService.getAllOrders().subscribe({
+  // Load all orders from API
+  loadOrders(): void {
+    this.http.get<any>(this.apiUrl).subscribe({
       next: (response) => {
-        this.orders = response.orders || [];
-        this.calculateStatusCounts();
+        // Merge API orders with demo orders (if any)
+        const apiOrders = response.orders || [];
+        // Only replace with API orders if they exist, otherwise keep demo orders
+        if (apiOrders.length > 0) {
+          this.orders = apiOrders;
+        }
+        // If no API orders, demo orders stay from addDemoOrders()
         this.applyFilters();
-        this.isLoading = false;
+        console.log('Orders loaded:', this.orders.length);
       },
       error: (error) => {
         console.error('Error loading orders:', error);
-        this.showError('Failed to load orders');
-        this.isLoading = false;
+        // On error, keep demo orders
+        this.showError('Using demo orders (API unavailable)');
+        this.applyFilters();
       }
     });
   }
 
-  /* ================= STATS ================= */
-  calculateStatusCounts(): void {
-    this.statusCounts.all = this.orders.length;
-    this.statusCounts.pending = this.orders.filter(o => o.orderStatus === 'pending').length;
-    this.statusCounts.confirmed = this.orders.filter(o => o.orderStatus === 'confirmed').length;
-    this.statusCounts.processing = this.orders.filter(o => o.orderStatus === 'processing').length;
-    this.statusCounts.shipped = this.orders.filter(o => o.orderStatus === 'shipped').length;
-    this.statusCounts.delivered = this.orders.filter(o => o.orderStatus === 'delivered').length;
-    this.statusCounts.cancelled = this.orders.filter(o => o.orderStatus === 'cancelled').length;
-  }
-
-  /* ================= FILTERS ================= */
+  // Apply filters
   applyFilters(): void {
     let filtered = [...this.orders];
 
@@ -96,9 +163,9 @@ export class AdminOrderComponent implements OnInit {
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(o =>
-        o.customer.firstName.toLowerCase().includes(query) ||
-        o.customer.lastName.toLowerCase().includes(query) ||
-        o.customer.phone.includes(query) ||
+        `${o.customer.firstName} ${o.customer.lastName}`.toLowerCase().includes(query) ||
+        o.customer.phone.toLowerCase().includes(query) ||
+        o.customer.email.toLowerCase().includes(query) ||
         o.items.some(item => item.productName.toLowerCase().includes(query))
       );
     }
@@ -106,33 +173,57 @@ export class AdminOrderComponent implements OnInit {
     this.filteredOrders = filtered;
   }
 
+  // Filter by status
   filterByStatus(status: string): void {
     this.filterStatus = status;
     this.applyFilters();
   }
 
+  // Search
   onSearch(): void {
     this.applyFilters();
   }
 
-  /* ================= DETAILS ================= */
+  // Get status count
+  getStatusCount(status: string): number {
+    if (status === 'all') return this.orders.length;
+    return this.orders.filter(o => o.orderStatus === status).length;
+  }
+
+  // Get status color
+  getStatusColor(status: string): string {
+    const colors: { [key: string]: string } = {
+      'pending': '#f59e0b',
+      'processing': '#3b82f6',
+      'shipped': '#8b5cf6',
+      'delivered': '#10b981',
+      'cancelled': '#ef4444'
+    };
+    return colors[status] || '#808080';
+  }
+
+  // View order details
   viewOrderDetails(order: Order): void {
     this.selectedOrder = order;
     this.showOrderDetails = true;
   }
 
+  // Close order details
   closeOrderDetails(): void {
-    this.selectedOrder = null;
     this.showOrderDetails = false;
+    this.selectedOrder = null;
   }
 
-  /* ================= ACTIONS ================= */
+  // Update order status
   updateStatus(order: Order, newStatus: string): void {
     if (!order._id) return;
 
-    this.orderService.updateOrderStatus(order._id, newStatus).subscribe({
-      next: () => {
-        this.showSuccess(`Order status updated to ${newStatus}`);
+    this.http.put<any>(`${this.apiUrl}/${order._id}`, {
+      orderStatus: newStatus
+    }).subscribe({
+      next: (response) => {
+        order.orderStatus = newStatus as any;
+        this.showSuccess(`Order status updated to ${newStatus}!`);
         this.loadOrders();
       },
       error: (error) => {
@@ -142,15 +233,19 @@ export class AdminOrderComponent implements OnInit {
     });
   }
 
+  // Delete order
   deleteOrder(order: Order): void {
-    if (!order._id) return;
-    if (!confirm('Are you sure you want to delete this order?')) return;
+    if (!confirm('Are you sure you want to delete this order?')) {
+      return;
+    }
 
-    this.orderService.deleteOrder(order._id).subscribe({
-      next: () => {
-        this.showSuccess('Order deleted successfully');
-        this.loadOrders();
+    if (!order._id) return;
+
+    this.http.delete<any>(`${this.apiUrl}/${order._id}`).subscribe({
+      next: (response) => {
+        this.showSuccess('Order deleted successfully!');
         this.closeOrderDetails();
+        this.loadOrders();
       },
       error: (error) => {
         console.error('Error deleting order:', error);
@@ -159,30 +254,43 @@ export class AdminOrderComponent implements OnInit {
     });
   }
 
-  /* ================= HELPERS ================= */
-  getStatusColor(status: string): string {
-    const colors: Record<string, string> = {
-      pending: '#FFA500',
-      confirmed: '#4CAF50',
-      processing: '#2196F3',
-      shipped: '#9C27B0',
-      delivered: '#4CAF50',
-      cancelled: '#F44336'
-    };
-    return colors[status] || '#666';
-  }
-  getStatusCount(status: string): number {
-    return this.statusCounts[status as keyof StatusCounts] || 0;
-  }
+  // Show messages
   showSuccess(message: string): void {
     this.successMessage = message;
-    this.errorMessage = '';
-    setTimeout(() => (this.successMessage = ''), 3000);
+    setTimeout(() => this.successMessage = '', 3000);
   }
 
   showError(message: string): void {
     this.errorMessage = message;
-    this.successMessage = '';
-    setTimeout(() => (this.errorMessage = ''), 5000);
+    setTimeout(() => this.errorMessage = '', 3000);
+  }
+
+  // Navigation methods
+  navigateTo(route: string): void {
+    this.router.navigate([`/admin/${route}`]);
+  }
+
+  performSearch(): void {
+    this.onSearch();
+  }
+
+  getInitials(): string {
+    return this.adminName.split(' ').map(n => n[0]).join('').toUpperCase();
+  }
+
+  logout(): void {
+    if (confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('adminToken');
+      sessionStorage.clear();
+      this.router.navigate(['/admin/login']);
+    }
+  }
+
+  // Format currency
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
   }
 }

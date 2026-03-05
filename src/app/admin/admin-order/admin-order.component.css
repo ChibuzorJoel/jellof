@@ -1,390 +1,688 @@
-.orders-container {
-    padding: 2rem;
-    background: #f5f5f5;
-    min-height: 100vh;
+/* Import Dark Theme Navigation Styles */
+@import url('../admin-dashboard/admin-dashboard.component.css');
+
+/* ===================================
+   ADMIN ORDERS PAGE
+=================================== */
+
+.admin-page {
+  min-height: 100vh;
+
+}
+
+.page-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ===================================
+   MESSAGES
+=================================== */
+
+.message {
+  position: fixed;
+  top: 80px;
+  right: 2rem;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 700;
+  z-index: 10000;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.success-message {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 2px solid #10b981;
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 2px solid #ef4444;
+}
+
+/* ===================================
+   PAGE HEADER
+=================================== */
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color:black;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  color: #b0b0b0;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* ===================================
+   STATUS TABS
+=================================== */
+
+.status-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.status-tab {
+  padding: 0.9rem 1.5rem;
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-tab:hover {
+  background: #242424;
+  border-color: #2d5016;
+}
+
+.status-tab.active {
+  background: #2d5016;
+  border-color: #2d5016;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(106, 192, 69, 0.3);
+}
+
+.tab-count {
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.status-tab.active .tab-count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ===================================
+   TABLE CARD
+=================================== */
+
+.table-card {
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #242424;
+}
+
+.table-header h3 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===================================
+   ORDERS TABLE
+=================================== */
+
+.table-container {
+  overflow-x: auto;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orders-table thead {
+  background: #242424;
+}
+
+.orders-table th {
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #b0b0b0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #333;
+}
+
+.orders-table tbody tr {
+  border-bottom: 1px solid #242424;
+  transition: all 0.2s ease;
+}
+
+.orders-table tbody tr:hover {
+  background: #242424;
+}
+
+.orders-table td {
+  padding: 1.25rem 1.5rem;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.order-id {
+  font-weight: 800;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.customer-name {
+  font-weight: 700;
+  color: #fff;
+}
+
+.quantity {
+  font-weight: 700;
+  text-align: center;
+}
+
+.price {
+  font-weight: 800;
+  color: #5fa832;
+  font-size: 1.1rem;
+}
+
+.date {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+/* ===================================
+   STATUS BADGES
+=================================== */
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ===================================
+   VIEW BUTTON
+=================================== */
+
+.btn-view {
+  padding: 0.6rem 1.25rem;
+  background: #3b82f6;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.btn-view:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.05);
+}
+
+/* ===================================
+   EMPTY STATE
+=================================== */
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #808080;
+}
+
+.empty-state svg {
+  color: #404040;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state p {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ===================================
+   ORDER DETAILS MODAL
+=================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.order-modal {
+  max-width: 900px;
+  width: 95%;
+  max-height: 90vh;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #242424;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #242424;
+}
+
+.modal-header h2 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.close-btn {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 2px solid #404040;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.modal-body {
+  padding: 2rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* ===================================
+   INFO SECTIONS
+=================================== */
+
+.info-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #242424;
+}
+
+.info-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.info-section h3 {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #5fa832;
+  margin: 0 0 1.25rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #b0b0b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ===================================
+   ITEMS TABLE
+=================================== */
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.items-table thead {
+  background: #242424;
+}
+
+.items-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #b0b0b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.items-table td {
+  padding: 0.75rem 1rem;
+  color: #e0e0e0;
+  font-weight: 500;
+  border-bottom: 1px solid #242424;
+}
+
+.item-total {
+  font-weight: 800;
+  color: #5fa832;
+}
+
+.order-total {
+  text-align: right;
+  font-size: 1.25rem;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  background: #242424;
+  border-radius: 8px;
+  border: 2px solid #2d5016;
+}
+
+.notes-text {
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 1rem;
+  background: #242424;
+  border-radius: 8px;
+  border-left: 4px solid #5fa832;
+}
+
+/* ===================================
+   STATUS UPDATE BUTTONS
+=================================== */
+
+.status-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-update-btn {
+  padding: 0.9rem 1.75rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-update-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.status-update-btn.active {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+/* ===================================
+   MODAL FOOTER
+=================================== */
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #242424;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #242424;
+}
+
+.btn-delete {
+  padding: 0.9rem 2rem;
+  background: #ef4444;
+  border: 2px solid #ef4444;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.btn-secondary {
+  padding: 0.9rem 2rem;
+  background: #404040;
+  border: 2px solid #404040;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.btn-secondary:hover {
+  background: #2d2d2d;
+  transform: translateY(-2px);
+}
+
+/* ===================================
+   LOADING STATE
+=================================== */
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  width: 70px;
+  height: 70px;
+  border: 5px solid #242424;
+  border-top: 5px solid #5fa832;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+  margin-top: 2rem;
+  color: #fff;
+  font-weight: 900;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ===================================
+   SCROLLBAR
+=================================== */
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #5fa832;
+}
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media (max-width: 1024px) {
+  .status-tabs {
+    gap: 0.5rem;
   }
   
-  .page-header {
-    margin-bottom: 2rem;
+  .status-tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    padding: 1rem;
   }
   
   .page-header h1 {
-    font-size: 2rem;
-    color: #2d5016;
-    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
   }
   
-  .page-header p {
-    color: #666;
-  }
-  
-  /* Messages */
-  .messages {
-    margin-bottom: 1rem;
-  }
-  
-  .alert {
-    padding: 1rem 1.5rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-  }
-  
-  .alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-  }
-  
-  .alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-  }
-  
-  /* Status Tabs */
   .status-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+    overflow-x: auto;
+    flex-wrap: nowrap;
   }
   
-  .status-tabs button {
-    padding: 0.8rem 1.5rem;
-    border: 2px solid #e0e0e0;
-    background: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .status-tabs button:hover {
-    border-color: #2d5016;
-  }
-  
-  .status-tabs button.active {
-    background: #2d5016;
-    color: white;
-    border-color: #2d5016;
-  }
-  
-  .count {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
+  .orders-table th,
+  .orders-table td {
+    padding: 0.75rem;
     font-size: 0.85rem;
-  }
-  
-  .status-tabs button.active .count {
-    background: rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Search Bar */
-  .search-bar {
-    margin-bottom: 1.5rem;
-  }
-  
-  .search-bar input {
-    width: 100%;
-    max-width: 500px;
-    padding: 0.8rem 1rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .search-bar input:focus {
-    outline: none;
-    border-color: #2d5016;
-  }
-  
-  /* Loading */
-  .loading {
-    text-align: center;
-    padding: 4rem;
-    font-size: 1.2rem;
-    color: #666;
-  }
-  
-  /* Table */
-  .orders-table {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  thead {
-    background: #2d5016;
-    color: white;
-  }
-  
-  th {
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  td {
-    padding: 1rem;
-    border-bottom: 1px solid #e0e0e0;
-    color: #666;
-  }
-  
-  tr:hover {
-    background: #f9f9f9;
-  }
-  
-  .price {
-    font-weight: 700;
-    color: #2d5016;
-    font-size: 1.1rem;
-  }
-  
-  .status-badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .btn-view {
-    padding: 0.5rem 1rem;
-    background: #2196F3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s ease;
-  }
-  
-  .btn-view:hover {
-    background: #1976D2;
-  }
-  
-  .empty-state {
-    text-align: center;
-    padding: 4rem;
-    color: #999;
-    font-size: 1.2rem;
-  }
-  
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 2rem;
-  }
-  
-  .modal-content {
-    background: white;
-    border-radius: 8px;
-    max-width: 800px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  }
-  
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem;
-    border-bottom: 2px solid #e0e0e0;
-  }
-  
-  .modal-header h2 {
-    margin: 0;
-    color: #2d5016;
-  }
-  
-  .btn-close {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #666;
-    width: 40px;
-    height: 40px;
-  }
-  
-  .btn-close:hover {
-    color: #000;
-  }
-  
-  .modal-body {
-    padding: 2rem;
-  }
-  
-  .info-section {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .info-section:last-child {
-    border-bottom: none;
-  }
-  
-  .info-section h3 {
-    color: #2d5016;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
   }
   
   .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-  
-  .info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  
-  .info-item label {
-    font-weight: 600;
-    color: #666;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .info-item span {
-    color: #333;
-    font-size: 1rem;
-  }
-  
-  .total-price {
-    font-size: 1.5rem !important;
-    font-weight: 700 !important;
-    color: #2d5016 !important;
+    grid-template-columns: 1fr;
   }
   
   .status-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-direction: column;
   }
   
-  .status-buttons button {
-    padding: 0.6rem 1.2rem;
-    border: 2px solid transparent;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-  }
-  
-  .status-buttons button:hover {
-    opacity: 0.8;
-    transform: translateY(-2px);
-  }
-  
-  .status-buttons button.active {
-    border-color: #333;
-    box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+  .status-update-btn {
+    width: 100%;
   }
   
   .modal-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 1.5rem 2rem;
-    border-top: 2px solid #e0e0e0;
+    flex-direction: column;
   }
   
-  .btn-delete {
-    padding: 0.8rem 1.5rem;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  
-  .btn-delete:hover {
-    background: #c82333;
-  }
-  
+  .btn-delete,
   .btn-secondary {
-    padding: 0.8rem 1.5rem;
-    background: #666;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
+    width: 100%;
   }
   
-  .btn-secondary:hover {
-    background: #555;
+  .message {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
   }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .orders-container {
-      padding: 1rem;
-    }
-  
-    .status-tabs {
-      overflow-x: auto;
-    }
-  
-    table {
-      font-size: 0.85rem;
-    }
-  
-    th, td {
-      padding: 0.75rem 0.5rem;
-    }
-  
-    .modal-content {
-      max-width: 100%;
-      margin: 0;
-      border-radius: 0;
-    }
-  
-    .info-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .status-buttons {
-      flex-direction: column;
-    }
-  
-    .status-buttons button {
-      width: 100%;
-    }
-  }
+}

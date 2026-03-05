@@ -43,6 +43,8 @@ import { LiveChatComponent } from './components/live-chat/live-chat.component';
 import { CartNotificationComponent } from './pages/components/cart-notification/cart-notification.component';
 import { ScrollAnimationDirective } from './directives/scroll-animation.directive';
 import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.component';
+import { AdminCategoriesComponent } from './admin/admin-categories/admin-categories.component';
+
 
 
 @NgModule({
@@ -77,6 +79,8 @@ import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.componen
     CartNotificationComponent,
     ScrollAnimationDirective,
     AdminLayoutComponent,
+    AdminCategoriesComponent,
+    
     
   ],
   imports: [

@@ -1,38 +1,27 @@
 export interface Product {
-  id?: string;        // frontend-friendly
-  _id?: string;       // backend (MongoDB)
-
+  id?: string;
+  _id?: string;
   name: string;
   category: string;
   price: number;
-
-  /* ================= MEDIA ================= */
   image: string;
   images?: string[];
-
-  /* ================= DESCRIPTION ================= */
   description?: string;
-
-  /* ================= FLAGS ================= */
   isNew?: boolean;
   inStock?: boolean;
-
-  /* ================= VARIANTS ================= */
   colors?: string[];
   sizes?: string[];
-
-  /* ================= PRICING ================= */
-  originalPrice?: number;     // Enables SALE badge & discount %
-  
-  /* ================= RATINGS ================= */
-  rating?: number;            // 1–5 stars
+  originalPrice?: number;
+  rating?: number;
   reviewCount?: number;
-
-  /* ================= INVENTORY ================= */
-  stockQuantity?: number;
+  stockQuantity?: number;   // <-- use this for stock count
   sku?: string;
-
-  /* ================= TIMESTAMPS ================= */
   createdAt?: Date;
   updatedAt?: Date;
+}
+
+// Optional wrapper for service responses
+export interface ProductsResponse {
+  success: boolean;
+  products: Product[];
 }
