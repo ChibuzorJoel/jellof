@@ -17,11 +17,11 @@
         </a>
         
         <div class="topbar-nav">
-          <a routerLink="/admin/dashboard" class="nav-link">Dashboard</a>
-          <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">Products</a>
-          <a routerLink="/admin/orders" class="nav-link">Orders</a>
-          <a routerLink="/admin/categories" class="nav-link">Categories</a>
-          <a routerLink="/admin/contacts" class="nav-link">Messages</a>
+          <a routerLink="/admin/dashboard" class="nav-link">DASHBOARD</a>
+          <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">PRODUCTS</a>
+          <a routerLink="/admin/orders" class="nav-link">ORDERS</a>
+          <a routerLink="/admin/categories" class="nav-link">CATEGORIES</a>
+          <a routerLink="/admin/contacts" class="nav-link">MESSAGES</a>
         </div>
       </div>
       
@@ -57,7 +57,7 @@
           <div class="profile-avatar">{{ getInitials() }}</div>
           <div class="profile-info">
             <div class="profile-name">{{ adminName }}</div>
-            <div class="profile-role">Administrator</div>
+            <div class="profile-role">ADMINISTRATOR</div>
           </div>
         </div>
         
@@ -68,7 +68,7 @@
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
           </svg>
-          Logout
+          LOGOUT
         </button>
       </div>
     </div>
@@ -76,10 +76,10 @@
 
   <!-- Success/Error Messages -->
   <div class="message success-message" *ngIf="successMessage">
-    {{ successMessage }}
+    ✓ {{ successMessage }}
   </div>
   <div class="message error-message" *ngIf="errorMessage">
-    {{ errorMessage }}
+    ✗ {{ errorMessage }}
   </div>
 
   <!-- Loading State -->
@@ -94,7 +94,7 @@
     <!-- Page Header -->
     <div class="page-header">
       <div>
-        <h1>Product Management</h1>
+        <h1>PRODUCT MANAGEMENT</h1>
         <p class="subtitle">Manage your product inventory</p>
       </div>
       <button class="add-btn" (click)="addProduct()">
@@ -102,7 +102,7 @@
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        Add Product
+        ADD PRODUCT
       </button>
     </div>
 
@@ -122,7 +122,7 @@
       
       <!-- Table Header -->
       <div class="table-header">
-        <h3>All Products ({{ filteredProducts.length }})</h3>
+        <h3>ALL PRODUCTS ({{ filteredProducts.length }})</h3>
       </div>
 
       <!-- Products Table -->
@@ -130,13 +130,13 @@
         <table class="products-table">
           <thead>
             <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock Qty</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>IMAGE</th>
+              <th>NAME</th>
+              <th>CATEGORY</th>
+              <th>PRICE</th>
+              <th>STOCK QTY</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
@@ -210,19 +210,7 @@
   </div>
 </div>
 
-<!-- Product Form Modal (Your existing form can go here) -->
-<div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>{{ isEditing ? 'Edit Product' : 'Add New Product' }}</h2>
-      <button class="close-btn" (click)="closeForm()">×</button>
-    </div>
-    <div class="modal-body">
-      <!-- Add your existing product form here -->
-     <!-- ADD THIS TO YOUR admin-product.component.html -->
-<!-- Replace the existing modal section with this complete form -->
-
-<!-- Product Form Modal -->
+<!-- Product Form Modal with WYSIWYG Editor -->
 <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
   <div class="modal-dialog" (click)="$event.stopPropagation()">
     
@@ -273,20 +261,22 @@
           required>
       </div>
 
-      <!-- Description -->
+      <!-- Description with WYSIWYG Editor -->
       <div class="form-group">
-        <label class="form-label">Description *</label>
-        <textarea 
-          class="form-textarea"
+        <label class="form-label">Product Description *</label>
+        <quill-editor 
           [(ngModel)]="newProduct.description"
-          placeholder="Enter product description"
-          rows="4"
-          required></textarea>
+          [modules]="quillModules"
+          [styles]="quillStyles"
+          placeholder="Write a detailed product description..."
+          class="quill-editor-custom">
+        </quill-editor>
+        <small class="form-hint">Use the toolbar to format text, add lists, and insert links</small>
       </div>
 
       <!-- Image URL -->
       <div class="form-group">
-        <label class="form-label">Image URL *</label>
+        <label class="form-label">Main Image URL *</label>
         <input 
           type="text" 
           class="form-input"
@@ -419,8 +409,5 @@
       </button>
     </div>
 
-  </div>
-</div>
-    </div>
   </div>
 </div>

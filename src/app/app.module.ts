@@ -1,10 +1,14 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
+
+// Angular Modules
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
+// Quill WYSIWYG Editor
+import { QuillModule } from 'ngx-quill';
 
 // Main App
 import { AppComponent } from './app.component';
@@ -23,38 +27,39 @@ import { ProductSearchComponent } from './pages/product-search/product-search.co
 import { QuickViewComponent } from './pages/quick-view/quick-view.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { AuthComponent } from './pages/auth/auth.component';
+import { CartComponent } from './pages/cart/cart.component';
 
 // Shared Components
 import { ProductCardComponent } from './shared/product-card/product-card.component';
+import { CartNotificationComponent } from './pages/components/cart-notification/cart-notification.component';
+import { LiveChatComponent } from './components/live-chat/live-chat.component';
+
+// Directives
+import { ScrollAnimationDirective } from './directives/scroll-animation.directive';
 
 // Admin Components
 import { AdminLoginComponent } from './admin/admin-login/admin-login.component';
-import { AdminProductComponent } from './admin/admin-product/admin-product.component';
+import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.component';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
+import { AdminProductComponent } from './admin/admin-product/admin-product.component';
 import { AdminOrderComponent } from './admin/admin-order/admin-order.component';
+import { AdminCategoriesComponent } from './admin/admin-categories/admin-categories.component';
+import { AdminMessageComponent } from './admin/admin-message/admin-message.component';
 
 // Services
 import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
 import { OrderService } from './services/order.service';
 import { ProductService } from './services/product.service';
-import { CartComponent } from './pages/cart/cart.component';
-import { LiveChatComponent } from './components/live-chat/live-chat.component';
-import { CartNotificationComponent } from './pages/components/cart-notification/cart-notification.component';
-import { ScrollAnimationDirective } from './directives/scroll-animation.directive';
-import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.component';
-import { AdminCategoriesComponent } from './admin/admin-categories/admin-categories.component';
-
-
 
 @NgModule({
   declarations: [
     AppComponent,
-    
+
     // Layout
     HeaderComponent,
     FooterComponent,
-    
+
     // Pages
     HomeComponent,
     AboutComponent,
@@ -65,38 +70,45 @@ import { AdminCategoriesComponent } from './admin/admin-categories/admin-categor
     QuickViewComponent,
     CheckoutComponent,
     AuthComponent,
-    
-    // Shared
+    CartComponent,
+
+    // Shared Components
     ProductCardComponent,
-    
+    CartNotificationComponent,
+    LiveChatComponent,
+
+    // Directives
+    ScrollAnimationDirective,
+
     // Admin
     AdminLoginComponent,
-    AdminProductComponent,
-    AdminDashboardComponent,
-    AdminOrderComponent,
-    CartComponent,
-    LiveChatComponent,
-    CartNotificationComponent,
-    ScrollAnimationDirective,
     AdminLayoutComponent,
+    AdminDashboardComponent,
+    AdminProductComponent,
+    AdminOrderComponent,
     AdminCategoriesComponent,
-    
-    
+    AdminMessageComponent
   ],
+
   imports: [
     BrowserModule,
-    CommonModule,
     AppRoutingModule,
+
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+
+    // Quill Editor
+    QuillModule.forRoot()
   ],
+
   providers: [
     AuthService,
     CartService,
     OrderService,
     ProductService
   ],
+
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -16,11 +16,13 @@ import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard
 import { AdminProductComponent } from './admin/admin-product/admin-product.component';
 import { AdminOrderComponent } from './admin/admin-order/admin-order.component';
 import { CartComponent } from './pages/cart/cart.component';
+import { AdminCategoriesComponent } from './admin/admin-categories/admin-categories.component';
+import { AdminMessageComponent } from './admin/admin-message/admin-message.component';
 
 // Guards (commented out until you create the files)
-// import { AuthGuard } from './guards/auth.guard';
-// import { AdminAuthGuard } from './guards/admin-auth.guard';
-
+import { AuthGuard } from './guards/auth.guard';
+ import { AdminAuthGuard } from './guards/admin-auth.guard';
+ 
 const routes: Routes = [
   // Public Routes
   { path: '', component: HomeComponent },
@@ -38,7 +40,7 @@ const routes: Routes = [
   { 
     path: 'checkout', 
     component: CheckoutComponent
-    // canActivate: [AuthGuard]  // ← Uncomment after creating AuthGuard
+    //canActivate: [AuthGuard]  // ← Uncomment after creating AuthGuard
   },
   { path: 'cart', component: CartComponent },
   
@@ -57,9 +59,18 @@ const routes: Routes = [
   { 
     path: 'admin/orders', 
     component: AdminOrderComponent
+    //canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
+  },
+  { 
+    path: 'admin/categories', 
+    component: AdminCategoriesComponent
     // canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
   },
-  
+  { 
+    path: 'admin/contacts', 
+    component: AdminMessageComponent
+    // canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
+  },
   
   // Wildcard Route (404)
   { path: '**', redirectTo: '', pathMatch: 'full' }

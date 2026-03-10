@@ -7,6 +7,7 @@ interface Product {
   name: string;
   category: string;
   price: number;
+  discountPrice?: number;
   description: string;
   image: string;
   images?: string[];
@@ -15,6 +16,7 @@ interface Product {
   sizes: string[];
   inStock: boolean;
   stockQuantity: number;
+  isOnSale?: boolean;
 }
 
 @Component({
@@ -23,51 +25,69 @@ interface Product {
   styleUrls: ['./admin-product.component.css']
 })
 export class AdminProductComponent implements OnInit {
-  // Navigation properties
+  // Navigation
   adminName = 'Admin';
   notificationCount = 5;
-  
+  searchQuery = '';
+
   // Products
   products: Product[] = [];
   filteredProducts: Product[] = [];
-  
-  // Form states
-  isEditing = false;
-  editingProduct: Product | null = null;
+  paginatedProducts: Product[] = [];
+
+  // Categories
+  categories: string[] = ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Accessories', 'Shoes'];
+  filterCategory = 'all';
+
+  // Available options
+  availableSizes: string[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+  // Form state
   showForm = false;
-  
-  // New product form
+  isEditing = false;
   newProduct: Product = this.getEmptyProduct();
   
-  // Filter/Search
-  searchQuery = '';
-  filterCategory = 'all';
-  
-  // Categories
-  categories = ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Accessories'];
-  
-  // Sizes
-  availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  
-  // Form helper properties
+  // Additional form fields
   colorInput = '';
   additionalImage1 = '';
   additionalImage2 = '';
-  
-  // API URL
-  private apiUrl = 'http://localhost:3000/api/products';
-  
-  // Messages
-  successMessage = '';
-  errorMessage = '';
-  
-  // Loading
-  isLoading = true;
-  
+
   // Pagination
   currentPage = 1;
   itemsPerPage = 10;
   totalPages = 1;
+
+  // Messages
+  successMessage = '';
+  errorMessage = '';
+  isLoading = true;
+
+  // API URL
+  private apiUrl = 'http://localhost:3000/api/products';
+
+  // Quill Editor Configuration
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'align': [] }],
+      ['link', 'image'],
+      ['clean']
+    ]
+  };
+
+  quillStyles = {
+    height: '250px',
+    backgroundColor: '#222',
+    color: '#fff',
+    border: '1px solid #333',
+    borderRadius: '6px'
+  };
 
   constructor(
     private http: HttpClient,
@@ -75,74 +95,103 @@ export class AdminProductComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Add demo data first
     this.addDemoProducts();
-    // Then load real products
     this.loadProducts();
   }
 
+  // Add demo products
   addDemoProducts(): void {
-    // Add 2 demo products
     this.products = [
       {
         _id: 'DEMO001',
         name: 'Floral Summer Dress',
         category: 'Dresses',
         price: 89.99,
-        description: 'Beautiful floral print summer dress, perfect for warm weather',
-        image: 'https://via.placeholder.com/60/2d5016/ffffff?text=Dress',
-        images: ['https://via.placeholder.com/300/2d5016/ffffff?text=Dress'],
+        discountPrice: 69.99,
+        description: `<h2>Beautiful Floral Summer Dress</h2>
+<p>Perfect for warm weather and outdoor events!</p>
+
+<h3>Features:</h3>
+<ul>
+  <li><strong>Premium Quality</strong> - Made from 100% breathable cotton</li>
+  <li><strong>Comfortable Fit</strong> - Relaxed silhouette for all-day wear</li>
+  <li><strong>Vibrant Colors</strong> - Beautiful floral print that won't fade</li>
+  <li><strong>Easy Care</strong> - Machine washable, wrinkle-resistant</li>
+</ul>
+
+<h3>Perfect For:</h3>
+<ul>
+  <li>Summer parties</li>
+  <li>Beach vacations</li>
+  <li>Casual outings</li>
+  <li>Garden events</li>
+</ul>
+
+<p><strong>Size Guide:</strong> Available in S, M, L, XL. Please refer to our size chart for the perfect fit.</p>
+
+<p><em>This dress pairs beautifully with sandals or sneakers for a casual look, or dress it up with heels for evening events!</em></p>`,
+        image: 'assets/images/instagram-3.jpeg',
+        images: [
+          'assets/images/instagram-3.jpeg',
+          'assets/images/instagram-2.jpeg',
+          'assets/images/instagram-1.jpeg'
+        ],
         isNew: true,
-        colors: ['Pink', 'Blue', 'White'],
-        sizes: ['S', 'M', 'L'],
+        colors: ['Pink', 'Blue', 'Yellow', 'White'],
+        sizes: ['S', 'M', 'L', 'XL'],
         inStock: true,
-        stockQuantity: 25
+        stockQuantity: 15,
+        isOnSale: true
       },
       {
         _id: 'DEMO002',
         name: 'Classic Denim Jeans',
         category: 'Bottoms',
         price: 69.99,
-        description: 'High-quality denim jeans with perfect fit',
-        image: 'https://via.placeholder.com/60/1f3710/ffffff?text=Jeans',
-        images: ['https://via.placeholder.com/300/1f3710/ffffff?text=Jeans'],
+        description: `<h2>Classic Denim Jeans</h2>
+<p>Timeless style meets modern comfort in these classic denim jeans.</p>
+
+<h3>Features:</h3>
+<ul>
+  <li><strong>Premium Denim</strong> - High-quality fabric that lasts</li>
+  <li><strong>Perfect Fit</strong> - Designed for all body types</li>
+  <li><strong>Versatile Style</strong> - Dress up or down</li>
+</ul>`,
+        image: 'assets/images/instagram-2.jpeg',
+        images: ['https://via.placeholder.com/400/1976D2/ffffff?text=Denim+Jeans'],
         isNew: false,
-        colors: ['Blue', 'Black'],
-        sizes: ['XS', 'S', 'M', 'L', 'XL'],
+        colors: ['Blue', 'Black', 'Grey'],
+        sizes: ['S', 'M', 'L', 'XL'],
         inStock: true,
-        stockQuantity: 8
+        stockQuantity: 8,
+        isOnSale: false
       }
     ];
     
-    this.filteredProducts = [...this.products];
-    this.calculatePagination();
+    this.applyFilters();
     this.isLoading = false;
   }
 
-  // Load all products from API
+  // Load products from API
   loadProducts(): void {
     this.http.get<any>(this.apiUrl).subscribe({
       next: (response) => {
-        // Merge API products with demo products (if any)
         const apiProducts = response.products || [];
-        // Only add API products if they exist, otherwise keep demo products
         if (apiProducts.length > 0) {
           this.products = apiProducts;
         }
-        // If no API products, demo products stay from addDemoProducts()
         this.applyFilters();
         console.log('Products loaded:', this.products.length);
       },
       error: (error) => {
         console.error('Error loading products:', error);
-        // On error, keep demo products
         this.showError('Using demo products (API unavailable)');
         this.applyFilters();
       }
     });
   }
 
-  // Apply search and filters
+  // Apply filters and pagination
   applyFilters(): void {
     let filtered = [...this.products];
 
@@ -154,7 +203,7 @@ export class AdminProductComponent implements OnInit {
     // Search filter
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(p => 
+      filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(query) ||
         p.category.toLowerCase().includes(query) ||
         p.description.toLowerCase().includes(query)
@@ -162,48 +211,136 @@ export class AdminProductComponent implements OnInit {
     }
 
     this.filteredProducts = filtered;
-    this.calculatePagination();
+    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+    this.updatePaginatedProducts();
   }
 
-  calculatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
-    if (this.currentPage > this.totalPages && this.totalPages > 0) {
-      this.currentPage = this.totalPages;
+  // Update paginated products
+  updatePaginatedProducts(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedProducts = this.filteredProducts.slice(startIndex, endIndex);
+  }
+
+  // Pagination methods
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedProducts();
     }
   }
 
-  get paginatedProducts(): Product[] {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.filteredProducts.slice(start, end);
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedProducts();
+    }
   }
 
-  // Show create form (renamed from showCreateForm to match HTML)
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.updatePaginatedProducts();
+  }
+
+  // Category change
+  onCategoryChange(): void {
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  // Search
+  performSearch(): void {
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.filterCategory = 'all';
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  // Discount pricing methods
+  getDiscountPercentage(product: Product): number {
+    if (!product.discountPrice || product.discountPrice >= product.price) {
+      return 0;
+    }
+    return Math.round(((product.price - product.discountPrice) / product.price) * 100);
+  }
+
+  isProductOnSale(product: Product): boolean {
+    return !!(product.discountPrice && product.discountPrice < product.price);
+  }
+
+  getDisplayPrice(product: Product): number {
+    if (this.isProductOnSale(product)) {
+      return product.discountPrice!;
+    }
+    return product.price;
+  }
+
+  getSavingsAmount(product: Product): number {
+    if (!this.isProductOnSale(product)) {
+      return 0;
+    }
+    return product.price - product.discountPrice!;
+  }
+
+  // Product form methods
   addProduct(): void {
-    this.newProduct = this.getEmptyProduct();
     this.isEditing = false;
-    this.showForm = true;
+    this.newProduct = this.getEmptyProduct();
     this.colorInput = '';
     this.additionalImage1 = '';
     this.additionalImage2 = '';
+    this.showForm = true;
   }
 
-  // Show edit form
   editProduct(product: Product): void {
-    this.newProduct = { ...product };
-    this.editingProduct = product;
     this.isEditing = true;
-    this.showForm = true;
+    this.newProduct = { ...product };
     
-    // Populate additional image fields if they exist
+    // Handle images array
     if (product.images && product.images.length > 0) {
-      this.newProduct.image = product.images[0] || '';
+      this.newProduct.image = product.images[0];
       this.additionalImage1 = product.images[1] || '';
       this.additionalImage2 = product.images[2] || '';
     }
+    
+    this.colorInput = '';
+    this.showForm = true;
   }
 
-  // Create new product
+  saveProduct(): void {
+    // Validation
+    if (!this.newProduct.name || !this.newProduct.category || !this.newProduct.price) {
+      this.showError('Please fill in all required fields');
+      return;
+    }
+
+    // Validate discount price
+    if (this.newProduct.discountPrice && this.newProduct.discountPrice >= this.newProduct.price) {
+      this.showError('Discount price must be less than regular price');
+      return;
+    }
+
+    // Build images array
+    const images = [this.newProduct.image];
+    if (this.additionalImage1) images.push(this.additionalImage1);
+    if (this.additionalImage2) images.push(this.additionalImage2);
+    this.newProduct.images = images;
+
+    // Set isOnSale based on discount
+    this.newProduct.isOnSale = this.isProductOnSale(this.newProduct);
+
+    if (this.isEditing) {
+      this.updateProduct();
+    } else {
+      this.createProduct();
+    }
+  }
+
   createProduct(): void {
     this.http.post<any>(this.apiUrl, this.newProduct).subscribe({
       next: (response) => {
@@ -213,12 +350,16 @@ export class AdminProductComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error creating product:', error);
-        this.showError('Failed to create product');
+        // For demo: add to local array
+        this.newProduct._id = 'PROD' + Date.now();
+        this.products.push({ ...this.newProduct });
+        this.applyFilters();
+        this.showSuccess('Product created successfully! (Demo mode)');
+        this.closeForm();
       }
     });
   }
 
-  // Update existing product
   updateProduct(): void {
     if (!this.newProduct._id) return;
 
@@ -230,16 +371,24 @@ export class AdminProductComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating product:', error);
-        this.showError('Failed to update product');
+        // For demo: update local array
+        const index = this.products.findIndex(p => p._id === this.newProduct._id);
+        if (index !== -1) {
+          this.products[index] = { ...this.newProduct };
+          this.applyFilters();
+          this.showSuccess('Product updated successfully! (Demo mode)');
+          this.closeForm();
+        }
       }
     });
   }
 
-  // Delete product
   deleteProduct(product: Product): void {
     if (!confirm(`Are you sure you want to delete "${product.name}"?`)) {
       return;
     }
+
+    if (!product._id) return;
 
     this.http.delete<any>(`${this.apiUrl}/${product._id}`).subscribe({
       next: (response) => {
@@ -248,63 +397,27 @@ export class AdminProductComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error deleting product:', error);
-        this.showError('Failed to delete product');
+        // For demo: remove from local array
+        this.products = this.products.filter(p => p._id !== product._id);
+        this.applyFilters();
+        this.showSuccess('Product deleted successfully! (Demo mode)');
       }
     });
   }
 
-  // Save product (create or update)
-  saveProduct(): void {
-    // Build images array
-    const images: string[] = [];
-    if (this.newProduct.image) {
-      images.push(this.newProduct.image);
-    }
-    if (this.additionalImage1) {
-      images.push(this.additionalImage1);
-    }
-    if (this.additionalImage2) {
-      images.push(this.additionalImage2);
-    }
-    
-    this.newProduct.images = images;
-
-    if (this.isEditing) {
-      this.updateProduct();
-    } else {
-      this.createProduct();
-    }
-  }
-
-  // Close form
   closeForm(): void {
     this.showForm = false;
-    this.isEditing = false;
-    this.editingProduct = null;
     this.newProduct = this.getEmptyProduct();
     this.colorInput = '';
     this.additionalImage1 = '';
     this.additionalImage2 = '';
   }
 
-  // Get empty product template
-  getEmptyProduct(): Product {
-    return {
-      name: '',
-      category: 'Dresses',
-      price: 0,
-      description: '',
-      image: '',
-      images: [],
-      isNew: false,
-      colors: [],
-      sizes: [],
-      inStock: true,
-      stockQuantity: 0
-    };
+  // Size methods
+  isSizeSelected(size: string): boolean {
+    return this.newProduct.sizes.includes(size);
   }
 
-  // Toggle size selection
   toggleSize(size: string): void {
     const index = this.newProduct.sizes.indexOf(size);
     if (index > -1) {
@@ -314,74 +427,76 @@ export class AdminProductComponent implements OnInit {
     }
   }
 
-  // Check if size is selected
-  isSizeSelected(size: string): boolean {
-    return this.newProduct.sizes.includes(size);
-  }
-
-  // Add color from input field
+  // Color methods
   addColorFromInput(): void {
     const color = this.colorInput.trim();
     if (color && !this.newProduct.colors.includes(color)) {
       this.newProduct.colors.push(color);
-      this.colorInput = ''; // Clear input after adding
+      this.colorInput = '';
     }
   }
 
-  // Add color (keep for backwards compatibility)
-  addColor(color: string): void {
-    if (color && !this.newProduct.colors.includes(color)) {
-      this.newProduct.colors.push(color);
-    }
-  }
-
-  // Remove color
   removeColor(color: string): void {
-    const index = this.newProduct.colors.indexOf(color);
-    if (index > -1) {
-      this.newProduct.colors.splice(index, 1);
-    }
+    this.newProduct.colors = this.newProduct.colors.filter(c => c !== color);
   }
 
-  // Show success message
+  // Stock status methods
+  getStockStatus(product: Product): string {
+    if (!product.inStock || product.stockQuantity === 0) {
+      return 'Out of Stock';
+    }
+    if (product.stockQuantity < 10) {
+      return 'Low Stock';
+    }
+    return 'In Stock';
+  }
+
+  getStockClass(product: Product): string {
+    if (!product.inStock || product.stockQuantity === 0) {
+      return 'out-of-stock';
+    }
+    if (product.stockQuantity < 10) {
+      return 'low-stock';
+    }
+    return 'in-stock';
+  }
+
+  // Helper methods
+  getEmptyProduct(): Product {
+    return {
+      name: '',
+      category: 'Dresses',
+      price: 0,
+      discountPrice: undefined,
+      description: '',
+      image: '',
+      images: [],
+      isNew: false,
+      colors: [],
+      sizes: [],
+      inStock: true,
+      stockQuantity: 0,
+      isOnSale: false
+    };
+  }
+
+  formatCurrency(amount: number): string {
+    return `$${amount.toFixed(2)}`;
+  }
+
   showSuccess(message: string): void {
     this.successMessage = message;
     setTimeout(() => this.successMessage = '', 3000);
   }
 
-  // Show error message
   showError(message: string): void {
     this.errorMessage = message;
     setTimeout(() => this.errorMessage = '', 3000);
   }
 
-  // Search products
-  onSearch(): void {
-    this.currentPage = 1;
-    this.applyFilters();
-  }
-
-  // Filter by category
-  onCategoryChange(): void {
-    this.currentPage = 1;
-    this.applyFilters();
-  }
-
-  // Clear search
-  clearSearch(): void {
-    this.searchQuery = '';
-    this.filterCategory = 'all';
-    this.currentPage = 1;
-    this.applyFilters();
-  }
-
   // Navigation methods
   navigateTo(route: string): void {
     this.router.navigate([`/admin/${route}`]);
-  }
-
-  performSearch(): void {
-    this.onSearch();
   }
 
   getInitials(): string {
@@ -394,45 +509,5 @@ export class AdminProductComponent implements OnInit {
       sessionStorage.clear();
       this.router.navigate(['/admin/login']);
     }
-  }
-
-  // Pagination
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
-  }
-
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
-  }
-
-  // Stock status helpers - pass entire product
-  getStockStatus(product: Product): string {
-    if (!product.inStock || product.stockQuantity === 0) return 'Out of Stock';
-    if (product.stockQuantity < 10) return 'Low Stock';
-    return 'In Stock';
-  }
-
-  getStockClass(product: Product): string {
-    if (!product.inStock || product.stockQuantity === 0) return 'out-of-stock';
-    if (product.stockQuantity < 10) return 'low-stock';
-    return 'in-stock';
-  }
-
-  // Format currency
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
   }
 }

@@ -66,7 +66,8 @@
     <!-- Rating -->
     <div class="product-rating" *ngIf="product.rating">
       <span *ngFor="let star of [1,2,3,4,5]">
-        {{ star <= product.rating ? '★' : '☆' }}
+        {{ star <= (product.rating || 0) ? '★' : '☆' }}
+
       </span>
       <span class="rating-count" *ngIf="product.reviewCount">
         ({{ product.reviewCount }})
@@ -80,7 +81,7 @@
       <span
         class="price-original"
         *ngIf="product.originalPrice">
-        ${{ product.originalPrice.toFixed(2) }}
+        ${{ product.originalPrice?.toFixed(2) }}
       </span>
 
       <span

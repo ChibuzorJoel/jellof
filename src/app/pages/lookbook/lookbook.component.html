@@ -70,13 +70,14 @@
       
       <div class="modal-grid">
         <!-- Image -->
-        <div class="modal-image" [style.background-image]="'url(' + selectedItem.image + ')'"></div>
+        <div class="modal-image" [style.background-image]="'url(' + selectedItem?.image + ')'"></div>
         
         <!-- Details -->
         <div class="modal-details">
-          <h2 class="modal-title">{{ selectedItem.title }}</h2>
-          <p class="modal-season">{{ selectedItem.season }}</p>
-          <p class="modal-description">{{ selectedItem.description }}</p>
+          <h2 class="modal-title">{{ selectedItem?.title }}</h2>
+          <p class="modal-season">{{ selectedItem?.season }}</p>
+          <p class="modal-description">{{ selectedItem?.description }}</p>
+
           
           <div class="products-in-look">
             <h3>Products in this look:</h3>
@@ -89,7 +90,8 @@
             
             <div class="look-total">
               <strong>Total Look:</strong>
-              <strong>${{ getTotalLookPrice(selectedItem).toFixed(2) }}</strong>
+              <strong *ngIf="selectedItem">${{ getTotalLookPrice(selectedItem).toFixed(2) }}</strong>
+
             </div>
           </div>
           

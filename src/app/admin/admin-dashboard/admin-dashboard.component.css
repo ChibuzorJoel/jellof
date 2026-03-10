@@ -15,14 +15,26 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
+
+
 /* ===================================
-   TOP NAVIGATION (Same as Products/Orders)
+   NAVIGATION BAR FIX - ONE LINE
+   
 =================================== */
 
 .admin-topbar {
   background: #000;
   border-bottom: 1px solid #333;
+}
+
+.topbar-content {
+  max-width: 100%;
+  margin: 0 auto;
   padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
 }
 
 .topbar-left {
@@ -36,6 +48,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .logo-icon {
@@ -47,6 +60,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
+  flex-shrink: 0;
 }
 
 .admin-logo span {
@@ -54,21 +68,24 @@
   font-weight: 900;
   font-size: 1.125rem;
   letter-spacing: 1px;
+  white-space: nowrap;
 }
 
 .topbar-nav {
   display: flex;
   gap: 0;
+  flex-shrink: 0;
 }
 
 .nav-link {
-  padding: 1.5rem 1.5rem;
+  padding: 1.5rem 1.25rem;
   color: #888;
   text-decoration: none;
   font-weight: 700;
   font-size: 0.875rem;
   transition: all 0.2s;
   border-bottom: 3px solid transparent;
+  white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -85,11 +102,13 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex-shrink: 0;
 }
 
 .search-box {
   position: relative;
-  width: 300px;
+  width: 250px;
+  flex-shrink: 0;
 }
 
 .search-icon {
@@ -98,6 +117,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: #666;
+  pointer-events: none;
 }
 
 .search-box input {
@@ -127,6 +147,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .icon-btn:hover {
@@ -134,7 +155,8 @@
   color: #fff;
 }
 
-.icon-btn .badge {
+.icon-btn .badge,
+.notification-btn .notification-badge {
   position: absolute;
   top: -4px;
   right: -4px;
@@ -145,12 +167,15 @@
   padding: 0.125rem 0.375rem;
   border-radius: 10px;
   min-width: 18px;
+  text-align: center;
 }
 
-.profile-section {
+.profile-section,
+.admin-profile {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .profile-avatar {
@@ -164,9 +189,11 @@
   color: #fff;
   font-weight: 800;
   font-size: 0.875rem;
+  flex-shrink: 0;
 }
 
-.profile-text {
+.profile-text,
+.profile-info {
   display: flex;
   flex-direction: column;
 }
@@ -175,12 +202,14 @@
   color: #fff;
   font-weight: 700;
   font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 .profile-role {
   color: #666;
   font-size: 0.75rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .logout-btn {
@@ -196,10 +225,61 @@
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .logout-btn:hover {
   background: #d32f2f;
+}
+
+/* Responsive - Only hide nav on very small screens */
+@media (max-width: 1400px) {
+  .topbar-left {
+    gap: 2rem;
+  }
+  
+  .nav-link {
+    padding: 1.5rem 1rem;
+    font-size: 0.813rem;
+  }
+  
+  .search-box {
+    width: 200px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .topbar-left {
+    gap: 1.5rem;
+  }
+  
+  .nav-link {
+    padding: 1.5rem 0.875rem;
+  }
+  
+  .profile-text,
+  .profile-info {
+    display: none;
+  }
+  
+  .topbar-right {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar-nav {
+    display: none;
+  }
+  
+  .search-box {
+    width: 150px;
+  }
+  
+  .topbar-content {
+    padding: 0 1rem;
+  }
 }
 
 /* ===================================
