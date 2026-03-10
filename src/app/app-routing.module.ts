@@ -22,6 +22,7 @@ import { AdminMessageComponent } from './admin/admin-message/admin-message.compo
 // Guards (commented out until you create the files)
 import { AuthGuard } from './guards/auth.guard';
  import { AdminAuthGuard } from './guards/admin-auth.guard';
+import { AdminPaymentComponent } from './admin/admin-payment/admin-payment.component';
  
 const routes: Routes = [
   // Public Routes
@@ -59,6 +60,11 @@ const routes: Routes = [
   { 
     path: 'admin/orders', 
     component: AdminOrderComponent
+    //canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
+  },
+  { 
+    path: 'admin/payment', 
+    component: AdminPaymentComponent
     //canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
   },
   { 

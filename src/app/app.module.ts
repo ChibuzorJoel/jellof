@@ -51,6 +51,7 @@ import { AuthService } from './services/auth.service';
 import { CartService } from './services/cart.service';
 import { OrderService } from './services/order.service';
 import { ProductService } from './services/product.service';
+import { AdminPaymentComponent } from './admin/admin-payment/admin-payment.component';
 
 @NgModule({
   declarations: [
@@ -87,7 +88,8 @@ import { ProductService } from './services/product.service';
     AdminProductComponent,
     AdminOrderComponent,
     AdminCategoriesComponent,
-    AdminMessageComponent
+    AdminMessageComponent,
+    AdminPaymentComponent
   ],
 
   imports: [
