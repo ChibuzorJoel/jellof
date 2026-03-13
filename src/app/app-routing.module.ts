@@ -23,6 +23,8 @@ import { AdminMessageComponent } from './admin/admin-message/admin-message.compo
 import { AuthGuard } from './guards/auth.guard';
  import { AdminAuthGuard } from './guards/admin-auth.guard';
 import { AdminPaymentComponent } from './admin/admin-payment/admin-payment.component';
+import { AdminCustomersComponent } from './admin/admin-customers/admin-customers.component';
+import { AdminInventoryComponent } from './admin/admin-inventory/admin-inventory.component';
  
 const routes: Routes = [
   // Public Routes
@@ -70,6 +72,16 @@ const routes: Routes = [
   { 
     path: 'admin/categories', 
     component: AdminCategoriesComponent
+    // canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
+  },
+  { 
+    path: 'admin/customers', 
+    component: AdminCustomersComponent
+    // canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
+  },
+  { 
+    path: 'admin/inventory', 
+    component: AdminInventoryComponent
     // canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
   },
   { 
