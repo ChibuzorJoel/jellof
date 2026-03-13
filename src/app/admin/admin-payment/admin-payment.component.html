@@ -1,257 +1,251 @@
 <!-- Admin Payments Management Page -->
 <div class="admin-page">
 
-    <!-- ================= TOP NAVBAR ================= -->
-    <nav class="admin-topbar">
-      <div class="topbar-content">
-  
-        <!-- LEFT -->
-        <div class="topbar-left">
-  
-          <a routerLink="/admin/dashboard" class="admin-logo">
-            <div class="logo-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-              </svg>
-            </div>
-            <span>ADMIN</span>
-          </a>
-  
-          <div class="topbar-nav">
-            <a routerLink="/admin/dashboard" class="nav-link">DASHBOARD</a>
-            <a routerLink="/admin/products" class="nav-link">PRODUCTS</a>
-            <a routerLink="/admin/orders" class="nav-link">ORDERS</a>
-            <a routerLink="/admin/categories" class="nav-link">CATEGORIES</a>
-            <a routerLink="/admin/payment" routerLinkActive="active" class="nav-link">PAYMENTS</a>
+  <!-- ================= TOP NAVBAR ================= -->
+  <nav class="admin-topbar">
+    <div class="topbar-content">
+
+      <!-- LEFT -->
+      <div class="topbar-left">
+
+        <a routerLink="/admin/dashboard" class="admin-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
           </div>
-  
+          <span>ADMIN</span>
+        </a>
+
+        <div class="topbar-nav">
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">DASHBOARD</a>
+      <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">PRODUCTS</a>
+      <a routerLink="/admin/orders" routerLinkActive="active" class="nav-link">ORDERS</a>
+      <a routerLink="/admin/categories" routerLinkActive="active" class="nav-link">CATEGORIES</a>
+      <a routerLink="/admin/payment" routerLinkActive="active" class="nav-link">PAYMENTS</a>
+      <a routerLink="/admin/customers" routerLinkActive="active" class="nav-link">CUSTOMERS</a>
+          <a routerLink="/admin/inventory" class="nav-link">INVENTORY</a>
         </div>
-  
-        <!-- RIGHT -->
-        <div class="topbar-right">
-  
-          <!-- Search -->
-          <div class="admin-search">
-            <input
-              type="text"
-              placeholder="Search payments..."
-              [(ngModel)]="searchQuery"
-              (keyup.enter)="performSearch()"
-              (input)="performSearch()">
-          </div>
-  
-          <!-- Admin -->
-          <div class="admin-profile">
-            <div class="profile-avatar">{{ getInitials() }}</div>
-            <div class="profile-info">
-              <div class="profile-name">{{ adminName }}</div>
-              <div class="profile-role">ADMIN</div>
-            </div>
-          </div>
-  
-          <button class="logout-btn" (click)="logout()">Logout</button>
-  
-        </div>
-  
+
       </div>
-    </nav>
-  
-    <!-- ================= ALERT MESSAGES ================= -->
-  
-    <div class="message success-message" *ngIf="successMessage">
-      ✓ {{ successMessage }}
+
+      <!-- RIGHT -->
+      <div class="topbar-right">
+
+        
+
+        <!-- Admin -->
+        <div class="admin-profile">
+          <div class="profile-avatar">{{ getInitials() }}</div>
+          <div class="profile-info">
+            <div class="profile-name">{{ adminName }}</div>
+            <div class="profile-role">ADMIN</div>
+          </div>
+        </div>
+
+        <button class="logout-btn" (click)="logout()">Logout</button>
+
+      </div>
+
     </div>
-  
-    <div class="message error-message" *ngIf="errorMessage">
-      ✗ {{ errorMessage }}
-    </div>
-  
-    <!-- ================= LOADING ================= -->
-  
-    <div class="loading-overlay" *ngIf="isLoading">
-      <div class="loading-spinner"></div>
-      <p>Loading Payments...</p>
-    </div>
-  
-    <!-- ================= MAIN CONTENT ================= -->
-  
-    <div class="page-content" *ngIf="!isLoading">
-  
-      <!-- HEADER -->
-      <div class="page-header">
-        <div>
-          <h1>💳 Payment Management</h1>
-          <p class="subtitle">Track and manage all payment transactions</p>
-        </div>
-      </div>
-  
-      <!-- ================= FILTERS ================= -->
-  
-      <div class="filters-bar">
-  
-        <select [(ngModel)]="filterStatus" (change)="performSearch()">
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="completed">Completed</option>
-          <option value="rejected">Rejected</option>
-        </select>
-  
-        <select [(ngModel)]="filterMethod" (change)="performSearch()">
-          <option value="all">All Methods</option>
-          <option value="card">Card</option>
-          <option value="bank">Bank Transfer</option>
-          <option value="paypal">PayPal</option>
-        </select>
-  
-        <button
-          *ngIf="searchQuery || filterStatus !== 'all' || filterMethod !== 'all'"
-          (click)="clearFilters()">
-          Clear Filters
-        </button>
-  
-      </div>
-  
-      <!-- ================= SUMMARY ================= -->
-  
-      <div class="summary-cards">
-  
-        <div class="summary-card">
-          <div class="card-label">Pending</div>
-          <div class="card-value">{{ getStatusCount('pending') }}</div>
-        </div>
-  
-        <div class="summary-card">
-          <div class="card-label">Approved</div>
-          <div class="card-value">{{ getStatusCount('approved') }}</div>
-        </div>
-  
-        <div class="summary-card">
-          <div class="card-label">Completed</div>
-          <div class="card-value">{{ getStatusCount('completed') }}</div>
-        </div>
-  
-        <div class="summary-card">
-          <div class="card-label">Rejected</div>
-          <div class="card-value">{{ getStatusCount('rejected') }}</div>
-        </div>
-  
-      </div>
-  
-      <!-- ================= PAYMENT CARDS ================= -->
-  
-      <div class="payment-grid">
-  
-        <div class="payment-card" *ngFor="let payment of paginatedPayments">
-  
-          <!-- Card Top -->
-          <div class="payment-top">
-  
-            <div>
-              <div class="customer-name">
-                {{ payment.customerName }}
-              </div>
-  
-              <div class="customer-email">
-                {{ payment.customerEmail }}
-              </div>
-            </div>
-  
-            <div class="amount">
-              {{ formatCurrency(payment.amount) }}
-            </div>
-  
-          </div>
-  
-          <!-- Details -->
-  
-          <div class="payment-details">
-  
-            <div>
-              <strong>Order:</strong> {{ payment.orderId }}
-            </div>
-  
-            <div>
-              <strong>Method:</strong>
-              {{ getPaymentMethodLabel(payment.paymentMethod) }}
-            </div>
-  
-            <div>
-              <strong>Transaction:</strong>
-              {{ payment.transactionId }}
-            </div>
-  
-            <div>
-              <strong>Date:</strong>
-              {{ formatDate(payment.date) }}
-            </div>
-  
-            <div
-              class="status-badge"
-              [ngClass]="getStatusClass(payment.status)">
-              {{ getStatusLabel(payment.status) }}
-            </div>
-  
-          </div>
-  
-          <!-- ACTIONS -->
-  
-          <div class="action-buttons">
-  
-            <button
-              *ngIf="payment.status === 'pending'"
-              class="action-btn approve-btn"
-              (click)="approvePayment(payment, $event)">
-              Approve
-            </button>
-  
-            <button
-              *ngIf="payment.status === 'pending'"
-              class="action-btn reject-btn"
-              (click)="rejectPayment(payment, $event)">
-              Reject
-            </button>
-  
-            <button
-              *ngIf="payment.status === 'approved'"
-              class="action-btn complete-btn"
-              (click)="completePayment(payment, $event)">
-              Complete
-            </button>
-  
-          </div>
-  
-        </div>
-  
-      </div>
-  
-      <!-- ================= EMPTY STATE ================= -->
-  
-      <div class="empty-state" *ngIf="filteredPayments.length === 0">
-        No payments found
-      </div>
-  
-      <!-- ================= PAGINATION ================= -->
-  
-      <div class="pagination" *ngIf="totalPages > 1">
-  
-        <button (click)="previousPage()" [disabled]="currentPage === 1">
-          Previous
-        </button>
-  
-        <button
-          *ngFor="let page of [].constructor(totalPages); let i = index"
-          [class.active]="currentPage === i + 1"
-          (click)="goToPage(i + 1)">
-          {{ i + 1 }}
-        </button>
-  
-        <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-          Next
-        </button>
-  
-      </div>
-  
-    </div>
-  
+  </nav>
+
+  <!-- ================= ALERT MESSAGES ================= -->
+
+  <div class="message success-message" *ngIf="successMessage">
+    ✓ {{ successMessage }}
   </div>
+
+  <div class="message error-message" *ngIf="errorMessage">
+    ✗ {{ errorMessage }}
+  </div>
+
+  <!-- ================= LOADING ================= -->
+
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Loading Payments...</p>
+  </div>
+
+  <!-- ================= MAIN CONTENT ================= -->
+
+  <div class="page-content" *ngIf="!isLoading">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <h1>💳 Payment Management</h1>
+        <p class="subtitle">Track and manage all payment transactions</p>
+      </div>
+    </div>
+
+    <!-- ================= FILTERS ================= -->
+
+    <div class="filters-bar">
+
+      <select [(ngModel)]="filterStatus" (change)="performSearch()">
+        <option value="all">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="completed">Completed</option>
+        <option value="rejected">Rejected</option>
+      </select>
+
+      <select [(ngModel)]="filterMethod" (change)="performSearch()">
+        <option value="all">All Methods</option>
+        <option value="card">Card</option>
+        <option value="bank">Bank Transfer</option>
+        <option value="paypal">PayPal</option>
+      </select>
+
+      <button
+        *ngIf="searchQuery || filterStatus !== 'all' || filterMethod !== 'all'"
+        (click)="clearFilters()">
+        Clear Filters
+      </button>
+
+    </div>
+
+    <!-- ================= SUMMARY ================= -->
+
+    <div class="summary-cards">
+
+      <div class="summary-card">
+        <div class="card-label">Pending</div>
+        <div class="card-value">{{ getStatusCount('pending') }}</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-label">Approved</div>
+        <div class="card-value">{{ getStatusCount('approved') }}</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-label">Completed</div>
+        <div class="card-value">{{ getStatusCount('completed') }}</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-label">Rejected</div>
+        <div class="card-value">{{ getStatusCount('rejected') }}</div>
+      </div>
+
+    </div>
+
+    <!-- ================= PAYMENT CARDS ================= -->
+
+    <div class="payment-grid">
+
+      <div class="payment-card" *ngFor="let payment of paginatedPayments">
+
+        <!-- Card Top -->
+        <div class="payment-top">
+
+          <div>
+            <div class="customer-name">
+              {{ payment.customerName }}
+            </div>
+
+            <div class="customer-email">
+              {{ payment.customerEmail }}
+            </div>
+          </div>
+
+          <div class="amount">
+            {{ formatCurrency(payment.amount) }}
+          </div>
+
+        </div>
+
+        <!-- Details -->
+
+        <div class="payment-details">
+
+          <div>
+            <strong>Order:</strong> {{ payment.orderId }}
+          </div>
+
+          <div>
+            <strong>Method:</strong>
+            {{ getPaymentMethodLabel(payment.paymentMethod) }}
+          </div>
+
+          <div>
+            <strong>Transaction:</strong>
+            {{ payment.transactionId }}
+          </div>
+
+          <div>
+            <strong>Date:</strong>
+            {{ formatDate(payment.date) }}
+          </div>
+
+          <div
+            class="status-badge"
+            [ngClass]="getStatusClass(payment.status)">
+            {{ getStatusLabel(payment.status) }}
+          </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="action-buttons">
+
+          <button
+            *ngIf="payment.status === 'pending'"
+            class="action-btn approve-btn"
+            (click)="approvePayment(payment, $event)">
+            Approve
+          </button>
+
+          <button
+            *ngIf="payment.status === 'pending'"
+            class="action-btn reject-btn"
+            (click)="rejectPayment(payment, $event)">
+            Reject
+          </button>
+
+          <button
+            *ngIf="payment.status === 'approved'"
+            class="action-btn complete-btn"
+            (click)="completePayment(payment, $event)">
+            Complete
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================= EMPTY STATE ================= -->
+
+    <div class="empty-state" *ngIf="filteredPayments.length === 0">
+      No payments found
+    </div>
+
+    <!-- ================= PAGINATION ================= -->
+
+    <div class="pagination" *ngIf="totalPages > 1">
+
+      <button (click)="previousPage()" [disabled]="currentPage === 1">
+        Previous
+      </button>
+
+      <button
+        *ngFor="let page of [].constructor(totalPages); let i = index"
+        [class.active]="currentPage === i + 1"
+        (click)="goToPage(i + 1)">
+        {{ i + 1 }}
+      </button>
+
+      <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Next
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
