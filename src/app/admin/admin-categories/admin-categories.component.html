@@ -1,233 +1,222 @@
 <!-- Admin Categories Page with Navigation -->
 <div class="admin-page">
   
-    <!-- Top Navigation Bar -->
-    <nav class="admin-topbar">
-      <div class="topbar-content">
+  <!-- Top Navigation Bar -->
+  <nav class="admin-topbar">
+    <div class="topbar-content">
+      
+      <!-- Left Side: Logo + Nav Links -->
+      <div class="topbar-left">
+        <a routerLink="/admin/dashboard" class="admin-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+          </div>
+          <span>ADMIN</span>
+        </a>
         
-        <!-- Left Side: Logo + Nav Links -->
-        <div class="topbar-left">
-          <a routerLink="/admin/dashboard" class="admin-logo">
-            <div class="logo-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-              </svg>
-            </div>
-            <span>ADMIN</span>
-          </a>
-          
-          <div class="topbar-nav">
-            <a routerLink="/admin/dashboard" class="nav-link">DASHBOARD</a>
-            <a routerLink="/admin/products" class="nav-link">PRODUCTS</a>
-            <a routerLink="/admin/orders" class="nav-link">ORDERS</a>
-            <a routerLink="/admin/categories" routerLinkActive="active" class="nav-link">CATEGORIES</a>
-            <a routerLink="/admin/payment" class="nav-link">PAYMENTS</a>
-          </div>
-        </div>
-        
-        <!-- Right Side: Search + Actions -->
-        <div class="topbar-right">
-          
-          <!-- Search Bar -->
-          <div class="admin-search">
-            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <input 
-              type="text" 
-              class="search-input" 
-              placeholder="Search categories..."
-              [(ngModel)]="searchQuery"
-              (keyup.enter)="performSearch()"
-              (input)="performSearch()">
-          </div>
-          
-          <!-- Notifications -->
-          <button class="notification-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
-          </button>
-          
-          <!-- Admin Profile -->
-          <div class="admin-profile">
-            <div class="profile-avatar">{{ getInitials() }}</div>
-            <div class="profile-info">
-              <div class="profile-name">{{ adminName }}</div>
-              <div class="profile-role">Administrator</div>
-            </div>
-          </div>
-          
-          <!-- Logout Button -->
-          <button class="logout-btn" (click)="logout()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            Logout
-          </button>
+        <div class="topbar-nav">
+          <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">DASHBOARD</a>
+      <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">PRODUCTS</a>
+      <a routerLink="/admin/orders" routerLinkActive="active" class="nav-link">ORDERS</a>
+      <a routerLink="/admin/categories" routerLinkActive="active" class="nav-link">CATEGORIES</a>
+      <a routerLink="/admin/payment" routerLinkActive="active" class="nav-link">PAYMENTS</a>
+      <a routerLink="/admin/customers" routerLinkActive="active" class="nav-link">CUSTOMERS</a>
+          <a routerLink="/admin/inventory" class="nav-link">INVENTORY</a>
         </div>
       </div>
-    </nav>
-  
-    <!-- Success/Error Messages -->
-    <div class="message success-message" *ngIf="successMessage">
-      ✓ {{ successMessage }}
-    </div>
-    <div class="message error-message" *ngIf="errorMessage">
-      ✗ {{ errorMessage }}
-    </div>
-  
-    <!-- Loading State -->
-    <div class="loading-overlay" *ngIf="isLoading">
-      <div class="loading-spinner"></div>
-      <p>Loading Categories...</p>
-    </div>
-  
-    <!-- Main Content -->
-    <div class="page-content" *ngIf="!isLoading">
       
-      <!-- Page Header -->
-      <div class="page-header">
-        <div>
-          <h1>📁 Category Management</h1>
-          <p class="subtitle">Organize your product categories</p>
-        </div>
-        <button class="add-btn" (click)="addCategory()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
+      <!-- Right Side: Search + Actions -->
+      <div class="topbar-right">
+        
+       
+        
+        <!-- Notifications -->
+        <button class="notification-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
           </svg>
-          Add Category
+          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
         </button>
-      </div>
-  
-      <!-- Categories Grid -->
-      <div class="categories-grid">
         
-        <div *ngFor="let category of filteredCategories" class="category-card">
-          <div class="category-header">
-            <div class="category-icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-            </div>
-            <div class="status-toggle">
-              <label class="toggle-switch">
-                <input 
-                  type="checkbox" 
-                  [checked]="category.isActive"
-                  (change)="toggleStatus(category)">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-  
-          <div class="category-body">
-            <h3 class="category-name">{{ category.name }}</h3>
-            <p class="category-description">{{ category.description }}</p>
-            
-            <div class="category-stats">
-              <div class="stat-item">
-                <span class="stat-label">Products</span>
-                <span class="stat-value">{{ category.productCount || 0 }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">Status</span>
-                <span class="stat-value" [class.active]="category.isActive" [class.inactive]="!category.isActive">
-                  {{ category.isActive ? 'Active' : 'Inactive' }}
-                </span>
-              </div>
-            </div>
-  
-            <div class="category-date">
-              Created: {{ formatDate(category.createdAt) }}
-            </div>
-          </div>
-  
-          <div class="category-actions">
-            <button class="action-btn edit-btn" (click)="editCategory(category)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-              Edit
-            </button>
-            <button class="action-btn delete-btn" (click)="deleteCategory(category)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-              Delete
-            </button>
+        <!-- Admin Profile -->
+        <div class="admin-profile">
+          <div class="profile-avatar">{{ getInitials() }}</div>
+          <div class="profile-info">
+            <div class="profile-name">{{ adminName }}</div>
+            <div class="profile-role">Administrator</div>
           </div>
         </div>
-  
-      </div>
-  
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="filteredCategories.length === 0">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="7" height="7"></rect>
-          <rect x="14" y="3" width="7" height="7"></rect>
-          <rect x="14" y="14" width="7" height="7"></rect>
-          <rect x="3" y="14" width="7" height="7"></rect>
-        </svg>
-        <p>No categories found</p>
-        <button class="add-btn" (click)="addCategory()">Add Your First Category</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Category Form Modal -->
-  <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ isEditing ? 'Edit Category' : 'Add New Category' }}</h2>
-        <button class="close-btn" (click)="closeForm()">×</button>
-      </div>
-      
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Category Name *</label>
-          <input 
-            type="text" 
-            class="form-input"
-            [(ngModel)]="newCategory.name"
-            placeholder="Enter category name">
-        </div>
-  
-        <div class="form-group">
-          <label>Description *</label>
-          <textarea 
-            class="form-textarea"
-            [(ngModel)]="newCategory.description"
-            rows="4"
-            placeholder="Enter category description"></textarea>
-        </div>
-  
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input 
-              type="checkbox"
-              [(ngModel)]="newCategory.isActive">
-            <span>Active Category</span>
-          </label>
-        </div>
-      </div>
-  
-      <div class="modal-footer">
-        <button class="btn-secondary" (click)="closeForm()">Cancel</button>
-        <button class="btn-primary" (click)="saveCategory()">
-          {{ isEditing ? 'Update' : 'Create' }} Category
+        
+        <!-- Logout Button -->
+        <button class="logout-btn" (click)="logout()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Logout
         </button>
       </div>
     </div>
+  </nav>
+
+  <!-- Success/Error Messages -->
+  <div class="message success-message" *ngIf="successMessage">
+    ✓ {{ successMessage }}
   </div>
+  <div class="message error-message" *ngIf="errorMessage">
+    ✗ {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Loading Categories...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="page-content" *ngIf="!isLoading">
+    
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1>📁 Category Management</h1>
+        <p class="subtitle">Organize your product categories</p>
+      </div>
+      <button class="add-btn" (click)="addCategory()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Category
+      </button>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="categories-grid">
+      
+      <div *ngFor="let category of filteredCategories" class="category-card">
+        <div class="category-header">
+          <div class="category-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <div class="status-toggle">
+            <label class="toggle-switch">
+              <input 
+                type="checkbox" 
+                [checked]="category.isActive"
+                (change)="toggleStatus(category)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="category-body">
+          <h3 class="category-name">{{ category.name }}</h3>
+          <p class="category-description">{{ category.description }}</p>
+          
+          <div class="category-stats">
+            <div class="stat-item">
+              <span class="stat-label">Products</span>
+              <span class="stat-value">{{ category.productCount || 0 }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Status</span>
+              <span class="stat-value" [class.active]="category.isActive" [class.inactive]="!category.isActive">
+                {{ category.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="category-date">
+            Created: {{ formatDate(category.createdAt) }}
+          </div>
+        </div>
+
+        <div class="category-actions">
+          <button class="action-btn edit-btn" (click)="editCategory(category)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Edit
+          </button>
+          <button class="action-btn delete-btn" (click)="deleteCategory(category)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Delete
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredCategories.length === 0">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <p>No categories found</p>
+      <button class="add-btn" (click)="addCategory()">Add Your First Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Form Modal -->
+<div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditing ? 'Edit Category' : 'Add New Category' }}</h2>
+      <button class="close-btn" (click)="closeForm()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Category Name *</label>
+        <input 
+          type="text" 
+          class="form-input"
+          [(ngModel)]="newCategory.name"
+          placeholder="Enter category name">
+      </div>
+
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea 
+          class="form-textarea"
+          [(ngModel)]="newCategory.description"
+          rows="4"
+          placeholder="Enter category description"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox"
+            [(ngModel)]="newCategory.isActive">
+          <span>Active Category</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeForm()">Cancel</button>
+      <button class="btn-primary" (click)="saveCategory()">
+        {{ isEditing ? 'Update' : 'Create' }} Category
+      </button>
+    </div>
+  </div>
+</div>

@@ -52,6 +52,8 @@ import { CartService } from './services/cart.service';
 import { OrderService } from './services/order.service';
 import { ProductService } from './services/product.service';
 import { AdminPaymentComponent } from './admin/admin-payment/admin-payment.component';
+import { AdminCustomersComponent } from './admin/admin-customers/admin-customers.component';
+import { AdminInventoryComponent } from './admin/admin-inventory/admin-inventory.component';
 
 @NgModule({
   declarations: [
@@ -89,7 +91,9 @@ import { AdminPaymentComponent } from './admin/admin-payment/admin-payment.compo
     AdminOrderComponent,
     AdminCategoriesComponent,
     AdminMessageComponent,
-    AdminPaymentComponent
+    AdminPaymentComponent,
+    AdminCustomersComponent,
+    AdminInventoryComponent
   ],
 
   imports: [
