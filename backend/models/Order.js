@@ -1,95 +1,108 @@
 const mongoose = require('mongoose');
 
-const orderSchema = new mongoose.Schema({
-  // Customer Information
-  customerName: {
+const OrderSchema = new mongoose.Schema({
+  // Order Identification
+  orderId: {
     type: String,
-    trim: true
+    unique: true,
+    default: function() {
+      return 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
   },
-  customerEmail: {
-    type: String,
-    lowercase: true,
-    trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email']
-  },
-  customerPhone: {
-    type: String,
-    required: [true, 'Customer phone is required'],
-    trim: true
-  },
-  
-  // Product Information
-  productName: {
-    type: String,
-    required: [true, 'Product name is required'],
-    trim: true
-  },
-  productId: {
+
+  // User
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
+    ref: 'User',
+    required: false // Allow guest orders
   },
-  productPrice: {
+
+  // Customer Information
+  customer: {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String },
+    zipCode: { type: String },
+    country: { type: String, default: 'Nigeria' }
+  },
+
+  // Order Items
+  items: [{
+    productId: {
+      type: String,  // Changed to String to accept both ObjectId and regular IDs
+      required: false
+    },
+    name: { type: String, required: true },
+    quantity: { type: Number, required: true, min: 1 },
+    price: { type: Number, required: true },
+    size: { type: String },
+    color: { type: String },
+    image: { type: String }
+  }],
+
+  // Pricing
+  subtotal: {
     type: Number,
-    required: [true, 'Product price is required'],
-    min: [0, 'Price cannot be negative']
+    required: true,
+    min: 0
   },
-  
-  // Order Details
-  quantity: {
+  shipping: {
     type: Number,
-    default: 1,
-    min: [1, 'Quantity must be at least 1']
+    default: 0,
+    min: 0
   },
-  size: {
-    type: String,
-    trim: true
+  tax: {
+    type: Number,
+    default: 0,
+    min: 0
   },
-  color: {
-    type: String,
-    trim: true
+  total: {
+    type: Number,
+    required: true,
+    min: 0
   },
-  totalPrice: {
-    type: Number
-  },
-  
+
   // Order Status
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
     default: 'pending'
   },
-  
-  // Shipping Information
-  shippingAddress: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String
-  },
-  
-  // Payment Information
+
+  // Payment
   paymentMethod: {
     type: String,
-    enum: ['bank_transfer', 'mobile_money', 'cash_on_delivery', 'card', 'other'],
-    default: 'bank_transfer'
+    enum: ['card', 'transfer', 'whatsapp', 'cash'],
+    required: true
   },
   paymentStatus: {
     type: String,
     enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
   },
-  
-  // Additional Information
-  notes: {
+  paymentDetails: {
+    type: mongoose.Schema.Types.Mixed
+  },
+
+  // Shipping
+  shippingMethod: {
     type: String,
-    trim: true
+    enum: ['standard', 'express', 'overnight'],
+    default: 'standard'
   },
   trackingNumber: {
-    type: String,
-    trim: true
+    type: String
   },
-  
+
+  // Notes
+  notes: {
+    type: String
+  },
+
   // Timestamps
   createdAt: {
     type: Date,
@@ -98,56 +111,16 @@ const orderSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
-  },
-  confirmedAt: {
-    type: Date
-  },
-  shippedAt: {
-    type: Date
-  },
-  deliveredAt: {
-    type: Date
   }
-});
-
-// Calculate total price before saving
-orderSchema.pre('save', function(next) {
-  this.totalPrice = this.productPrice * this.quantity;
-  this.updatedAt = Date.now();
-  next();
-});
-
-// Update status timestamps
-orderSchema.pre('save', function(next) {
-  if (this.isModified('status')) {
-    switch (this.status) {
-      case 'confirmed':
-        this.confirmedAt = Date.now();
-        break;
-      case 'shipped':
-        this.shippedAt = Date.now();
-        break;
-      case 'delivered':
-        this.deliveredAt = Date.now();
-        break;
-    }
-  }
-  next();
+}, {
+  timestamps: true
 });
 
 // Index for faster queries
-orderSchema.index({ status: 1 });
-orderSchema.index({ customerPhone: 1 });
-orderSchema.index({ createdAt: -1 });
-orderSchema.index({ paymentStatus: 1 });
+OrderSchema.index({ orderId: 1 });
+OrderSchema.index({ userId: 1 });
+OrderSchema.index({ status: 1 });
+OrderSchema.index({ createdAt: -1 });
+OrderSchema.index({ 'customer.email': 1 });
 
-// Generate order number
-orderSchema.virtual('orderNumber').get(function() {
-  return `JLF${this._id.toString().slice(-8).toUpperCase()}`;
-});
-
-// Ensure virtuals are included in JSON
-orderSchema.set('toJSON', { virtuals: true });
-orderSchema.set('toObject', { virtuals: true });
-
-module.exports = mongoose.models.Order || mongoose.model('Order', orderSchema);
+module.exports = mongoose.model('Order', OrderSchema);

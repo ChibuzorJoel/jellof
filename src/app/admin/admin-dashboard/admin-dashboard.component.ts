@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from 'src/app/services/auth.service';
 
 interface DashboardStats {
   totalProducts: number;
@@ -88,7 +89,8 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -399,11 +401,9 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   logout(): void {
-    if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('adminToken');
-      sessionStorage.clear();
-      this.router.navigate(['/admin/login']);
-    }
+    
+    this.authService.logout();
+    this.router.navigate(['/admin/login']);
   }
 
   // Order status helpers

@@ -2,19 +2,22 @@ const express = require('express');
 const router = express.Router();
 const lookbookController = require('../controllers/lookbookController');
 
-// GET - Get all lookbook items
+// Get all lookbook items
 router.get('/', lookbookController.getAllLookbookItems);
 
-// GET - Get lookbook item by ID
+// Get lookbook item by ID
 router.get('/:id', lookbookController.getLookbookItemById);
 
-// POST - Create lookbook item (admin)
+// Create lookbook item (admin only)
 router.post('/', lookbookController.createLookbookItem);
 
-// PUT - Update lookbook item (admin)
+// Update lookbook item (admin only)
 router.put('/:id', lookbookController.updateLookbookItem);
 
-// DELETE - Delete lookbook item (admin)
+// Toggle featured status (admin only)
+router.patch('/:id/featured', lookbookController.toggleFeatured);
+
+// Delete lookbook item (admin only)
 router.delete('/:id', lookbookController.deleteLookbookItem);
 
 module.exports = router;

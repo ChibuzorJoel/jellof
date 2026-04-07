@@ -599,3 +599,245 @@
       font-size: 1.5rem;
     }
   }
+  /* PAYMENT SECTION STYLES */
+
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.payment-method-option {
+  cursor: pointer;
+  position: relative;
+}
+
+.payment-method-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.payment-method-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.payment-method-option input[type="radio"]:checked + .payment-method-card {
+  border-color: #8b5cf6;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+.payment-method-option:hover .payment-method-card {
+  border-color: #a78bfa;
+  transform: translateY(-2px);
+}
+
+.payment-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.payment-details h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.payment-details p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* PAYMENT FORMS */
+
+.payment-form {
+  margin-top: 30px;
+  padding: 25px;
+  background: #f9fafb;
+  border-radius: 12px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+}
+
+.payment-security-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 15px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+}
+
+.security-icon {
+  font-size: 24px;
+}
+
+.payment-security-notice p {
+  margin: 0;
+  font-size: 14px;
+  color: #166534;
+}
+
+/* BANK TRANSFER STYLES */
+
+.transfer-info {
+  margin-bottom: 25px;
+}
+
+.transfer-info h4 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.transfer-info > p {
+  margin: 0 0 20px 0;
+  color: #6b7280;
+}
+
+.bank-details-card {
+  background: white;
+  border: 2px solid #8b5cf6;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.bank-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.bank-detail:last-child {
+  border-bottom: none;
+}
+
+.bank-detail label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.bank-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.total-amount {
+  font-size: 20px;
+  color: #8b5cf6;
+}
+
+.transfer-instructions {
+  margin: 20px 0 10px 0;
+  padding: 15px;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #92400e;
+}
+
+/* WHATSAPP INFO STYLES */
+
+.whatsapp-info {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.whatsapp-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.whatsapp-info h4 {
+  margin: 0 0 15px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.whatsapp-info p {
+  margin: 0 0 20px 0;
+  color: #6b7280;
+  line-height: 1.6;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.whatsapp-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.benefit {
+  padding: 12px 20px;
+  background: #dcfce7;
+  border-radius: 8px;
+  color: #166534;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 768px) {
+  .payment-methods {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-form {
+    padding: 20px 15px;
+  }
+
+  .bank-detail {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .whatsapp-benefits {
+    grid-template-columns: 1fr;
+  }
+}

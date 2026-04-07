@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from 'src/app/services/auth.service';
 
 interface Product {
   _id?: string;
@@ -91,7 +92,8 @@ export class AdminProductComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -504,10 +506,8 @@ export class AdminProductComponent implements OnInit {
   }
 
   logout(): void {
-    if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('adminToken');
-      sessionStorage.clear();
-      this.router.navigate(['/admin/login']);
-    }
+    
+    this.authService.logout();
+    this.router.navigate(['/admin/login']);
   }
 }

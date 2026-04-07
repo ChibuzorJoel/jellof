@@ -17,6 +17,9 @@ router.get('/:id', productsController.getProductById);
 // POST - Create new product (admin)
 router.post('/', productsController.createProduct);
 
+// PUT - Update product stock (admin)
+router.put('/:id/stock', productsController.updateStock);
+
 // PUT - Update product (admin)
 router.put('/:id', productsController.updateProduct);
 

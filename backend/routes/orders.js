@@ -2,22 +2,28 @@ const express = require('express');
 const router = express.Router();
 const ordersController = require('../controllers/ordersController');
 
-// POST - Create new order (from WhatsApp)
+// Create new order
 router.post('/', ordersController.createOrder);
 
-// GET - Get all orders
+// Get all orders
 router.get('/', ordersController.getAllOrders);
 
-// GET - Get orders by status
+// Get order statistics
+router.get('/stats', ordersController.getOrderStats);
+
+// Get orders by status
 router.get('/status/:status', ordersController.getOrdersByStatus);
 
-// GET - Get order by ID
+// Get order by ID
 router.get('/:id', ordersController.getOrderById);
 
-// PUT - Update order status
+// Update order status
 router.put('/:id/status', ordersController.updateOrderStatus);
 
-// DELETE - Delete order
+// Update payment status
+router.put('/:id/payment', ordersController.updatePaymentStatus);
+
+// Delete order
 router.delete('/:id', ordersController.deleteOrder);
 
 module.exports = router;

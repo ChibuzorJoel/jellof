@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from 'src/app/services/auth.service';
 
 interface Category {
   _id?: string;
@@ -9,6 +10,8 @@ interface Category {
   productCount?: number;
   isActive: boolean;
   createdAt?: Date | string;
+  icon?: string;         
+  displayOrder?: number;
 }
 
 @Component({
@@ -17,49 +20,41 @@ interface Category {
   styleUrls: ['./admin-categories.component.css']
 })
 export class AdminCategoriesComponent implements OnInit {
-  // Navigation properties
+
   adminName = 'Admin';
   notificationCount = 5;
-  
-  // Categories
+
   categories: Category[] = [];
   filteredCategories: Category[] = [];
-  
-  // Form states
+
   isEditing = false;
   editingCategory: Category | null = null;
   showForm = false;
-  
-  // New category form
+
   newCategory: Category = this.getEmptyCategory();
-  
-  // Search
+
   searchQuery = '';
-  
-  // Messages
+
   successMessage = '';
   errorMessage = '';
-  
-  // Loading
+
   isLoading = true;
-  
-  // API URL
+
   private apiUrl = 'http://localhost:3000/api/categories';
 
   constructor(
     private http: HttpClient,
-    private router: Router
-  ) { }
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    // Add demo categories first
     this.addDemoCategories();
-    // Then load real categories
     this.loadCategories();
   }
 
+  // ================= DEMO DATA =================
   addDemoCategories(): void {
-    // Add demo categories
     this.categories = [
       {
         _id: 'CAT001',
@@ -67,7 +62,7 @@ export class AdminCategoriesComponent implements OnInit {
         description: 'Beautiful dresses for every occasion',
         productCount: 45,
         isActive: true,
-        createdAt: new Date('2024-01-15')
+        createdAt: new Date()
       },
       {
         _id: 'CAT002',
@@ -75,7 +70,7 @@ export class AdminCategoriesComponent implements OnInit {
         description: 'Stylish tops and blouses',
         productCount: 38,
         isActive: true,
-        createdAt: new Date('2024-01-16')
+        createdAt: new Date()
       },
       {
         _id: 'CAT003',
@@ -83,57 +78,38 @@ export class AdminCategoriesComponent implements OnInit {
         description: 'Jeans, pants, and skirts',
         productCount: 32,
         isActive: true,
-        createdAt: new Date('2024-01-17')
-      },
-      {
-        _id: 'CAT004',
-        name: 'Outerwear',
-        description: 'Jackets, coats, and cardigans',
-        productCount: 18,
-        isActive: true,
-        createdAt: new Date('2024-01-18')
-      },
-      {
-        _id: 'CAT005',
-        name: 'Accessories',
-        description: 'Bags, jewelry, and scarves',
-        productCount: 56,
-        isActive: false,
-        createdAt: new Date('2024-01-19')
+        createdAt: new Date()
       }
     ];
-    
+
     this.filteredCategories = [...this.categories];
     this.isLoading = false;
   }
 
-  // Load all categories from API
+  // ================= LOAD API =================
   loadCategories(): void {
     this.http.get<any>(this.apiUrl).subscribe({
       next: (response) => {
-        // Merge API categories with demo categories (if any)
-        const apiCategories = response.categories || [];
-        // Only replace with API categories if they exist, otherwise keep demo
-        if (apiCategories.length > 0) {
-          this.categories = apiCategories;
-        }
+        const apiCategories = response.categories || response || [];
+
+        this.categories = [
+          ...this.categories,
+          ...apiCategories
+        ];
+
         this.applyFilters();
-        console.log('Categories loaded:', this.categories.length);
       },
-      error: (error) => {
-        console.error('Error loading categories:', error);
-        // On error, keep demo categories
+      error: () => {
         this.showError('Using demo categories (API unavailable)');
         this.applyFilters();
       }
     });
   }
 
-  // Apply search filter
+  // ================= FILTER =================
   applyFilters(): void {
     let filtered = [...this.categories];
 
-    // Search filter
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
       filtered = filtered.filter(c =>
@@ -145,14 +121,14 @@ export class AdminCategoriesComponent implements OnInit {
     this.filteredCategories = filtered;
   }
 
-  // Show create form
+  // ================= ADD =================
   addCategory(): void {
     this.newCategory = this.getEmptyCategory();
     this.isEditing = false;
     this.showForm = true;
   }
 
-  // Show edit form
+  // ================= EDIT =================
   editCategory(category: Category): void {
     this.newCategory = { ...category };
     this.editingCategory = category;
@@ -160,75 +136,183 @@ export class AdminCategoriesComponent implements OnInit {
     this.showForm = true;
   }
 
-  // Create new category
+  // ================= CREATE =================
   createCategory(): void {
-    this.http.post<any>(this.apiUrl, this.newCategory).subscribe({
+
+    // validation
+    if (!this.newCategory.name || !this.newCategory.description) {
+      this.showError('Please fill all required fields');
+      return;
+    }
+  
+    const payload = {
+      name: this.newCategory.name,
+      description: this.newCategory.description,
+      isActive: this.newCategory.isActive
+    };
+  
+    console.log('Sending payload:', payload);
+  
+    this.http.post<any>(this.apiUrl, payload).subscribe({
       next: (response) => {
+  
+        console.log('Create response:', response);
+  
+        const created: Category =
+          response.category ||
+          response.data ||
+          response;
+  
+        // fallback id
+        if (!created._id) {
+          created._id = 'TEMP_' + Date.now();
+        }
+  
+        // add instantly
+        this.categories.unshift(created);
+  
+        this.applyFilters();
         this.showSuccess('Category created successfully!');
-        this.loadCategories();
         this.closeForm();
       },
+  
       error: (error) => {
-        console.error('Error creating category:', error);
-        this.showError('Failed to create category');
+  
+        console.error('API failed — creating locally', error);
+  
+        // fallback create locally (so button always works)
+        const localCategory: Category = {
+          _id: 'LOCAL_' + Date.now(),
+          name: this.newCategory.name,
+          description: this.newCategory.description,
+          isActive: this.newCategory.isActive,
+          createdAt: new Date()
+        };
+  
+        this.categories.unshift(localCategory);
+  
+        this.applyFilters();
+        this.showSuccess('Category created locally');
+        this.closeForm();
       }
     });
   }
 
-  // Update existing category
+  // ================= UPDATE =================
   updateCategory(): void {
-    if (!this.newCategory._id) return;
 
-    this.http.put<any>(`${this.apiUrl}/${this.newCategory._id}`, this.newCategory).subscribe({
-      next: (response) => {
+    // DEMO CATEGORY
+    if (!this.newCategory._id || this.newCategory._id.startsWith('CAT')) {
+
+      const index = this.categories.findIndex(
+        c => c._id === this.newCategory._id
+      );
+
+      if (index !== -1) {
+        this.categories[index] = { ...this.newCategory };
+      }
+
+      this.applyFilters();
+      this.showSuccess('Demo category updated!');
+      this.closeForm();
+      return;
+    }
+
+    // API CATEGORY
+    this.http.put<any>(
+      `${this.apiUrl}/${this.newCategory._id}`,
+      this.newCategory
+    ).subscribe({
+      next: () => {
+
+        const index = this.categories.findIndex(
+          c => c._id === this.newCategory._id
+        );
+
+        if (index !== -1) {
+          this.categories[index] = { ...this.newCategory };
+        }
+
+        this.applyFilters();
         this.showSuccess('Category updated successfully!');
-        this.loadCategories();
         this.closeForm();
       },
-      error: (error) => {
-        console.error('Error updating category:', error);
+      error: () => {
         this.showError('Failed to update category');
       }
     });
   }
+  toggleStatus(category: Category): void {
 
-  // Delete category
+    // DEMO CATEGORY
+    if (!category._id || category._id.startsWith('CAT')) {
+      category.isActive = !category.isActive;
+      this.showSuccess('Demo category status updated!');
+      return;
+    }
+  
+    category.isActive = !category.isActive;
+  
+    this.http.put<any>(
+      `${this.apiUrl}/${category._id}`,
+      category
+    ).subscribe({
+      next: () => {
+        this.showSuccess(
+          `Category ${category.isActive ? 'activated' : 'deactivated'}!`
+        );
+      },
+      error: () => {
+        category.isActive = !category.isActive;
+        this.showError('Failed to update category status');
+      }
+    });
+  }
+  // ================= DELETE =================
   deleteCategory(category: Category): void {
+
     if (!confirm(`Are you sure you want to delete "${category.name}"?`)) {
       return;
     }
 
-    this.http.delete<any>(`${this.apiUrl}/${category._id}`).subscribe({
-      next: (response) => {
+    // DEMO CATEGORY
+    if (!category._id || category._id.startsWith('CAT')) {
+
+      this.categories = this.categories.filter(
+        c => c._id !== category._id
+      );
+
+      this.applyFilters();
+      this.showSuccess('Demo category deleted!');
+      return;
+    }
+
+    // API CATEGORY
+    this.http.delete<any>(
+      `${this.apiUrl}/${category._id}`
+    ).subscribe({
+      next: () => {
+
+        this.categories = this.categories.filter(
+          c => c._id !== category._id
+        );
+
+        this.applyFilters();
         this.showSuccess('Category deleted successfully!');
-        this.loadCategories();
       },
-      error: (error) => {
-        console.error('Error deleting category:', error);
+      error: () => {
         this.showError('Failed to delete category');
       }
     });
   }
-
-  // Toggle category status
-  toggleStatus(category: Category): void {
-    category.isActive = !category.isActive;
-    
-    if (category._id) {
-      this.http.put<any>(`${this.apiUrl}/${category._id}`, category).subscribe({
-        next: (response) => {
-          this.showSuccess(`Category ${category.isActive ? 'activated' : 'deactivated'}!`);
-        },
-        error: (error) => {
-          console.error('Error updating status:', error);
-          category.isActive = !category.isActive; // Revert on error
-          this.showError('Failed to update category status');
-        }
-      });
-    }
+  getInitials(): string {
+    return this.adminName
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
   }
-
-  // Save category (create or update)
+  // ================= SAVE =================
   saveCategory(): void {
     if (this.isEditing) {
       this.updateCategory();
@@ -237,7 +321,7 @@ export class AdminCategoriesComponent implements OnInit {
     }
   }
 
-  // Close form
+  // ================= CLOSE =================
   closeForm(): void {
     this.showForm = false;
     this.isEditing = false;
@@ -245,7 +329,6 @@ export class AdminCategoriesComponent implements OnInit {
     this.newCategory = this.getEmptyCategory();
   }
 
-  // Get empty category template
   getEmptyCategory(): Category {
     return {
       name: '',
@@ -255,7 +338,7 @@ export class AdminCategoriesComponent implements OnInit {
     };
   }
 
-  // Search
+  // ================= SEARCH =================
   onSearch(): void {
     this.applyFilters();
   }
@@ -265,28 +348,17 @@ export class AdminCategoriesComponent implements OnInit {
     this.applyFilters();
   }
 
-  // Navigation methods
+  // ================= NAV =================
   navigateTo(route: string): void {
     this.router.navigate([`/admin/${route}`]);
   }
 
-  performSearch(): void {
-    this.onSearch();
-  }
-
-  getInitials(): string {
-    return this.adminName.split(' ').map(n => n[0]).join('').toUpperCase();
-  }
-
   logout(): void {
-    if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('adminToken');
-      sessionStorage.clear();
-      this.router.navigate(['/admin/login']);
-    }
+    this.authService.logout();
+    this.router.navigate(['/admin/login']);
   }
 
-  // Show messages
+  // ================= MESSAGES =================
   showSuccess(message: string): void {
     this.successMessage = message;
     setTimeout(() => this.successMessage = '', 3000);
@@ -297,7 +369,7 @@ export class AdminCategoriesComponent implements OnInit {
     setTimeout(() => this.errorMessage = '', 3000);
   }
 
-  // Format date
+  // ================= DATE =================
   formatDate(date: Date | string | undefined): string {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString();

@@ -5,6 +5,7 @@
    - admin-inventory.component.css
 =================================== */
 @import url('../admin-dashboard/admin-dashboard.component.css');
+
 /* ===================================
    BASE ADMIN STYLES
 =================================== */
@@ -21,7 +22,6 @@
   color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
-
 
 /* ===================================
    MESSAGES
@@ -479,109 +479,259 @@
 }
 
 /* ===================================
-   ACTION BUTTONS
+   IMPROVED ACTION BUTTONS
+   Professional, Modern, Well-Arranged
 =================================== */
 
 .action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.625rem;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  padding: 0.25rem 0;
 }
 
+/* Base Action Button */
 .action-btn {
-  width: 36px;
-  height: 36px;
+  position: relative;
+  width: 38px;
+  height: 38px;
   background: transparent;
-  border: 1px solid #333;
-  border-radius: 6px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
   color: #888;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.action-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  transition: all 0.25s;
+  flex-shrink: 0;
 }
 
 .action-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.05);
 }
 
+.action-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* Tooltip on Hover */
+.action-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: #2a2a2a;
+  color: #fff;
+  padding: 0.5rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  z-index: 100;
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  border: 6px solid transparent;
+  border-top-color: #2a2a2a;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s;
+  z-index: 100;
+}
+
+.action-btn:hover::after,
+.action-btn:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* View Button - Blue */
 .view-btn {
   background: rgba(33, 150, 243, 0.1);
-  border-color: #2196F3;
-  color: #2196F3;
+  border-color: rgba(33, 150, 243, 0.3);
+  color: #42A5F5;
 }
 
 .view-btn:hover {
-  background: #2196F3;
+  background: linear-gradient(135deg, #2196F3, #1976D2);
+  border-color: #2196F3;
   color: #fff;
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
 }
 
+.view-btn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Block Button - Orange */
 .block-btn {
   background: rgba(255, 152, 0, 0.1);
-  border-color: #FF9800;
-  color: #FF9800;
+  border-color: rgba(255, 152, 0, 0.3);
+  color: #FFB74D;
 }
 
 .block-btn:hover {
-  background: #FF9800;
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+  border-color: #FF9800;
   color: #fff;
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
 }
 
+.block-btn:hover svg {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Unblock Button - Green */
 .unblock-btn {
   background: rgba(76, 175, 80, 0.1);
-  border-color: #4CAF50;
-  color: #4CAF50;
+  border-color: rgba(76, 175, 80, 0.3);
+  color: #66BB6A;
 }
 
 .unblock-btn:hover {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #4CAF50, #388E3C);
+  border-color: #4CAF50;
   color: #fff;
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
 }
 
+.unblock-btn:hover svg {
+  transform: scale(1.15);
+}
+
+/* Edit Button - Yellow */
+.edit-btn {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+  color: #FFD54F;
+}
+
+.edit-btn:hover {
+  background: linear-gradient(135deg, #FFC107, #FFA000);
+  border-color: #FFC107;
+  color: #000;
+  box-shadow: 0 8px 20px rgba(255, 193, 7, 0.4);
+}
+
+.edit-btn:hover svg {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* Delete Button - Red */
 .delete-btn {
   background: rgba(244, 67, 54, 0.1);
-  border-color: #f44336;
-  color: #f44336;
+  border-color: rgba(244, 67, 54, 0.3);
+  color: #EF5350;
 }
 
 .delete-btn:hover {
-  background: #f44336;
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  border-color: #f44336;
   color: #fff;
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
 }
 
+.delete-btn:hover svg {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Approve Button - Light Green */
 .approve-btn {
   background: rgba(139, 195, 74, 0.1);
-  border-color: #8BC34A;
-  color: #8BC34A;
+  border-color: rgba(139, 195, 74, 0.3);
+  color: #9CCC65;
 }
 
 .approve-btn:hover {
-  background: #8BC34A;
+  background: linear-gradient(135deg, #8BC34A, #689F38);
+  border-color: #8BC34A;
   color: #fff;
+  box-shadow: 0 8px 20px rgba(139, 195, 74, 0.4);
 }
 
+.approve-btn:hover svg {
+  transform: scale(1.15);
+}
+
+/* Reject Button - Red */
 .reject-btn {
   background: rgba(244, 67, 54, 0.1);
-  border-color: #f44336;
-  color: #f44336;
+  border-color: rgba(244, 67, 54, 0.3);
+  color: #EF5350;
 }
 
 .reject-btn:hover {
-  background: #f44336;
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  border-color: #f44336;
   color: #fff;
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
 }
 
+.reject-btn:hover svg {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* Complete Button - Green */
 .complete-btn {
   background: rgba(76, 175, 80, 0.1);
-  border-color: #4CAF50;
-  color: #4CAF50;
+  border-color: rgba(76, 175, 80, 0.3);
+  color: #66BB6A;
 }
 
 .complete-btn:hover {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #4CAF50, #388E3C);
+  border-color: #4CAF50;
   color: #fff;
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
+
+.complete-btn:hover svg {
+  transform: scale(1.15);
+}
+
+/* Disabled State */
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.action-btn:disabled:hover::after,
+.action-btn:disabled:hover::before {
+  display: none;
+}
+
+/* Focus State for Accessibility */
+.action-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid #4CAF50;
+  outline-offset: 2px;
 }
 
 /* ===================================
@@ -984,6 +1134,20 @@
   .summary-cards {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  .action-buttons {
+    gap: 0.5rem;
+  }
+  
+  .action-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1024,6 +1188,27 @@
     padding: 1rem;
     font-size: 0.813rem;
   }
+  
+  .action-buttons {
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  
+  .action-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .action-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  /* Hide tooltips on mobile */
+  .action-btn::after,
+  .action-btn::before {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1040,12 +1225,16 @@
   }
   
   .action-buttons {
-    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .action-btn {
+    width: 44px;
+    height: 44px;
   }
   
   .stock-control-extra {
     gap: 0.5rem;
   }
 }
-
-

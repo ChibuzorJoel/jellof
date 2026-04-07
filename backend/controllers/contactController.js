@@ -39,12 +39,21 @@ exports.submitContactForm = async (req, res) => {
       contactId = saved._id;
     }
 
-    // Send emails
-    await emailService.sendContactNotification({ name, email, phone, subject, message });
-    await emailService.sendContactAutoReply({ name, email });
+    // Try to send emails (non-blocking - don't fail if email fails)
+    try {
+      if (emailService && emailService.sendContactNotification) {
+        await emailService.sendContactNotification({ name, email, phone, subject, message });
+        await emailService.sendContactAutoReply({ name, email });
+        console.log('✅ Emails sent successfully');
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.warn('⚠️ Email sending failed (non-critical):', emailError.message);
+      console.log('💡 Tip: Configure email credentials in .env file to enable email notifications');
+    }
 
-    // Log to console (fallback if no database)
-    console.log('Contact form submission:', {
+    // Log to console
+    console.log('✅ Contact form submission saved:', {
       id: contactId,
       name,
       email,
@@ -60,7 +69,7 @@ exports.submitContactForm = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error submitting contact form:', error);
+    console.error('❌ Error submitting contact form:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to send message. Please try again later.'
@@ -123,6 +132,45 @@ exports.getContactById = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve contact'
+    });
+  }
+};
+
+// Update contact status
+exports.updateContactStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!Contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Database not configured'
+      });
+    }
+
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { status, updatedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Contact not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Contact status updated',
+      contact
+    });
+  } catch (error) {
+    console.error('Error updating contact:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update contact'
     });
   }
 };

@@ -70,6 +70,11 @@ const routes: Routes = [
     //canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
   },
   { 
+    path: 'admin/message', 
+    component: AdminMessageComponent
+    //canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard
+  },
+  { 
     path: 'admin/categories', 
     component: AdminCategoriesComponent
     // canActivate: [AdminAuthGuard]  // ← Uncomment after creating AdminAuthGuard

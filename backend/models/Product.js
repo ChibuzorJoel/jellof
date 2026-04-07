@@ -9,7 +9,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Category is required'],
-    enum: ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Accessories'],
+    enum: ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Accessories', 'Shoes'],
     trim: true
   },
   price: {
@@ -17,9 +17,21 @@ const productSchema = new mongoose.Schema({
     required: [true, 'Price is required'],
     min: [0, 'Price cannot be negative']
   },
+  discountPrice: {
+    type: Number,
+    min: [0, 'Discount price cannot be negative'],
+    validate: {
+      validator: function(value) {
+        // Discount price must be less than regular price
+        return !value || value < this.price;
+      },
+      message: 'Discount price must be less than regular price'
+    }
+  },
   description: {
     type: String,
-    trim: true
+    trim: true,
+    default: ''
   },
   image: {
     type: String,
@@ -54,26 +66,51 @@ const productSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+  }
+}, {
+  timestamps: true // This automatically adds createdAt and updatedAt
+});
+
+// ✅ FIXED: Pre-save hook - Use async WITHOUT next parameter
+productSchema.pre('save', async function() {
+  // Auto-update inStock based on stockQuantity
+  this.inStock = this.stockQuantity > 0;
+  
+  // If images array is provided, set the first image as the main image
+  if (this.images && this.images.length > 0 && !this.image) {
+    this.image = this.images[0];
+  }
+  
+  // If main image is provided but images array is empty, populate images array
+  if (this.image && (!this.images || this.images.length === 0)) {
+    this.images = [this.image];
   }
 });
 
-// Index for faster queries
+// Virtual for checking if product is on sale
+productSchema.virtual('isOnSale').get(function() {
+  return !!(this.discountPrice && this.discountPrice < this.price);
+});
+
+// Virtual for actual selling price
+productSchema.virtual('sellingPrice').get(function() {
+  return this.isOnSale ? this.discountPrice : this.price;
+});
+
+// Virtual for discount percentage
+productSchema.virtual('discountPercentage').get(function() {
+  if (!this.isOnSale) return 0;
+  return Math.round(((this.price - this.discountPrice) / this.price) * 100);
+});
+
+// Ensure virtuals are included when converting to JSON
+productSchema.set('toJSON', { virtuals: true });
+productSchema.set('toObject', { virtuals: true });
+
+// Indexes for faster queries
 productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ name: 'text', description: 'text' });
+productSchema.index({ inStock: 1 });
 
-// Update timestamp on save
-productSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
-module.exports = mongoose.models.Product || mongoose.model('Product', productSchema);
+module.exports = mongoose.model('Product', productSchema);

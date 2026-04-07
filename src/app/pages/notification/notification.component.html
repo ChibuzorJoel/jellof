@@ -1,0 +1,18 @@
+<div class="notification-container">
+    <div 
+      *ngFor="let notification of notifications"
+      class="notification notification-{{notification.type}}"
+      [class.notification-visible]="notification.visible"
+      (click)="hideNotification(notification.id)"
+    >
+      <div class="notification-icon">
+        {{ getIcon(notification.type) }}
+      </div>
+      <div class="notification-content">
+        <p class="notification-message">{{ notification.message }}</p>
+      </div>
+      <button class="notification-close" (click)="hideNotification(notification.id)">
+        ×
+      </button>
+    </div>
+  </div>
