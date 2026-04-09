@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 const newsletterController = require('../controllers/newsletterController');
 
-// POST - Subscribe to newsletter
+// Public routes
 router.post('/subscribe', newsletterController.subscribe);
+router.get('/unsubscribe/:email', newsletterController.unsubscribe);
 
-// POST - Unsubscribe from newsletter
-router.post('/unsubscribe', newsletterController.unsubscribe);
-
-// GET - Get all subscribers (admin)
-router.get('/subscribers', newsletterController.getAllSubscribers);
-
-// DELETE - Delete subscriber
-router.delete('/subscribers/:id', newsletterController.deleteSubscriber);
+// Admin routes (add authentication middleware in production)
+router.get('/', newsletterController.getAllSubscribers);
+router.get('/stats', newsletterController.getStatistics);
+router.get('/export', newsletterController.exportSubscribers);
+router.get('/:email', newsletterController.getSubscriberByEmail);
+router.put('/:email/preferences', newsletterController.updatePreferences);
+router.delete('/:id', newsletterController.deleteSubscriber);
 
 module.exports = router;

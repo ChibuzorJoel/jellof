@@ -1,0 +1,67 @@
+<div class="newsletter-subscription">
+    <div class="newsletter-container">
+      <!-- Header -->
+      <div class="newsletter-header">
+        <h3>Join Our Newsletter</h3>
+        <p>Get updates on new arrivals, exclusive sales, and styling tips!</p>
+      </div>
+  
+      <!-- Success Message -->
+      <div class="success-message" *ngIf="submitSuccess">
+        <div class="success-icon">✓</div>
+        <p>{{ successMessage }}</p>
+      </div>
+  
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="submitError">
+        <div class="error-icon">✕</div>
+        <p>{{ errorMessage }}</p>
+      </div>
+  
+      <!-- Subscription Form -->
+      <form class="newsletter-form" (ngSubmit)="subscribe()" *ngIf="!submitSuccess">
+        <div class="form-group">
+          <input 
+            type="email" 
+            class="newsletter-input"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="Enter your email"
+            [disabled]="isSubmitting"
+            (focus)="clearError()"
+            required
+          />
+        </div>
+  
+        <button 
+          type="submit" 
+          class="newsletter-button"
+          [disabled]="isSubmitting || !email"
+        >
+          <span *ngIf="!isSubmitting">Subscribe</span>
+          <span *ngIf="isSubmitting">Subscribing...</span>
+        </button>
+      </form>
+  
+      <!-- Benefits -->
+      <div class="newsletter-benefits">
+        <div class="benefit-item">
+          <span class="benefit-icon">📬</span>
+          <span>Exclusive Offers</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🎁</span>
+          <span>New Arrivals First</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">✨</span>
+          <span>Style Tips</span>
+        </div>
+      </div>
+  
+      <!-- Privacy Notice -->
+      <p class="privacy-notice">
+        We respect your privacy. Unsubscribe at any time.
+      </p>
+    </div>
+  </div>

@@ -25,6 +25,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { AdminPaymentComponent } from './admin/admin-payment/admin-payment.component';
 import { AdminCustomersComponent } from './admin/admin-customers/admin-customers.component';
 import { AdminInventoryComponent } from './admin/admin-inventory/admin-inventory.component';
+import { NewsletterComponent } from './pages/newsletter/newsletter.component';
  
 const routes: Routes = [
   // Public Routes
@@ -34,6 +35,8 @@ const routes: Routes = [
   { path: 'lookbook', component: LookbookComponent },
   { path: 'about', component: AboutComponent },
   { path: 'contact', component: ContactComponent },
+  { path: 'newsletter', component: NewsletterComponent },
+  
   
   // Auth Routes
   { path: 'login', component: AuthComponent },

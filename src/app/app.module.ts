@@ -28,6 +28,8 @@ import { QuickViewComponent } from './pages/quick-view/quick-view.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
 import { AuthComponent } from './pages/auth/auth.component';
 import { CartComponent } from './pages/cart/cart.component';
+import { NewsletterComponent } from './pages/newsletter/newsletter.component';
+
 
 // Shared Components
 import { ProductCardComponent } from './shared/product-card/product-card.component';
@@ -57,6 +59,9 @@ import { AdminInventoryComponent } from './admin/admin-inventory/admin-inventory
 import { NotificationComponent } from './pages/notification/notification.component';
 
 
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -76,6 +81,8 @@ import { NotificationComponent } from './pages/notification/notification.compone
     CheckoutComponent,
     AuthComponent,
     CartComponent,
+    NewsletterComponent,
+    
 
     // Shared Components
     ProductCardComponent,
@@ -97,6 +104,7 @@ import { NotificationComponent } from './pages/notification/notification.compone
     AdminCustomersComponent,
     AdminInventoryComponent,
     NotificationComponent,
+    
     
   ],
 

@@ -1,18 +1,38 @@
 const mongoose = require('mongoose');
 
-const newsletterSchema = new mongoose.Schema({
+const NewsletterSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: true,
     unique: true,
-    lowercase: true,
     trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email']
+    lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address']
+  },
+  name: {
+    type: String,
+    trim: true
   },
   status: {
     type: String,
-    enum: ['active', 'unsubscribed'],
+    enum: ['active', 'unsubscribed', 'bounced'],
     default: 'active'
+  },
+  source: {
+    type: String,
+    enum: ['website', 'checkout', 'popup', 'footer', 'manual'],
+    default: 'website'
+  },
+  preferences: {
+    newArrivals: { type: Boolean, default: true },
+    sales: { type: Boolean, default: true },
+    styling: { type: Boolean, default: true },
+    weeklyDigest: { type: Boolean, default: false }
+  },
+  metadata: {
+    ipAddress: String,
+    userAgent: String,
+    referrer: String
   },
   subscribedAt: {
     type: Date,
@@ -20,12 +40,29 @@ const newsletterSchema = new mongoose.Schema({
   },
   unsubscribedAt: {
     type: Date
+  },
+  lastEmailSent: {
+    type: Date
+  },
+  emailsSent: {
+    type: Number,
+    default: 0
+  },
+  emailsOpened: {
+    type: Number,
+    default: 0
+  },
+  emailsClicked: {
+    type: Number,
+    default: 0
   }
+}, {
+  timestamps: true
 });
 
-// Index for faster queries (keep ONLY non-duplicate ones)
-newsletterSchema.index({ status: 1 });
+// Index for faster queries
+NewsletterSchema.index({ email: 1 });
+NewsletterSchema.index({ status: 1 });
+NewsletterSchema.index({ subscribedAt: -1 });
 
-module.exports =
-  mongoose.models.Newsletter ||
-  mongoose.model('Newsletter', newsletterSchema);
+module.exports = mongoose.model('Newsletter', NewsletterSchema);
