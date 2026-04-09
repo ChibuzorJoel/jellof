@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NewsletterService } from '../../services/newsletter.service';
 
 @Component({
   selector: 'app-footer',
@@ -6,7 +7,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {
-  currentYear: number = new Date().getFullYear();
+  newsletterEmail: string = '';
+  message: string = '';
+  messageType: 'success' | 'error' | '' = '';
+
+  currentYear: number = new Date().getFullYear(); // <-- Add this
 
   socialLinks = [
     { name: 'Instagram', url: 'https://instagram.com/jellof', icon: 'instagram' },
@@ -29,4 +34,43 @@ export class FooterComponent {
     { name: 'Size Guide', route: '/size-guide' },
     { name: 'FAQs', route: '/faqs' }
   ];
+
+  constructor(private newsletterService: NewsletterService) {}
+
+  subscribeNewsletter(): void {
+    // validate email
+    if (!this.newsletterEmail.trim()) {
+      this.showMessage('Please enter your email', 'error');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.newsletterEmail)) {
+      this.showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    // use NewsletterService
+    this.newsletterService.subscribe({ email: this.newsletterEmail, source: 'website' })
+      .subscribe({
+        next: (response: any) => {
+          this.showMessage(response.message || 'Subscribed successfully!', 'success');
+          this.newsletterEmail = '';
+        },
+        error: (error) => {
+          const msg = error?.error?.message || 'Subscription failed. Try again.';
+          this.showMessage(msg, 'error');
+        }
+      });
+  }
+
+  showMessage(msg: string, type: 'success' | 'error') {
+    this.message = msg;
+    this.messageType = type;
+
+    setTimeout(() => {
+      this.message = '';
+      this.messageType = '';
+    }, 4000);
+  }
 }
