@@ -10,7 +10,7 @@ interface Category {
   productCount?: number;
   isActive: boolean;
   createdAt?: Date | string;
-  icon?: string;         
+  icon?: string;
   displayOrder?: number;
 }
 
@@ -39,6 +39,7 @@ export class AdminCategoriesComponent implements OnInit {
   errorMessage = '';
 
   isLoading = true;
+  apiConnected = false;
 
   private apiUrl = 'http://localhost:3000/api/categories';
 
@@ -49,59 +50,105 @@ export class AdminCategoriesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.addDemoCategories();
-    this.loadCategories();
+    this.checkBackendConnection();
+  }
+
+  // ================= CHECK BACKEND =================
+  checkBackendConnection(): void {
+    console.log('🔍 Checking backend connection...');
+    console.log('📍 Testing: http://localhost:3000/api/test');
+    
+    this.http.get<any>('http://localhost:3000/api/test').subscribe({
+      next: (response) => {
+        console.log('✅ Backend connected:', response);
+        this.apiConnected = true;
+        
+        if (response.database === 'Connected') {
+          console.log('✅ MongoDB is connected');
+          this.loadCategories();
+        } else {
+          console.error('❌ MongoDB not connected!');
+          this.showError('⚠️ Backend running but MongoDB disconnected!');
+          this.isLoading = false;
+        }
+      },
+      error: (error) => {
+        console.error('❌ Backend not reachable:', error);
+        this.apiConnected = false;
+        this.isLoading = false;
+        this.showError(`❌ Backend not running!
+
+Start backend:
+  cd backend
+  npm run dev
+
+Expected output:
+  ✅ Server running on port 3000
+  ✅ MongoDB connected`);
+        
+        this.addDemoCategories();
+      }
+    });
   }
 
   // ================= DEMO DATA =================
   addDemoCategories(): void {
     this.categories = [
       {
-        _id: 'CAT001',
-        name: 'Dresses',
-        description: 'Beautiful dresses for every occasion',
-        productCount: 45,
-        isActive: true,
-        createdAt: new Date()
-      },
-      {
-        _id: 'CAT002',
-        name: 'Tops',
-        description: 'Stylish tops and blouses',
-        productCount: 38,
-        isActive: true,
-        createdAt: new Date()
-      },
-      {
-        _id: 'CAT003',
-        name: 'Bottoms',
-        description: 'Jeans, pants, and skirts',
-        productCount: 32,
+        _id: 'DEMO-001',
+        name: '⚠️ Demo: Dresses',
+        description: 'Backend not connected - demo data only',
+        productCount: 0,
         isActive: true,
         createdAt: new Date()
       }
     ];
 
     this.filteredCategories = [...this.categories];
-    this.isLoading = false;
+    console.log('📦 Using demo categories (backend unavailable)');
   }
 
   // ================= LOAD API =================
   loadCategories(): void {
+    console.log('🔄 Loading categories from:', this.apiUrl);
+
     this.http.get<any>(this.apiUrl).subscribe({
       next: (response) => {
+        console.log('✅ API Response:', response);
+
         const apiCategories = response.categories || response || [];
-
-        this.categories = [
-          ...this.categories,
-          ...apiCategories
-        ];
+        
+        if (apiCategories.length > 0) {
+          this.categories = apiCategories;
+          console.log(`✅ Loaded ${apiCategories.length} categories from MongoDB`);
+          console.log('📦 Categories:', this.categories.map(c => c.name));
+        } else {
+          console.log('ℹ️ No categories in database yet - start by adding one!');
+          this.categories = [];
+        }
 
         this.applyFilters();
+        this.isLoading = false;
       },
-      error: () => {
-        this.showError('Using demo categories (API unavailable)');
-        this.applyFilters();
+      error: (error) => {
+        console.error('❌ Failed to load categories:', error);
+        console.error('Status:', error.status);
+        console.error('URL:', error.url);
+        
+        this.isLoading = false;
+        
+        if (error.status === 0) {
+          this.showError('❌ Cannot reach API endpoint!');
+        } else if (error.status === 404) {
+          this.showError(`❌ API endpoint not found!
+
+Add to backend/server.js:
+
+const categoryRoutes = require('./routes/categories');
+app.use('/api/categories', categoryRoutes);`);
+        }
+        
+        this.addDemoCategories();
       }
     });
   }
@@ -123,195 +170,222 @@ export class AdminCategoriesComponent implements OnInit {
 
   // ================= ADD =================
   addCategory(): void {
+    if (!this.apiConnected) {
+      this.showError('❌ Backend not connected! Start server first');
+      return;
+    }
+
     this.newCategory = this.getEmptyCategory();
     this.isEditing = false;
     this.showForm = true;
   }
 
-  // ================= EDIT =================
-  editCategory(category: Category): void {
-    this.newCategory = { ...category };
-    this.editingCategory = category;
-    this.isEditing = true;
-    this.showForm = true;
-  }
-
   // ================= CREATE =================
   createCategory(): void {
-
-    // validation
-    if (!this.newCategory.name || !this.newCategory.description) {
-      this.showError('Please fill all required fields');
+    // Validation
+    if (!this.newCategory.name?.trim() || !this.newCategory.description?.trim()) {
+      this.showError('❌ Name and description are required');
       return;
     }
-  
+
+    if (!this.apiConnected) {
+      this.showError('❌ Backend not connected!');
+      return;
+    }
+
     const payload = {
-      name: this.newCategory.name,
-      description: this.newCategory.description,
+      name: this.newCategory.name.trim(),
+      description: this.newCategory.description.trim(),
       isActive: this.newCategory.isActive
     };
-  
-    console.log('Sending payload:', payload);
-  
+
+    console.log('═══════════════════════════════');
+    console.log('🔄 CREATING CATEGORY');
+    console.log('═══════════════════════════════');
+    console.log('📍 URL:', this.apiUrl);
+    console.log('📦 Payload:', JSON.stringify(payload, null, 2));
+    console.log('═══════════════════════════════');
+
     this.http.post<any>(this.apiUrl, payload).subscribe({
       next: (response) => {
-  
-        console.log('Create response:', response);
-  
-        const created: Category =
-          response.category ||
-          response.data ||
-          response;
-  
-        // fallback id
-        if (!created._id) {
-          created._id = 'TEMP_' + Date.now();
+        console.log('═══════════════════════════════');
+        console.log('✅ SUCCESS - CATEGORY CREATED!');
+        console.log('═══════════════════════════════');
+        console.log('📥 Response:', JSON.stringify(response, null, 2));
+        
+        const created = response.category || response.data || response;
+        
+        if (created._id) {
+          console.log('💾 MongoDB ID:', created._id);
+          console.log('✅ Category saved to database!');
+          console.log('');
+          console.log('🔍 VERIFY IN MONGODB COMPASS:');
+          console.log('   Database: jellof-fashion');
+          console.log('   Collection: categories');
+          console.log('   Document ID:', created._id);
+          console.log('═══════════════════════════════');
+          
+          // Add to UI
+          this.categories.unshift(created);
+          this.applyFilters();
+          this.showSuccess(`✅ "${created.name}" saved to MongoDB!`);
+          this.closeForm();
+        } else {
+          console.warn('⚠️ No _id in response - category may not be saved!');
+          this.showError('⚠️ Category created but no ID returned');
         }
-  
-        // add instantly
-        this.categories.unshift(created);
-  
-        this.applyFilters();
-        this.showSuccess('Category created successfully!');
-        this.closeForm();
       },
-  
+
       error: (error) => {
-  
-        console.error('API failed — creating locally', error);
-  
-        // fallback create locally (so button always works)
-        const localCategory: Category = {
-          _id: 'LOCAL_' + Date.now(),
-          name: this.newCategory.name,
-          description: this.newCategory.description,
-          isActive: this.newCategory.isActive,
-          createdAt: new Date()
-        };
-  
-        this.categories.unshift(localCategory);
-  
-        this.applyFilters();
-        this.showSuccess('Category created locally');
-        this.closeForm();
+        console.log('═══════════════════════════════');
+        console.log('❌ ERROR - CATEGORY NOT SAVED');
+        console.log('═══════════════════════════════');
+        console.error('Status:', error.status);
+        console.error('URL:', error.url);
+        console.error('Message:', error.message);
+        console.error('Error:', error.error);
+        console.log('═══════════════════════════════');
+
+        // User-friendly error messages
+        if (error.status === 0) {
+          this.showError(`❌ BACKEND NOT RESPONDING!
+
+1. Check if backend is running:
+   cd backend
+   npm run dev
+
+2. Should see:
+   ✅ Server running on port 3000
+   ✅ MongoDB connected
+
+3. Test manually:
+   http://localhost:3000/api/test`);
+          
+        } else if (error.status === 404) {
+          this.showError(`❌ API ENDPOINT NOT FOUND!
+
+In backend/server.js, add:
+
+const categoryRoutes = require('./routes/categories');
+app.use('/api/categories', categoryRoutes);
+
+Then restart: npm run dev`);
+          
+        } else if (error.status === 500) {
+          this.showError(`❌ SERVER ERROR!
+
+Check backend console for errors.
+
+Common causes:
+1. MongoDB not running
+   → brew services start mongodb-community
+   
+2. Model not imported
+   → const Category = require('./models/Category');
+   
+3. Route not exported
+   → module.exports = router;`);
+          
+        } else {
+          this.showError(`❌ ${error.error?.message || error.message}`);
+        }
       }
     });
   }
 
   // ================= UPDATE =================
   updateCategory(): void {
-
-    // DEMO CATEGORY
-    if (!this.newCategory._id || this.newCategory._id.startsWith('CAT')) {
-
-      const index = this.categories.findIndex(
-        c => c._id === this.newCategory._id
-      );
-
-      if (index !== -1) {
-        this.categories[index] = { ...this.newCategory };
-      }
-
-      this.applyFilters();
-      this.showSuccess('Demo category updated!');
-      this.closeForm();
+    if (!this.newCategory._id || this.newCategory._id.startsWith('DEMO-')) {
+      this.showError('❌ Cannot update demo categories');
       return;
     }
 
-    // API CATEGORY
+    console.log('🔄 Updating category:', this.newCategory._id);
+
     this.http.put<any>(
       `${this.apiUrl}/${this.newCategory._id}`,
       this.newCategory
     ).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('✅ Category updated:', response);
 
-        const index = this.categories.findIndex(
-          c => c._id === this.newCategory._id
-        );
-
+        const index = this.categories.findIndex(c => c._id === this.newCategory._id);
         if (index !== -1) {
-          this.categories[index] = { ...this.newCategory };
+          this.categories[index] = { ...response.category || this.newCategory };
         }
 
         this.applyFilters();
-        this.showSuccess('Category updated successfully!');
+        this.showSuccess('✅ Category updated in MongoDB!');
         this.closeForm();
       },
-      error: () => {
-        this.showError('Failed to update category');
+      error: (error) => {
+        console.error('❌ Update failed:', error);
+        this.showError(`❌ ${error.error?.message || 'Failed to update'}`);
       }
     });
   }
-  toggleStatus(category: Category): void {
 
-    // DEMO CATEGORY
-    if (!category._id || category._id.startsWith('CAT')) {
-      category.isActive = !category.isActive;
-      this.showSuccess('Demo category status updated!');
+  // ================= EDIT =================
+  editCategory(category: Category): void {
+    if (category._id?.startsWith('DEMO-')) {
+      this.showError('❌ Cannot edit demo categories. Connect backend first.');
       return;
     }
-  
-    category.isActive = !category.isActive;
-  
-    this.http.put<any>(
-      `${this.apiUrl}/${category._id}`,
-      category
-    ).subscribe({
-      next: () => {
-        this.showSuccess(
-          `Category ${category.isActive ? 'activated' : 'deactivated'}!`
-        );
-      },
-      error: () => {
-        category.isActive = !category.isActive;
-        this.showError('Failed to update category status');
-      }
-    });
+
+    this.newCategory = { ...category };
+    this.editingCategory = category;
+    this.isEditing = true;
+    this.showForm = true;
   }
+
   // ================= DELETE =================
   deleteCategory(category: Category): void {
+    if (!confirm(`Delete "${category.name}"?`)) return;
 
-    if (!confirm(`Are you sure you want to delete "${category.name}"?`)) {
+    if (category._id?.startsWith('DEMO-')) {
+      this.showError('❌ Cannot delete demo categories');
       return;
     }
 
-    // DEMO CATEGORY
-    if (!category._id || category._id.startsWith('CAT')) {
+    console.log('🗑️ Deleting category:', category._id);
 
-      this.categories = this.categories.filter(
-        c => c._id !== category._id
-      );
-
-      this.applyFilters();
-      this.showSuccess('Demo category deleted!');
-      return;
-    }
-
-    // API CATEGORY
-    this.http.delete<any>(
-      `${this.apiUrl}/${category._id}`
-    ).subscribe({
+    this.http.delete<any>(`${this.apiUrl}/${category._id}`).subscribe({
       next: () => {
-
-        this.categories = this.categories.filter(
-          c => c._id !== category._id
-        );
-
+        console.log('✅ Category deleted from MongoDB');
+        this.categories = this.categories.filter(c => c._id !== category._id);
         this.applyFilters();
-        this.showSuccess('Category deleted successfully!');
+        this.showSuccess('✅ Category deleted!');
       },
-      error: () => {
-        this.showError('Failed to delete category');
+      error: (error) => {
+        console.error('❌ Delete failed:', error);
+        this.showError(`❌ ${error.error?.message || 'Failed to delete'}`);
       }
     });
   }
-  getInitials(): string {
-    return this.adminName
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
+
+  // ================= TOGGLE STATUS =================
+  toggleStatus(category: Category): void {
+    if (category._id?.startsWith('DEMO-')) {
+      this.showError('❌ Cannot modify demo categories');
+      return;
+    }
+
+    const newStatus = !category.isActive;
+    
+    this.http.put<any>(
+      `${this.apiUrl}/${category._id}`,
+      { ...category, isActive: newStatus }
+    ).subscribe({
+      next: () => {
+        category.isActive = newStatus;
+        this.showSuccess(`✅ ${newStatus ? 'Activated' : 'Deactivated'}`);
+      },
+      error: (error) => {
+        this.showError('❌ Failed to update status');
+      }
+    });
   }
+
   // ================= SAVE =================
   saveCategory(): void {
     if (this.isEditing) {
@@ -353,6 +427,10 @@ export class AdminCategoriesComponent implements OnInit {
     this.router.navigate([`/admin/${route}`]);
   }
 
+  getInitials(): string {
+    return this.adminName.split(' ').map(n => n[0]).join('').toUpperCase();
+  }
+
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/admin/login']);
@@ -361,12 +439,12 @@ export class AdminCategoriesComponent implements OnInit {
   // ================= MESSAGES =================
   showSuccess(message: string): void {
     this.successMessage = message;
-    setTimeout(() => this.successMessage = '', 3000);
+    setTimeout(() => this.successMessage = '', 5000);
   }
 
   showError(message: string): void {
     this.errorMessage = message;
-    setTimeout(() => this.errorMessage = '', 3000);
+    setTimeout(() => this.errorMessage = '', 10000);
   }
 
   // ================= DATE =================

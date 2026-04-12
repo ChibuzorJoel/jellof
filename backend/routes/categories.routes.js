@@ -1,20 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const categoriesController = require('../controllers/categoriesController');
-// const { protect, authorize } = require('../middleware/auth'); // Uncomment if using auth
 
-// Public routes
+// Get all categories
 router.get('/', categoriesController.getAllCategories);
-router.get('/slug/:slug', categoriesController.getCategoryBySlug);
+
+// Get category by ID
 router.get('/:id', categoriesController.getCategoryById);
 
-// Admin routes (add auth middleware when ready)
-router.post('/', categoriesController.createCategory); // Add: protect, authorize('admin')
-router.put('/:id', categoriesController.updateCategory); // Add: protect, authorize('admin')
-router.delete('/:id', categoriesController.deleteCategory); // Add: protect, authorize('admin')
+// Get category by slug
+router.get('/slug/:slug', categoriesController.getCategoryBySlug);
 
-// Utility routes
+// Create category
+router.post('/', categoriesController.createCategory);
+
+// Update category
+router.put('/:id', categoriesController.updateCategory);
+
+// Delete category
+router.delete('/:id', categoriesController.deleteCategory);
+
+// Update product count for a category
 router.put('/:id/update-count', categoriesController.updateProductCount);
-router.post('/update-all-counts', categoriesController.updateAllProductCounts);
+
+// Update all categories product counts
+router.put('/update-all-counts', categoriesController.updateAllProductCounts);
 
 module.exports = router;

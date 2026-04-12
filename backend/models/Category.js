@@ -49,15 +49,15 @@ const categorySchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Generate slug from name before saving
-categorySchema.pre('save', async function(next) {
+// ✅ FIXED: Generate slug from name before saving (removed 'next' callback)
+categorySchema.pre('save', async function() {
   if (this.isModified('name')) {
     this.slug = this.name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
   }
-  next();
+  // ✅ No next() needed with async functions in Mongoose 7+
 });
 
 // Update product count when needed
