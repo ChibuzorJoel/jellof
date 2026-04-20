@@ -1,0 +1,245 @@
+<!-- ================= LOADING STATE ================= -->
+<div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Loading product details...</p>
+  </div>
+  
+  <!-- ================= ERROR STATE ================= -->
+  <div class="error-container" *ngIf="errorMessage && !isLoading">
+    <div class="error-icon">⚠️</div>
+    <h2>{{ errorMessage }}</h2>
+    <button class="back-btn" (click)="goBack()">← Back to Collections</button>
+  </div>
+  
+  <!-- ================= PRODUCT DETAIL ================= -->
+  <div class="product-detail-page" *ngIf="product && !isLoading">
+    
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <span (click)="goBack()" class="breadcrumb-link">Collections</span>
+      <span class="breadcrumb-separator">›</span>
+      <span class="breadcrumb-link">{{ product.category }}</span>
+      <span class="breadcrumb-separator">›</span>
+      <span class="breadcrumb-current">{{ product.name }}</span>
+    </div>
+  
+    <!-- Main Product Section -->
+    <div class="product-container">
+      
+      <!-- Left: Images -->
+      <div class="product-images-section">
+        <!-- Main Image -->
+        <div class="main-image-container">
+          <img 
+            [src]="images[currentImageIndex]" 
+            [alt]="product.name"
+            class="main-image">
+          
+          <!-- Navigation Arrows -->
+          <button 
+            class="image-nav prev" 
+            (click)="previousImage()"
+            *ngIf="images.length > 1">
+            ‹
+          </button>
+          <button 
+            class="image-nav next" 
+            (click)="nextImage()"
+            *ngIf="images.length > 1">
+            ›
+          </button>
+  
+          <!-- Image Badge -->
+          <div class="image-badge new-badge" *ngIf="product.isNew">NEW</div>
+          <div class="image-badge sale-badge" *ngIf="product.isOnSale">SALE</div>
+        </div>
+  
+        <!-- Thumbnail Images -->
+        <div class="thumbnail-gallery" *ngIf="images.length > 1">
+          <img 
+            *ngFor="let image of images; let i = index"
+            [src]="image" 
+            [alt]="product.name + ' thumbnail'"
+            class="thumbnail"
+            [class.active]="i === currentImageIndex"
+            (click)="selectImage(i)">
+        </div>
+      </div>
+  
+      <!-- Right: Product Details -->
+      <div class="product-info-section">
+        
+        <!-- Category -->
+        <div class="product-category">{{ product.category }}</div>
+        
+        <!-- Title -->
+        <h1 class="product-title">{{ product.name }}</h1>
+        
+        <!-- Price -->
+        <div class="product-price-section">
+          <span class="price-current">{{ formatPrice(product.price) }}</span>
+          <span class="price-original" *ngIf="product.discountPrice">
+            {{ formatPrice(product.discountPrice) }}
+          </span>
+        </div>
+  
+        <!-- Stock Status -->
+        <div class="stock-status" [class.in-stock]="isInStock()" [class.out-of-stock]="!isInStock()">
+          {{ getStockStatus() }}
+        </div>
+  
+        <!-- Description -->
+        <div class="product-description">
+          <h3>Description</h3>
+          <div [innerHTML]="product.description"></div>
+        </div>
+  
+        <!-- Color Selection -->
+        <div class="product-option" *ngIf="product.colors && product.colors.length > 0">
+          <label class="option-label">
+            Color: <span class="selected-value">{{ selectedColor }}</span>
+          </label>
+          <div class="color-options">
+            <button 
+              *ngFor="let color of product.colors"
+              class="color-btn"
+              [class.selected]="selectedColor === color"
+              [title]="color"
+              (click)="selectColor(color)">
+              <span class="color-name">{{ color }}</span>
+            </button>
+          </div>
+        </div>
+  
+        <!-- Size Selection -->
+        <div class="product-option" *ngIf="product.sizes && product.sizes.length > 0">
+          <label class="option-label">
+            Size: <span class="selected-value">{{ selectedSize }}</span>
+          </label>
+          <div class="size-options">
+            <button 
+              *ngFor="let size of product.sizes"
+              class="size-btn"
+              [class.selected]="selectedSize === size"
+              (click)="selectSize(size)">
+              {{ size }}
+            </button>
+          </div>
+        </div>
+  
+        <!-- Quantity -->
+        <div class="product-option">
+          <label class="option-label">Quantity:</label>
+          <div class="quantity-controls">
+            <button class="qty-btn" (click)="decreaseQuantity()" [disabled]="quantity <= 1">−</button>
+            <input 
+              type="number" 
+              [(ngModel)]="quantity" 
+              min="1" 
+              max="99" 
+              class="qty-input">
+            <button class="qty-btn" (click)="increaseQuantity()" [disabled]="quantity >= 99">+</button>
+          </div>
+        </div>
+  
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button 
+            class="btn-primary add-to-cart-btn" 
+            (click)="addToCart()"
+            [disabled]="!isInStock()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            {{ isInStock() ? 'Add to Cart' : 'Out of Stock' }}
+          </button>
+          
+          <button 
+            class="btn-secondary buy-now-btn" 
+            (click)="buyNow()"
+            [disabled]="!isInStock()">
+            Buy Now
+          </button>
+        </div>
+  
+        <!-- Success Message -->
+        <div class="success-alert" *ngIf="showSuccessMessage">
+          ✓ Added to cart successfully!
+        </div>
+  
+        <!-- Product Meta -->
+        <div class="product-meta">
+          <div class="meta-item" *ngIf="product.sku">
+            <strong>SKU:</strong> {{ product.sku }}
+          </div>
+          <div class="meta-item">
+            <strong>Category:</strong> {{ product.category }}
+          </div>
+          <div class="meta-item" *ngIf="product.stockQuantity">
+            <strong>Availability:</strong> {{ product.stockQuantity }} in stock
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  
+    <!-- ================= YOU MAY ALSO LIKE (ANIMATED CAROUSEL) ================= -->
+    <div class="recommended-section" *ngIf="recommendedProducts.length > 0">
+      <div class="section-header">
+        <h2>You May Also Like</h2>
+        <div class="carousel-controls">
+          <button class="carousel-btn" (click)="previousSlide()">‹</button>
+          <button class="carousel-btn" (click)="nextSlide()">›</button>
+        </div>
+      </div>
+  
+      <div 
+        class="carousel-container"
+        (mouseenter)="pauseCarousel()"
+        (mouseleave)="resumeCarousel()">
+        
+        <div 
+          class="carousel-track"
+          [style.transform]="'translateX(-' + (carouselPosition * (100 / itemsToShow)) + '%)'">
+          
+          <div 
+            *ngFor="let product of recommendedProducts"
+            class="carousel-item"
+            (click)="viewProduct(product)">
+            
+            <div class="carousel-product-card">
+              <div class="carousel-product-image">
+                <img 
+                  [src]="product.image || product.images?.[0] || 'assets/images/placeholder.jpg'" 
+                  [alt]="product.name">
+                <div class="product-overlay">
+                  <button class="quick-view-btn">View Details</button>
+                </div>
+              </div>
+              
+              <div class="carousel-product-info">
+                <h4 class="carousel-product-name">{{ product.name }}</h4>
+                <div class="carousel-product-price">
+                  {{ formatPrice(product.price) }}
+                </div>
+              </div>
+            </div>
+          </div>
+  
+        </div>
+      </div>
+  
+      <!-- Carousel Indicators -->
+      <div class="carousel-indicators">
+        <button 
+          *ngFor="let item of recommendedProducts; let i = index"
+          class="indicator"
+          [class.active]="i === carouselPosition"
+          (click)="carouselPosition = i">
+        </button>
+      </div>
+    </div>
+  
+  </div>

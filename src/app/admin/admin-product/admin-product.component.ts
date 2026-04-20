@@ -28,7 +28,6 @@ interface Product {
 export class AdminProductComponent implements OnInit {
   // Navigation
   adminName = 'Admin';
-  notificationCount = 5;
   searchQuery = '';
 
   // Products
@@ -63,8 +62,12 @@ export class AdminProductComponent implements OnInit {
   errorMessage = '';
   isLoading = true;
 
-  // API URL
+  // Notification count (dynamic)
+  private contactMessages: any[] = [];
+
+  // API URLs
   private apiUrl = 'http://localhost:3000/api/products';
+  private contactApiUrl = 'http://localhost:3000/api/contact';
 
   // Quill Editor Configuration
   quillModules = {
@@ -99,9 +102,30 @@ export class AdminProductComponent implements OnInit {
   ngOnInit(): void {
     this.addDemoProducts();
     this.loadProducts();
+    this.loadNotificationCount();
   }
 
-  // Add demo products
+  // ================= DYNAMIC NOTIFICATION COUNT =================
+  
+  get notificationCount(): number {
+    return this.contactMessages.filter(c => c.status === 'new').length;
+  }
+
+  loadNotificationCount(): void {
+    this.http.get<any>(this.contactApiUrl).subscribe({
+      next: (response) => {
+        this.contactMessages = response.contacts || [];
+        console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
+      },
+      error: (error) => {
+        console.log('ℹ️ Could not load notification count');
+        this.contactMessages = [];
+      }
+    });
+  }
+
+  // ================= DEMO PRODUCTS =================
+
   addDemoProducts(): void {
     this.products = [
       {
@@ -174,7 +198,8 @@ export class AdminProductComponent implements OnInit {
     this.isLoading = false;
   }
 
-  // Load products from API
+  // ================= LOAD PRODUCTS =================
+
   loadProducts(): void {
     this.http.get<any>(this.apiUrl).subscribe({
       next: (response) => {
@@ -193,7 +218,8 @@ export class AdminProductComponent implements OnInit {
     });
   }
 
-  // Apply filters and pagination
+  // ================= FILTERS & PAGINATION =================
+
   applyFilters(): void {
     let filtered = [...this.products];
 
@@ -213,22 +239,38 @@ export class AdminProductComponent implements OnInit {
     }
 
     this.filteredProducts = filtered;
+    
+    // Calculate total pages
     this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+    
+    // Reset to page 1 if current page exceeds total pages
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = 1;
+    }
+    
+    // Ensure current page is at least 1
+    if (this.currentPage < 1) {
+      this.currentPage = 1;
+    }
+    
     this.updatePaginatedProducts();
   }
 
-  // Update paginated products
   updatePaginatedProducts(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedProducts = this.filteredProducts.slice(startIndex, endIndex);
+    
+    console.log(`📄 Page ${this.currentPage}/${this.totalPages}: Showing ${this.paginatedProducts.length} of ${this.filteredProducts.length} products`);
   }
 
-  // Pagination methods
+  // ================= PAGINATION METHODS =================
+
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.updatePaginatedProducts();
+      this.scrollToTop();
     }
   }
 
@@ -236,21 +278,52 @@ export class AdminProductComponent implements OnInit {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.updatePaginatedProducts();
+      this.scrollToTop();
     }
   }
 
   goToPage(page: number): void {
-    this.currentPage = page;
-    this.updatePaginatedProducts();
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedProducts();
+      this.scrollToTop();
+    }
   }
 
-  // Category change
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Helper to get visible page numbers for pagination
+  getVisiblePages(): number[] {
+    const maxVisible = 5;
+    const pages: number[] = [];
+    
+    if (this.totalPages <= maxVisible) {
+      // Show all pages
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show first, last, and pages around current
+      const start = Math.max(1, this.currentPage - 2);
+      const end = Math.min(this.totalPages, this.currentPage + 2);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  }
+
+  // ================= CATEGORY & SEARCH =================
+
   onCategoryChange(): void {
     this.currentPage = 1;
     this.applyFilters();
   }
 
-  // Search
   performSearch(): void {
     this.currentPage = 1;
     this.applyFilters();
@@ -263,7 +336,8 @@ export class AdminProductComponent implements OnInit {
     this.applyFilters();
   }
 
-  // Discount pricing methods
+  // ================= DISCOUNT PRICING =================
+
   getDiscountPercentage(product: Product): number {
     if (!product.discountPrice || product.discountPrice >= product.price) {
       return 0;
@@ -289,7 +363,8 @@ export class AdminProductComponent implements OnInit {
     return product.price - product.discountPrice!;
   }
 
-  // Product form methods
+  // ================= PRODUCT FORM =================
+
   addProduct(): void {
     this.isEditing = false;
     this.newProduct = this.getEmptyProduct();
@@ -415,7 +490,8 @@ export class AdminProductComponent implements OnInit {
     this.additionalImage2 = '';
   }
 
-  // Size methods
+  // ================= SIZE METHODS =================
+
   isSizeSelected(size: string): boolean {
     return this.newProduct.sizes.includes(size);
   }
@@ -429,7 +505,8 @@ export class AdminProductComponent implements OnInit {
     }
   }
 
-  // Color methods
+  // ================= COLOR METHODS =================
+
   addColorFromInput(): void {
     const color = this.colorInput.trim();
     if (color && !this.newProduct.colors.includes(color)) {
@@ -442,7 +519,8 @@ export class AdminProductComponent implements OnInit {
     this.newProduct.colors = this.newProduct.colors.filter(c => c !== color);
   }
 
-  // Stock status methods
+  // ================= STOCK STATUS =================
+
   getStockStatus(product: Product): string {
     if (!product.inStock || product.stockQuantity === 0) {
       return 'Out of Stock';
@@ -463,7 +541,8 @@ export class AdminProductComponent implements OnInit {
     return 'in-stock';
   }
 
-  // Helper methods
+  // ================= HELPERS =================
+
   getEmptyProduct(): Product {
     return {
       name: '',
@@ -496,7 +575,8 @@ export class AdminProductComponent implements OnInit {
     setTimeout(() => this.errorMessage = '', 3000);
   }
 
-  // Navigation methods
+  // ================= NAVIGATION =================
+
   navigateTo(route: string): void {
     this.router.navigate([`/admin/${route}`]);
   }
@@ -506,7 +586,6 @@ export class AdminProductComponent implements OnInit {
   }
 
   logout(): void {
-    
     this.authService.logout();
     this.router.navigate(['/admin/login']);
   }

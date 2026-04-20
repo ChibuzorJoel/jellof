@@ -14,7 +14,17 @@ interface InventoryItem {
   stockStatus: 'in-stock' | 'low' | 'out';
   lastUpdated: Date | string;
 }
-
+interface Contact {
+  _id?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  status: 'new' | 'read' | 'replied';
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
 @Component({
   selector: 'app-admin-inventory',
   templateUrl: './admin-inventory.component.html',
@@ -23,7 +33,7 @@ interface InventoryItem {
 export class AdminInventoryComponent implements OnInit {
   // Navigation
   adminName = 'Admin';
-  notificationCount = 5;
+  
   searchQuery = '';
 
   // Inventory
@@ -33,16 +43,21 @@ export class AdminInventoryComponent implements OnInit {
 
   // Filters
   filterStatus: string = 'all';
+  filteredContacts: Contact[] = [];
 
   // Pagination
   currentPage = 1;
   itemsPerPage = 10;
   totalPages = 1;
+  contacts: Contact[] = [];
 
   // Messages
   successMessage = '';
   errorMessage = '';
   isLoading = true;
+  replyMessage = '';
+  showMessageDetails = false;
+  selectedContact: Contact | null = null;
 
   // API URL
   private apiUrl = 'http://localhost:3000/api/inventory';
@@ -57,7 +72,27 @@ export class AdminInventoryComponent implements OnInit {
     this.addDemoInventory();
     this.loadInventory();
   }
+  // ================= GET NOTIFICATION COUNT (NEW MESSAGES) =================
+  get notificationCount(): number {
+    return this.contacts.filter(c => c.status === 'new').length;
+  }
 
+  // Alternative: Get count by status
+  get newMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'new').length;
+  }
+
+  get readMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'read').length;
+  }
+
+  get repliedMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'replied').length;
+  }
+
+  get totalMessagesCount(): number {
+    return this.contacts.length;
+  }
   // Add demo inventory
   addDemoInventory(): void {
     this.inventory = [

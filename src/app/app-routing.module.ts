@@ -8,6 +8,7 @@ import { LookbookComponent } from './pages/lookbook/lookbook.component';
 import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { CheckoutComponent } from './pages/checkout/checkout.component';
+import { ProductDetailComponent } from './pages/product-detail/product-detail.component';
 import { AuthComponent } from './pages/auth/auth.component';
 
 // Admin
@@ -37,6 +38,10 @@ const routes: Routes = [
   { path: 'contact', component: ContactComponent },
   { path: 'newsletter', component: NewsletterComponent },
   
+  {
+    path: 'product/:id',
+    component: ProductDetailComponent
+  },
   
   // Auth Routes
   { path: 'login', component: AuthComponent },

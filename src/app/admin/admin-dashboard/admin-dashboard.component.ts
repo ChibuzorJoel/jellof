@@ -49,6 +49,17 @@ interface TopProduct {
   revenue: number;
   rating?: number;
 }
+interface Contact {
+  _id?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  status: 'new' | 'read' | 'replied';
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -58,7 +69,11 @@ interface TopProduct {
 export class AdminDashboardComponent implements OnInit {
   // Navigation properties
   adminName = 'Admin';
-  notificationCount = 5;
+  filteredContacts: Contact[] = [];
+  showMessageDetails = false;
+  selectedContact: Contact | null = null;
+  contacts: Contact[] = [];
+  replyMessage = '';
   searchQuery = '';
 
   // Dashboard data
@@ -99,7 +114,27 @@ export class AdminDashboardComponent implements OnInit {
     // Then load real data from API
     this.loadDashboardData();
   }
+  // ================= GET NOTIFICATION COUNT (NEW MESSAGES) =================
+  get notificationCount(): number {
+    return this.contacts.filter(c => c.status === 'new').length;
+  }
 
+  // Alternative: Get count by status
+  get newMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'new').length;
+  }
+
+  get readMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'read').length;
+  }
+
+  get repliedMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'replied').length;
+  }
+
+  get totalMessagesCount(): number {
+    return this.contacts.length;
+  }
   // Add demo data for immediate display
   addDemoData(): void {
     // Demo statistics
@@ -171,7 +206,7 @@ export class AdminDashboardComponent implements OnInit {
         items: []
       }
     ];
-
+    
     // Demo low stock products
     this.lowStockProducts = [
       {

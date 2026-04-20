@@ -17,6 +17,7 @@ export interface Product {
   reviewCount?: number;
   stockQuantity?: number;   // <-- use this for stock count
   sku?: string;
+  isOnSale?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

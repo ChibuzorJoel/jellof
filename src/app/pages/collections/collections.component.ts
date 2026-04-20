@@ -28,7 +28,9 @@ export class CollectionsComponent implements OnInit {
   /* ---------- Products ---------- */
   allProducts: Product[] = [];
   displayedProducts: Product[] = [];
+  paginatedProducts: Product[] = [];
   quickViewProduct: Product | null = null;
+  recommendedProducts: Product[] = [];
 
   /* ---------- Categories ---------- */
   categories: Category[] = [
@@ -44,6 +46,11 @@ export class CollectionsComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   showQuickView = false;
+
+  /* ---------- Pagination ---------- */
+  currentPage = 1;
+  itemsPerPage = 12; // 12 products per page for grid view
+  totalPages = 1;
 
   /* ---------- Cart Notification ---------- */
   showCartNotification = false;
@@ -153,6 +160,7 @@ export class CollectionsComponent implements OnInit {
         
         this.updateCategoryCounts();
         this.applyFilters(true);
+        this.loadRecommendedProducts();
         this.isLoading = false;
       },
       error: (error) => {
@@ -171,6 +179,44 @@ export class CollectionsComponent implements OnInit {
   retryLoad(): void {
     this.loadProducts();
     this.loadCategories();
+  }
+
+  /* ---------- RECOMMENDED PRODUCTS (You May Also Like) ---------- */
+  loadRecommendedProducts(): void {
+    if (this.allProducts.length === 0) {
+      this.recommendedProducts = [];
+      return;
+    }
+
+    // Get 8 random products from different categories
+    const shuffled = [...this.allProducts].sort(() => 0.5 - Math.random());
+    this.recommendedProducts = shuffled.slice(0, 8);
+    
+    console.log(`✅ Loaded ${this.recommendedProducts.length} recommended products`);
+  }
+
+  getRelatedProducts(product: Product | null): Product[] {
+    if (!product || this.allProducts.length === 0) {
+      return this.recommendedProducts;
+    }
+
+    // Get products from same category, excluding the current product
+    let related = this.allProducts.filter(p => 
+      p.category === product.category && 
+      p._id !== product._id
+    );
+
+    // If not enough products from same category, add random products
+    if (related.length < 8) {
+      const remaining = this.allProducts.filter(p => 
+        p._id !== product._id && 
+        !related.some(r => r._id === p._id)
+      );
+      const shuffled = remaining.sort(() => 0.5 - Math.random());
+      related = [...related, ...shuffled].slice(0, 8);
+    }
+
+    return related.slice(0, 8);
   }
 
   /* ---------- Add to Cart ---------- */
@@ -204,6 +250,7 @@ export class CollectionsComponent implements OnInit {
   filterByCategory(categoryId: string): void {
     console.log('🔍 Filtering by category:', categoryId);
     this.selectedCategory = categoryId;
+    this.currentPage = 1; // Reset to first page
     this.applyFilters();
   }
 
@@ -233,9 +280,83 @@ export class CollectionsComponent implements OnInit {
 
     this.displayedProducts = filtered;
 
-    console.log(`✅ Filtered: ${filtered.length} products`);
+    // Calculate pagination
+    this.totalPages = Math.ceil(this.displayedProducts.length / this.itemsPerPage);
+    
+    // Reset to page 1 if current page exceeds total pages
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = 1;
+    }
+    
+    // Ensure current page is at least 1
+    if (this.currentPage < 1) {
+      this.currentPage = 1;
+    }
+
+    this.updatePaginatedProducts();
+
+    console.log(`✅ Filtered: ${filtered.length} products, Page ${this.currentPage}/${this.totalPages}`);
 
     if (scrollToProduct) this.scrollToFirstProduct();
+  }
+
+  /* ---------- PAGINATION ---------- */
+  updatePaginatedProducts(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedProducts = this.displayedProducts.slice(startIndex, endIndex);
+    
+    console.log(`📄 Page ${this.currentPage}/${this.totalPages}: Showing ${this.paginatedProducts.length} products`);
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedProducts();
+      this.scrollToTop();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedProducts();
+      this.scrollToTop();
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedProducts();
+      this.scrollToTop();
+    }
+  }
+
+  getVisiblePages(): number[] {
+    const maxVisible = 5;
+    const pages: number[] = [];
+    
+    if (this.totalPages <= maxVisible) {
+      // Show all pages
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current
+      const start = Math.max(1, this.currentPage - 2);
+      const end = Math.min(this.totalPages, this.currentPage + 2);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /* ---------- Sorting ---------- */
@@ -260,10 +381,12 @@ export class CollectionsComponent implements OnInit {
 
   onSortChange(value: string): void {
     this.sortBy = value;
+    this.currentPage = 1; // Reset to first page
     this.applyFilters();
   }
 
   onSearch(): void {
+    this.currentPage = 1; // Reset to first page
     this.applyFilters(true);
   }
 
@@ -272,6 +395,7 @@ export class CollectionsComponent implements OnInit {
     this.sortBy = 'featured';
     this.priceRange = { min: 0, max: 1000 };
     this.searchQuery = '';
+    this.currentPage = 1; // Reset to first page
     this.applyFilters();
   }
 
@@ -281,15 +405,12 @@ export class CollectionsComponent implements OnInit {
 
   /* ---------- Scroll ---------- */
   private scrollToFirstProduct(): void {
-    if (!this.displayedProducts.length) return;
-
-    const product = this.displayedProducts[0];
-    const id = product._id || product.id;
-
     setTimeout(() => {
-      const el = document.getElementById(`product-${id}`);
-      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 300);
+      const productsSection = document.querySelector('.products-container');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   }
 
   /* ---------- Quick View ---------- */

@@ -48,11 +48,9 @@ export class QuickViewComponent implements OnChanges {
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-
     if (changes['product'] && this.product) {
       this.initializeProduct();
     }
-
   }
 
   // ================= INITIALIZE PRODUCT =================
@@ -60,7 +58,6 @@ export class QuickViewComponent implements OnChanges {
 
     if (!this.product) return;
 
-    // Initialize images safely
     if (this.product.images && this.product.images.length > 0) {
       this.images = this.product.images;
     } else if (this.product.image) {
@@ -71,47 +68,45 @@ export class QuickViewComponent implements OnChanges {
 
     this.currentImageIndex = 0;
 
-    // Auto select size
-    if (this.product.sizes && this.product.sizes.length > 0) {
-      this.selectedSize = this.product.sizes[0];
-    } else {
-      this.selectedSize = '';
-    }
+    this.selectedSize = this.product.sizes?.[0] || '';
+    this.selectedColor = this.product.colors?.[0] || '';
 
-    // Auto select color
-    if (this.product.colors && this.product.colors.length > 0) {
-      this.selectedColor = this.product.colors[0];
-    } else {
-      this.selectedColor = '';
-    }
-
-    // Reset quantity
     this.quantity = 1;
+  }
+
+  // ================= NAVIGATE TO PRODUCT =================
+  viewProductDetail(): void {
+
+    if (!this.product) return;
+
+    const productId = this.product._id || this.product.id;
+
+    if (!productId) return;
+
+    this.closeModal();
+
+    this.router.navigate(['/product', productId]);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ================= IMAGE CONTROLS =================
   previousImage(): void {
-
     if (this.currentImageIndex > 0) {
       this.currentImageIndex--;
     }
-
   }
 
   nextImage(): void {
-
     if (this.currentImageIndex < this.images.length - 1) {
       this.currentImageIndex++;
     }
-
   }
 
   selectImage(index: number): void {
-
     if (index >= 0 && index < this.images.length) {
       this.currentImageIndex = index;
     }
-
   }
 
   // ================= PRODUCT OPTIONS =================
@@ -125,19 +120,15 @@ export class QuickViewComponent implements OnChanges {
 
   // ================= QUANTITY =================
   increaseQuantity(): void {
-
     if (this.quantity < 99) {
       this.quantity++;
     }
-
   }
 
   decreaseQuantity(): void {
-
     if (this.quantity > 1) {
       this.quantity--;
     }
-
   }
 
   // ================= CART =================
@@ -171,9 +162,7 @@ export class QuickViewComponent implements OnChanges {
 
   // ================= MODAL =================
   closeModal(): void {
-
     this.close.emit();
-
   }
 
   // ================= BUY NOW =================

@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 const contactController = require('../controllers/contactController');
 
-// POST - Submit contact form
+// Public routes (accessible to anyone)
 router.post('/', contactController.submitContactForm);
 
-// GET - Get all contacts (admin)
+// Admin routes (should be protected with auth middleware in production)
 router.get('/', contactController.getAllContacts);
-
-// GET - Get contact by ID
+router.get('/stats', contactController.getContactStats);
 router.get('/:id', contactController.getContactById);
-
-// DELETE - Delete contact
+router.put('/:id', contactController.updateContactStatus);
+router.post('/:id/reply', contactController.sendReply);
 router.delete('/:id', contactController.deleteContact);
+router.post('/bulk-delete', contactController.bulkDeleteContacts);
 
 module.exports = router;

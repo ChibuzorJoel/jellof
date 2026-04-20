@@ -57,6 +57,7 @@ import { AdminPaymentComponent } from './admin/admin-payment/admin-payment.compo
 import { AdminCustomersComponent } from './admin/admin-customers/admin-customers.component';
 import { AdminInventoryComponent } from './admin/admin-inventory/admin-inventory.component';
 import { NotificationComponent } from './pages/notification/notification.component';
+import { ProductDetailComponent } from './pages/product-detail/product-detail.component';
 
 
 
@@ -104,6 +105,7 @@ import { NotificationComponent } from './pages/notification/notification.compone
     AdminCustomersComponent,
     AdminInventoryComponent,
     NotificationComponent,
+    ProductDetailComponent,
     
     
   ],

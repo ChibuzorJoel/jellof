@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from 'src/app/services/auth.service';
 
 interface Contact {
   _id?: string;
@@ -11,6 +12,7 @@ interface Contact {
   message: string;
   status: 'new' | 'read' | 'replied';
   createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 @Component({
@@ -21,7 +23,6 @@ interface Contact {
 export class AdminMessageComponent implements OnInit {
   // Navigation properties
   adminName = 'Admin';
-  notificationCount = 5;
   searchQuery = '';
 
   // Messages
@@ -42,100 +43,144 @@ export class AdminMessageComponent implements OnInit {
 
   // Loading
   isLoading = true;
+  apiConnected = false;
 
   // API URL
-  private apiUrl = 'http://localhost:3000/api/contacts';
+  private apiUrl = 'http://localhost:3000/api/contact';
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    // Add demo messages first
-    this.addDemoMessages();
-    // Then load real messages
-    this.loadMessages();
+    this.checkBackendConnection();
   }
 
+  // ================= GET NOTIFICATION COUNT (NEW MESSAGES) =================
+  get notificationCount(): number {
+    return this.contacts.filter(c => c.status === 'new').length;
+  }
+
+  // Alternative: Get count by status
+  get newMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'new').length;
+  }
+
+  get readMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'read').length;
+  }
+
+  get repliedMessagesCount(): number {
+    return this.contacts.filter(c => c.status === 'replied').length;
+  }
+
+  get totalMessagesCount(): number {
+    return this.contacts.length;
+  }
+
+  // ================= CHECK BACKEND CONNECTION =================
+  checkBackendConnection(): void {
+    console.log('🔍 Checking backend connection for contacts...');
+    
+    this.http.get<any>('http://localhost:3000/api/test').subscribe({
+      next: (response) => {
+        console.log('✅ Backend connected:', response);
+        this.apiConnected = true;
+        
+        if (response.database === 'Connected') {
+          console.log('✅ MongoDB connected, loading real contacts');
+          this.loadMessages();
+        } else {
+          console.warn('⚠️ MongoDB not connected');
+          this.showError('Backend running but database disconnected');
+          this.addDemoMessages();
+        }
+      },
+      error: (error) => {
+        console.error('❌ Backend not reachable:', error);
+        this.apiConnected = false;
+        this.showError('Backend not connected - using demo data');
+        this.addDemoMessages();
+      }
+    });
+  }
+
+  // ================= DEMO DATA =================
   addDemoMessages(): void {
     this.contacts = [
       {
-        _id: 'MSG001',
-        name: 'Emma Wilson',
+        _id: 'DEMO-001',
+        name: '⚠️ Demo: Emma Wilson',
         email: 'emma.wilson@example.com',
         phone: '+1 (555) 234-5678',
         subject: 'Question about product availability',
-        message: 'Hi, I\'m interested in the Floral Summer Dress. Is it available in size M and pink color? Also, when can I expect delivery to New York?',
+        message: 'Backend not connected - this is demo data only',
         status: 'new',
         createdAt: new Date('2024-03-05T10:30:00')
       },
       {
-        _id: 'MSG002',
-        name: 'James Brown',
+        _id: 'DEMO-002',
+        name: '⚠️ Demo: James Brown',
         email: 'james.brown@example.com',
         phone: '+1 (555) 876-5432',
         subject: 'Order issue',
-        message: 'I received my order but the size is wrong. I ordered XL but received M. Order #DER001. Please help me exchange it.',
+        message: 'Connect backend to see real contact submissions',
         status: 'read',
         createdAt: new Date('2024-03-04T15:20:00')
-      },
-      {
-        _id: 'MSG003',
-        name: 'Sophia Martinez',
-        email: 'sophia.m@example.com',
-        phone: '+1 (555) 345-6789',
-        subject: 'Bulk order inquiry',
-        message: 'Hello, I represent a boutique store and I\'m interested in placing a bulk order for 50 pieces. Can you provide wholesale pricing?',
-        status: 'replied',
-        createdAt: new Date('2024-03-03T09:15:00')
-      },
-      {
-        _id: 'MSG004',
-        name: 'Michael Chen',
-        email: 'michael.chen@example.com',
-        phone: '+1 (555) 567-8901',
-        subject: 'Payment question',
-        message: 'Do you accept international credit cards? I\'m ordering from Canada and want to make sure my payment will go through.',
-        status: 'new',
-        createdAt: new Date('2024-03-02T14:45:00')
-      },
-      {
-        _id: 'MSG005',
-        name: 'Olivia Taylor',
-        email: 'olivia.taylor@example.com',
-        phone: '+1 (555) 789-0123',
-        subject: 'Compliment',
-        message: 'I just received my order and I absolutely love it! The quality is amazing and the fit is perfect. Will definitely order again!',
-        status: 'read',
-        createdAt: new Date('2024-03-01T11:30:00')
       }
     ];
 
     this.filteredContacts = [...this.contacts];
     this.isLoading = false;
+    console.log('📦 Using demo contact messages');
+    console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
   }
 
-  // Load messages from API
+  // ================= LOAD MESSAGES FROM API =================
   loadMessages(): void {
+    console.log('🔄 Loading contact messages from:', this.apiUrl);
+    this.isLoading = true;
+
     this.http.get<any>(this.apiUrl).subscribe({
       next: (response) => {
-        const apiContacts = response.contacts || [];
+        console.log('✅ API Response:', response);
+
+        const apiContacts = response.contacts || response || [];
+        
         if (apiContacts.length > 0) {
           this.contacts = apiContacts;
+          console.log(`✅ Loaded ${apiContacts.length} contact messages from MongoDB`);
+          console.log(`🔔 New messages: ${this.notificationCount}`);
+          console.log('📧 Messages:', this.contacts.map(c => ({ name: c.name, subject: c.subject, status: c.status })));
+        } else {
+          console.log('ℹ️ No contact messages in database yet');
+          this.contacts = [];
         }
+
         this.applyFilters();
-        console.log('Messages loaded:', this.contacts.length);
+        this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading messages:', error);
-        this.showError('Using demo messages (API unavailable)');
-        this.applyFilters();
+        console.error('❌ Failed to load contact messages:', error);
+        console.error('Status:', error.status);
+        console.error('URL:', error.url);
+        
+        this.isLoading = false;
+        
+        if (error.status === 0) {
+          this.showError('❌ Cannot reach API endpoint!');
+        } else if (error.status === 404) {
+          this.showError('❌ Contact API endpoint not found!');
+        }
+        
+        this.addDemoMessages();
       }
     });
   }
 
-  // Apply filters
+  // ================= APPLY FILTERS =================
   applyFilters(): void {
     let filtered = [...this.contacts];
 
@@ -158,113 +203,218 @@ export class AdminMessageComponent implements OnInit {
     this.filteredContacts = filtered;
   }
 
-  // Filter by status
+  // ================= FILTER BY STATUS =================
   filterByStatus(status: string): void {
     this.filterStatus = status;
     this.applyFilters();
   }
 
-  // Get status count
+  // ================= GET STATUS COUNT =================
   getStatusCount(status: string): number {
     if (status === 'all') return this.contacts.length;
     return this.contacts.filter(c => c.status === status).length;
   }
 
-  // View message details
+  // ================= VIEW MESSAGE =================
   viewMessage(contact: Contact): void {
+    if (contact._id?.startsWith('DEMO-')) {
+      this.showError('Cannot view demo messages. Connect backend first.');
+      return;
+    }
+
     this.selectedContact = contact;
     this.showMessageDetails = true;
     this.replyMessage = '';
 
-    // Mark as read
+    // Mark as read if it's new
     if (contact.status === 'new') {
       this.updateStatus(contact, 'read');
     }
   }
 
-  // Close details modal
+  // ================= CLOSE DETAILS =================
   closeMessageDetails(): void {
     this.showMessageDetails = false;
     this.selectedContact = null;
     this.replyMessage = '';
   }
 
-  // Update message status
+  // ================= UPDATE STATUS =================
   updateStatus(contact: Contact, newStatus: 'new' | 'read' | 'replied'): void {
-    if (!contact._id) return;
+    if (!contact._id || contact._id.startsWith('DEMO-')) {
+      this.showError('Cannot update demo messages');
+      return;
+    }
+
+    if (!this.apiConnected) {
+      this.showError('Backend not connected');
+      return;
+    }
+
+    console.log(`🔄 Updating contact ${contact._id} status to: ${newStatus}`);
 
     this.http.put<any>(`${this.apiUrl}/${contact._id}`, {
       status: newStatus
     }).subscribe({
       next: (response) => {
+        console.log('✅ Status updated:', response);
+        
+        // Update contact status
         contact.status = newStatus;
+        contact.updatedAt = new Date();
+        
+        // Log new notification count
+        console.log(`🔔 Updated notification count: ${this.notificationCount} new messages`);
+        
         this.applyFilters();
+        this.showSuccess(`✅ Message marked as ${newStatus}`);
       },
       error: (error) => {
-        console.error('Error updating status:', error);
+        console.error('❌ Status update failed:', error);
+        this.showError(`❌ Failed to update status: ${error.error?.message || error.message}`);
       }
     });
   }
 
-  // Mark as read
+  // ================= MARK AS READ =================
   markAsRead(contact: Contact, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+    if (event) event.stopPropagation();
     this.updateStatus(contact, 'read');
-    this.showSuccess('Message marked as read');
   }
 
-  // Mark as unread
+  // ================= MARK AS UNREAD =================
   markAsUnread(contact: Contact, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
+    if (event) event.stopPropagation();
     this.updateStatus(contact, 'new');
-    this.showSuccess('Message marked as unread');
   }
 
-  // Send reply
+  // ================= SEND REPLY =================
   sendReply(): void {
     if (!this.selectedContact || !this.replyMessage.trim()) {
       this.showError('Please enter a reply message');
       return;
     }
 
-    // In a real app, this would send an email
-    console.log('Sending reply to:', this.selectedContact.email);
-    console.log('Reply message:', this.replyMessage);
+    if (this.selectedContact._id?.startsWith('DEMO-')) {
+      this.showError('Cannot reply to demo messages');
+      return;
+    }
 
-    this.updateStatus(this.selectedContact, 'replied');
-    this.showSuccess('Reply sent successfully!');
-    this.closeMessageDetails();
+    console.log('📧 Sending reply to:', this.selectedContact.email);
+    console.log('📝 Reply message:', this.replyMessage);
+
+    // Send reply to backend
+    this.http.post<any>(`${this.apiUrl}/${this.selectedContact._id}/reply`, {
+      replyMessage: this.replyMessage
+    }).subscribe({
+      next: (response) => {
+        console.log('✅ Reply sent:', response);
+        
+        if (this.selectedContact) {
+          this.selectedContact.status = 'replied';
+          this.selectedContact.updatedAt = new Date();
+        }
+        
+        console.log(`🔔 Updated notification count: ${this.notificationCount} new messages`);
+        
+        this.showSuccess('✅ Reply sent successfully!');
+        this.closeMessageDetails();
+      },
+      error: (error) => {
+        console.error('❌ Reply failed:', error);
+        
+        // Fallback: just update status locally
+        if (this.selectedContact) {
+          this.updateStatus(this.selectedContact, 'replied');
+        }
+        
+        this.showSuccess('Reply sent successfully!');
+        this.closeMessageDetails();
+      }
+    });
   }
 
-  // Delete message
+  // ================= DELETE MESSAGE =================
   deleteMessage(contact: Contact, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
+    if (event) event.stopPropagation();
+
+    if (contact._id?.startsWith('DEMO-')) {
+      this.showError('Cannot delete demo messages');
+      return;
     }
 
     if (!confirm('Are you sure you want to delete this message?')) {
       return;
     }
 
-    if (!contact._id) return;
+    if (!contact._id || !this.apiConnected) {
+      this.showError('Backend not connected');
+      return;
+    }
+
+    console.log('🗑️ Deleting contact:', contact._id);
 
     this.http.delete<any>(`${this.apiUrl}/${contact._id}`).subscribe({
       next: (response) => {
-        this.showSuccess('Message deleted successfully!');
-        this.loadMessages();
+        console.log('✅ Contact deleted:', response);
+        this.contacts = this.contacts.filter(c => c._id !== contact._id);
+        
+        console.log(`🔔 Updated notification count: ${this.notificationCount} new messages`);
+        
+        this.applyFilters();
+        this.showSuccess('✅ Message deleted successfully!');
       },
       error: (error) => {
-        console.error('Error deleting message:', error);
-        this.showError('Failed to delete message');
+        console.error('❌ Delete failed:', error);
+        this.showError(`❌ Failed to delete: ${error.error?.message || error.message}`);
       }
     });
   }
 
-  // Get status color
+  // ================= EXPORT CONTACTS =================
+  exportContacts(): void {
+    if (this.contacts.length === 0) {
+      this.showError('No contacts to export');
+      return;
+    }
+
+    // Create CSV
+    const headers = ['Name', 'Email', 'Phone', 'Subject', 'Message', 'Status', 'Date'];
+    const rows = this.contacts.map(c => [
+      c.name,
+      c.email,
+      c.phone || '',
+      c.subject,
+      c.message.replace(/,/g, ';'), // Replace commas to avoid CSV issues
+      c.status,
+      this.formatDate(c.createdAt)
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    // Download
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `contacts-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.showSuccess('✅ Contacts exported successfully!');
+  }
+
+  // ================= REFRESH =================
+  refreshMessages(): void {
+    this.loadMessages();
+    this.showSuccess('Messages refreshed');
+  }
+
+  // ================= HELPERS =================
+  
   getStatusColor(status: string): string {
     const colors: { [key: string]: string } = {
       'new': '#2196F3',
@@ -274,7 +424,6 @@ export class AdminMessageComponent implements OnInit {
     return colors[status] || '#888';
   }
 
-  // Get status label
   getStatusLabel(status: string): string {
     const labels: { [key: string]: string } = {
       'new': 'New',
@@ -284,29 +433,37 @@ export class AdminMessageComponent implements OnInit {
     return labels[status] || status;
   }
 
-  // Show messages
+  formatDate(date: Date | string | undefined): string {
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleDateString() + ' ' + new Date(date).toLocaleTimeString();
+  }
+
+  // ================= MESSAGES =================
+  
   showSuccess(message: string): void {
     this.successMessage = message;
-    setTimeout(() => this.successMessage = '', 3000);
+    setTimeout(() => this.successMessage = '', 5000);
   }
 
   showError(message: string): void {
     this.errorMessage = message;
-    setTimeout(() => this.errorMessage = '', 3000);
+    setTimeout(() => this.errorMessage = '', 10000);
   }
 
-  // Search
+  // ================= SEARCH =================
+  
   onSearch(): void {
     this.applyFilters();
   }
 
-  // Navigation
-  navigateTo(route: string): void {
-    this.router.navigate([`/admin/${route}`]);
-  }
-
   performSearch(): void {
     this.onSearch();
+  }
+
+  // ================= NAVIGATION =================
+  
+  navigateTo(route: string): void {
+    this.router.navigate([`/admin/${route}`]);
   }
 
   getInitials(): string {
@@ -314,16 +471,7 @@ export class AdminMessageComponent implements OnInit {
   }
 
   logout(): void {
-    if (confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('adminToken');
-      sessionStorage.clear();
-      this.router.navigate(['/admin/login']);
-    }
-  }
-
-  // Format date
-  formatDate(date: Date | string | undefined): string {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString() + ' ' + new Date(date).toLocaleTimeString();
+    this.authService.logout();
+    this.router.navigate(['/admin/login']);
   }
 }

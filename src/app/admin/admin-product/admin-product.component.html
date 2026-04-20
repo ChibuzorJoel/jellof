@@ -18,27 +18,28 @@
         
         <div class="topbar-nav">
           <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">DASHBOARD</a>
-        <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">PRODUCTS</a>
-        <a routerLink="/admin/orders" routerLinkActive="active" class="nav-link">ORDERS</a>
-        <a routerLink="/admin/categories" routerLinkActive="active" class="nav-link">CATEGORIES</a>
-        <a routerLink="/admin/payment" routerLinkActive="active" class="nav-link">PAYMENTS</a>
-        <a routerLink="/admin/customers" routerLinkActive="active" class="nav-link">CUSTOMERS</a>
-            <a routerLink="/admin/inventory" class="nav-link">INVENTORY</a>
+          <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">PRODUCTS</a>
+          <a routerLink="/admin/orders" routerLinkActive="active" class="nav-link">ORDERS</a>
+          <a routerLink="/admin/categories" routerLinkActive="active" class="nav-link">CATEGORIES</a>
+          <a routerLink="/admin/payment" routerLinkActive="active" class="nav-link">PAYMENTS</a>
+          <a routerLink="/admin/customers" routerLinkActive="active" class="nav-link">CUSTOMERS</a>
+          <a routerLink="/admin/inventory" routerLinkActive="active" class="nav-link">INVENTORY</a>
         </div>
       </div>
       
       <!-- Right Side: Search + Actions -->
       <div class="topbar-right">
         
-        
-        
-        <!-- Notifications -->
-        <button class="notification-btn">
+        <!-- Notifications with DYNAMIC COUNT -->
+        <button class="notification-btn" routerLink="/admin/message" title="View Messages">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
           </svg>
-          <span class="notification-badge" *ngIf="notificationCount > 0"><a routerLink="/admin/message" class="nav-link">INVENTORY</a>{{ notificationCount }}</span>
+          <!-- ✅ DYNAMIC NOTIFICATION BADGE -->
+          <span class="notification-badge" *ngIf="notificationCount > 0">
+            {{ notificationCount > 99 ? '99+' : notificationCount }}
+          </span>
         </button>
         
         <!-- Admin Profile -->
@@ -177,29 +178,110 @@
         </div>
       </div>
 
-      <!-- Pagination -->
+      <!-- ✅ IMPROVED PAGINATION -->
       <div class="pagination" *ngIf="totalPages > 1">
-        <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
-          Previous
-        </button>
-        <div class="page-numbers">
+        <!-- Pagination Info -->
+        <div class="pagination-info">
+          Showing {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ currentPage * itemsPerPage > filteredProducts.length ? filteredProducts.length : currentPage * itemsPerPage }} of {{ filteredProducts.length }} products
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+          <!-- First Page Button -->
           <button 
-            *ngFor="let page of [].constructor(totalPages); let i = index"
-            class="page-number"
-            [class.active]="currentPage === i + 1"
-            (click)="goToPage(i + 1)">
-            {{ i + 1 }}
+            class="page-btn page-first" 
+            (click)="goToPage(1)" 
+            [disabled]="currentPage === 1"
+            title="First Page">
+            «
+          </button>
+          
+          <!-- Previous Page Button -->
+          <button 
+            class="page-btn page-prev" 
+            (click)="previousPage()" 
+            [disabled]="currentPage === 1"
+            title="Previous Page">
+            ‹
+          </button>
+          
+          <!-- Page Numbers with Ellipsis -->
+          <div class="page-numbers">
+            <!-- First page if not visible -->
+            <button 
+              *ngIf="getVisiblePages()[0] > 1"
+              class="page-number"
+              (click)="goToPage(1)">
+              1
+            </button>
+            
+            <!-- Ellipsis before visible pages -->
+            <span 
+              class="page-ellipsis" 
+              *ngIf="getVisiblePages()[0] > 2">
+              ...
+            </span>
+            
+            <!-- Visible page numbers -->
+            <button 
+              *ngFor="let page of getVisiblePages()"
+              class="page-number"
+              [class.active]="currentPage === page"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+            
+            <!-- Ellipsis after visible pages -->
+            <span 
+              class="page-ellipsis" 
+              *ngIf="getVisiblePages()[getVisiblePages().length - 1] < totalPages - 1">
+              ...
+            </span>
+            
+            <!-- Last page if not visible -->
+            <button 
+              *ngIf="getVisiblePages()[getVisiblePages().length - 1] < totalPages"
+              class="page-number"
+              (click)="goToPage(totalPages)">
+              {{ totalPages }}
+            </button>
+          </div>
+          
+          <!-- Next Page Button -->
+          <button 
+            class="page-btn page-next" 
+            (click)="nextPage()" 
+            [disabled]="currentPage === totalPages"
+            title="Next Page">
+            ›
+          </button>
+          
+          <!-- Last Page Button -->
+          <button 
+            class="page-btn page-last" 
+            (click)="goToPage(totalPages)" 
+            [disabled]="currentPage === totalPages"
+            title="Last Page">
+            »
           </button>
         </div>
-        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
-          Next
-        </button>
+        
+        <!-- Items Per Page Selector -->
+        <div class="items-per-page">
+          <label>Show:</label>
+          <select [(ngModel)]="itemsPerPage" (change)="applyFilters()" class="per-page-select">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Product Form Modal with WYSIWYG Editor -->
+<!-- Product Form Modal (keeping the same as before) -->
 <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
   <div class="modal-dialog" (click)="$event.stopPropagation()">
     

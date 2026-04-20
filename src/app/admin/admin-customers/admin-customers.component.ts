@@ -24,7 +24,7 @@ interface Customer {
 export class AdminCustomersComponent implements OnInit {
   // Navigation
   adminName = 'Admin';
-  notificationCount = 5;
+  notificationCount = 0;
   searchQuery = '';
 
   // Customers

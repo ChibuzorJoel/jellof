@@ -6,10 +6,20 @@ const isValidObjectId = (id) => {
   return mongoose.Types.ObjectId.isValid(id) && (String(new mongoose.Types.ObjectId(id)) === id);
 };
 
-// Get all products
+// Get all products with PAGINATION SUPPORT
 exports.getAllProducts = async (req, res) => {
   try {
-    const { category, minPrice, maxPrice, search, sort, inStock } = req.query;
+    const { 
+      category, 
+      minPrice, 
+      maxPrice, 
+      search, 
+      sort, 
+      inStock,
+      page = 1,        // New: page number (default 1)
+      limit = 12       // New: items per page (default 12)
+    } = req.query;
+    
     let query = {};
 
     // Filter by category
@@ -38,7 +48,19 @@ exports.getAllProducts = async (req, res) => {
       ];
     }
 
-    let products = await Product.find(query);
+    // Calculate pagination
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Get total count for pagination
+    const totalCount = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalCount / limitNum);
+
+    // Find products with pagination
+    let products = await Product.find(query)
+      .skip(skip)
+      .limit(limitNum);
 
     // Sort
     if (sort === 'price-low') {
@@ -54,6 +76,9 @@ exports.getAllProducts = async (req, res) => {
     res.status(200).json({
       success: true,
       count: products.length,
+      total: totalCount,
+      page: pageNum,
+      totalPages: totalPages,
       products
     });
   } catch (error) {
@@ -141,12 +166,28 @@ exports.searchProducts = async (req, res) => {
 exports.getProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
+    const { page = 1, limit = 12 } = req.query;
     
-    const products = await Product.find({ category });
+    // Pagination
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Get total count
+    const totalCount = await Product.countDocuments({ category });
+    const totalPages = Math.ceil(totalCount / limitNum);
+
+    // Get products
+    const products = await Product.find({ category })
+      .skip(skip)
+      .limit(limitNum);
 
     res.status(200).json({
       success: true,
       count: products.length,
+      total: totalCount,
+      page: pageNum,
+      totalPages: totalPages,
       products
     });
   } catch (error) {
@@ -154,6 +195,59 @@ exports.getProductsByCategory = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve products',
+      error: error.message
+    });
+  }
+};
+
+// Get recommended products (You May Also Like)
+exports.getRecommendedProducts = async (req, res) => {
+  try {
+    const { productId, category, limit = 8 } = req.query;
+    const limitNum = parseInt(limit);
+
+    let query = {};
+    
+    // If product ID provided, exclude it
+    if (productId && isValidObjectId(productId)) {
+      query._id = { $ne: productId };
+    }
+
+    // If category provided, prioritize same category
+    if (category) {
+      query.category = category;
+    }
+
+    // Get recommended products
+    let products = await Product.find(query)
+      .limit(limitNum)
+      .sort({ createdAt: -1 });
+
+    // If not enough products from same category, add random products
+    if (products.length < limitNum) {
+      const remaining = limitNum - products.length;
+      const additionalProducts = await Product.find({
+        _id: { 
+          $ne: productId,
+          $nin: products.map(p => p._id)
+        }
+      })
+        .limit(remaining)
+        .sort({ createdAt: -1 });
+      
+      products = [...products, ...additionalProducts];
+    }
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      products
+    });
+  } catch (error) {
+    console.error('Error getting recommended products:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve recommended products',
       error: error.message
     });
   }
