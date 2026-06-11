@@ -7,6 +7,8 @@
   "type": "commonjs",
   "main": "serve.js",
   "scripts": {
+    "start": "node serve.js",
+    "dev": "nodemon serve.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
