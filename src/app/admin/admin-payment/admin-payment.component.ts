@@ -24,7 +24,7 @@ interface Payment {
 export class AdminPaymentComponent implements OnInit {
   // Navigation
   adminName = 'Admin';
-  notificationCount = 5;
+  
   searchQuery = '';
 
   // Payments
@@ -40,7 +40,7 @@ export class AdminPaymentComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 10;
   totalPages = 1;
-
+  private contactMessages: any[] = [];
   // Messages
   successMessage = '';
   errorMessage = '';
@@ -48,6 +48,7 @@ export class AdminPaymentComponent implements OnInit {
 
   // API URL
   private apiUrl = 'http://localhost:3000/api/payments';
+  private contactApiUrl = 'http://localhost:3000/api/contact';
 
   constructor(
     private http: HttpClient,
@@ -58,8 +59,26 @@ export class AdminPaymentComponent implements OnInit {
   ngOnInit(): void {
     this.addDemoPayments();
     this.loadPayments();
+    this.loadNotificationCount();
   }
+ // ================= DYNAMIC NOTIFICATION COUNT =================
+  
+ get notificationCount(): number {
+  return this.contactMessages.filter(c => c.status === 'new').length;
+}
 
+loadNotificationCount(): void {
+  this.http.get<any>(this.contactApiUrl).subscribe({
+    next: (response) => {
+      this.contactMessages = response.contacts || [];
+      console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
+    },
+    error: (error) => {
+      console.log('ℹ️ Could not load notification count');
+      this.contactMessages = [];
+    }
+  });
+}
   // Add demo payments
   addDemoPayments(): void {
     this.payments = [

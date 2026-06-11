@@ -40,7 +40,7 @@ export class AdminInventoryComponent implements OnInit {
   inventory: InventoryItem[] = [];
   filteredInventory: InventoryItem[] = [];
   paginatedInventory: InventoryItem[] = [];
-
+  private contactMessages: any[] = [];
   // Filters
   filterStatus: string = 'all';
   filteredContacts: Contact[] = [];
@@ -61,7 +61,7 @@ export class AdminInventoryComponent implements OnInit {
 
   // API URL
   private apiUrl = 'http://localhost:3000/api/inventory';
-
+  private contactApiUrl = 'http://localhost:3000/api/contact';
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -71,27 +71,25 @@ export class AdminInventoryComponent implements OnInit {
   ngOnInit(): void {
     this.addDemoInventory();
     this.loadInventory();
+    this.loadNotificationCount();
   }
-  // ================= GET NOTIFICATION COUNT (NEW MESSAGES) =================
+  // ================= DYNAMIC NOTIFICATION COUNT =================
+  
   get notificationCount(): number {
-    return this.contacts.filter(c => c.status === 'new').length;
+    return this.contactMessages.filter(c => c.status === 'new').length;
   }
 
-  // Alternative: Get count by status
-  get newMessagesCount(): number {
-    return this.contacts.filter(c => c.status === 'new').length;
-  }
-
-  get readMessagesCount(): number {
-    return this.contacts.filter(c => c.status === 'read').length;
-  }
-
-  get repliedMessagesCount(): number {
-    return this.contacts.filter(c => c.status === 'replied').length;
-  }
-
-  get totalMessagesCount(): number {
-    return this.contacts.length;
+  loadNotificationCount(): void {
+    this.http.get<any>(this.contactApiUrl).subscribe({
+      next: (response) => {
+        this.contactMessages = response.contacts || [];
+        console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
+      },
+      error: (error) => {
+        console.log('ℹ️ Could not load notification count');
+        this.contactMessages = [];
+      }
+    });
   }
   // Add demo inventory
   addDemoInventory(): void {

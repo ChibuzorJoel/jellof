@@ -6,7 +6,7 @@ const isValidObjectId = (id) => {
   return mongoose.Types.ObjectId.isValid(id) && (String(new mongoose.Types.ObjectId(id)) === id);
 };
 
-// Get all products with PAGINATION SUPPORT
+// Get all products - RETURNS ALL PRODUCTS (frontend handles pagination)
 exports.getAllProducts = async (req, res) => {
   try {
     const { 
@@ -15,9 +15,78 @@ exports.getAllProducts = async (req, res) => {
       maxPrice, 
       search, 
       sort, 
+      inStock
+    } = req.query;
+    
+    let query = {};
+
+    // Filter by category
+    if (category && category !== 'all') {
+      query.category = category;
+    }
+
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = parseFloat(minPrice);
+      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+    }
+
+    // Filter by stock status
+    if (inStock !== undefined) {
+      query.inStock = inStock === 'true';
+    }
+
+    // Search
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Find ALL products (no limit - frontend handles pagination)
+    let products = await Product.find(query);
+
+    // Sort
+    if (sort === 'price-low') {
+      products.sort((a, b) => a.price - b.price);
+    } else if (sort === 'price-high') {
+      products.sort((a, b) => b.price - a.price);
+    } else if (sort === 'name') {
+      products.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sort === 'newest') {
+      products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      products
+    });
+  } catch (error) {
+    console.error('Error getting products:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve products',
+      error: error.message
+    });
+  }
+};
+
+// Get all products with BACKEND PAGINATION (optional - for admin or large datasets)
+exports.getAllProductsPaginated = async (req, res) => {
+  try {
+    const { 
+      category, 
+      minPrice, 
+      maxPrice, 
+      search, 
+      sort, 
       inStock,
-      page = 1,        // New: page number (default 1)
-      limit = 12       // New: items per page (default 12)
+      page = 1,        // Page number (default 1)
+      limit = 50       // Items per page (default 50)
     } = req.query;
     
     let query = {};
@@ -166,28 +235,13 @@ exports.searchProducts = async (req, res) => {
 exports.getProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
-    const { page = 1, limit = 12 } = req.query;
     
-    // Pagination
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
-    const skip = (pageNum - 1) * limitNum;
-
-    // Get total count
-    const totalCount = await Product.countDocuments({ category });
-    const totalPages = Math.ceil(totalCount / limitNum);
-
-    // Get products
-    const products = await Product.find({ category })
-      .skip(skip)
-      .limit(limitNum);
+    // Get ALL products from category (no pagination)
+    const products = await Product.find({ category });
 
     res.status(200).json({
       success: true,
       count: products.length,
-      total: totalCount,
-      page: pageNum,
-      totalPages: totalPages,
       products
     });
   } catch (error) {

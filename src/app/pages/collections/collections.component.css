@@ -549,3 +549,303 @@
     }
   }
   
+
+
+  /* =============================================== */
+/* PAGINATION STYLES FOR COLLECTIONS PAGE */
+/* =============================================== */
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 20px;
+  margin-top: 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-btn {
+  padding: 10px 14px;
+  background: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.3s;
+  min-width: 45px;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #e8e8e8;
+  border-color: #999;
+  transform: translateY(-2px);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #fafafa;
+}
+
+.page-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-number {
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.3s;
+  min-width: 45px;
+  font-weight: 500;
+}
+
+.page-number:hover {
+  background: #f5f5f5;
+  border-color: #999;
+  transform: translateY(-2px);
+}
+
+.page-number.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
+  font-weight: 600;
+  cursor: default;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.page-number.active:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: translateY(0);
+}
+
+.page-ellipsis {
+  padding: 10px;
+  color: #999;
+  font-size: 14px;
+  user-select: none;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
+.items-per-page label {
+  font-weight: 500;
+}
+
+.per-page-select {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.per-page-select:hover {
+  border-color: #999;
+}
+
+.per-page-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* =============================================== */
+/* YOU MAY ALSO LIKE / RECOMMENDED SECTION */
+/* =============================================== */
+
+.recommended-section {
+  padding: 60px 0;
+  background: linear-gradient(to bottom, #fafafa 0%, #ffffff 100%);
+  margin-top: 60px;
+}
+
+.recommended-section .section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.recommended-section .section-header h2 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.recommended-section .section-header p {
+  font-size: 16px;
+  color: #666;
+  font-weight: 400;
+}
+
+.recommended-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  padding: 0 20px;
+}
+
+/* =============================================== */
+/* RESPONSIVE DESIGN */
+/* =============================================== */
+
+@media (max-width: 768px) {
+  .pagination-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px 15px;
+    gap: 15px;
+  }
+  
+  .pagination-info {
+    text-align: center;
+    font-size: 13px;
+  }
+  
+  .pagination-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .items-per-page {
+    justify-content: center;
+  }
+  
+  .page-numbers {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .page-btn,
+  .page-number {
+    min-width: 38px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .recommended-products {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+  }
+
+  .recommended-section .section-header h2 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-numbers {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .recommended-products {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =============================================== */
+/* ANIMATION */
+/* =============================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pagination-container,
+.recommended-section {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* =============================================== */
+/* ALTERNATIVE COMPACT PAGINATION STYLE */
+/* =============================================== */
+
+.pagination-container.compact {
+  padding: 20px;
+}
+
+.pagination-container.compact .page-btn,
+.pagination-container.compact .page-number {
+  padding: 8px 12px;
+  font-size: 13px;
+  min-width: 38px;
+}
+
+/* =============================================== */
+/* LOADING STATE FOR PAGINATION */
+/* =============================================== */
+
+.pagination-container.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.pagination-container.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

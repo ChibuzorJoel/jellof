@@ -22,7 +22,6 @@ interface Category {
 export class AdminCategoriesComponent implements OnInit {
 
   adminName = 'Admin';
-  notificationCount = 5;
 
   categories: Category[] = [];
   filteredCategories: Category[] = [];
@@ -40,8 +39,10 @@ export class AdminCategoriesComponent implements OnInit {
 
   isLoading = true;
   apiConnected = false;
+  private contactMessages: any[] = [];
 
   private apiUrl = 'http://localhost:3000/api/categories';
+  private contactApiUrl = 'http://localhost:3000/api/contact';
 
   constructor(
     private http: HttpClient,
@@ -51,8 +52,26 @@ export class AdminCategoriesComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkBackendConnection();
+    this.loadNotificationCount();
   }
+ // ================= DYNAMIC NOTIFICATION COUNT =================
+  
+ get notificationCount(): number {
+  return this.contactMessages.filter(c => c.status === 'new').length;
+}
 
+loadNotificationCount(): void {
+  this.http.get<any>(this.contactApiUrl).subscribe({
+    next: (response) => {
+      this.contactMessages = response.contacts || [];
+      console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
+    },
+    error: (error) => {
+      console.log('ℹ️ Could not load notification count');
+      this.contactMessages = [];
+    }
+  });
+}
   // ================= CHECK BACKEND =================
   checkBackendConnection(): void {
     console.log('🔍 Checking backend connection...');

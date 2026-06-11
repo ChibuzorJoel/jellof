@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export interface CartItem {
   product: any;
@@ -16,10 +18,41 @@ export class CartService {
   private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
   public cartItems$ = this.cartItemsSubject.asObservable();
 
-  constructor() {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     // Load cart from localStorage on init
     this.loadCartFromStorage();
   }
+
+  /* ================= AUTHENTICATION CHECK ================= */
+  
+  private checkAuthentication(): boolean {
+    const isLoggedIn = this.authService.isLoggedIn;
+    
+    if (!isLoggedIn) {
+      // User not logged in - redirect to login
+      const currentUrl = this.router.url;
+      
+      // Show alert
+      
+      
+      // Redirect to login with return URL
+      this.router.navigate(['/login'], { 
+        queryParams: { 
+          returnUrl: currentUrl,
+          message: 'Please login to add items to your cart'
+        }
+      });
+      
+      return false;
+    }
+    
+    return true;
+  }
+
+  /* ================= CART OPERATIONS ================= */
 
   // Get all cart items
   getCartItems(): CartItem[] {
@@ -31,8 +64,14 @@ export class CartService {
     return this.cartItems$;
   }
 
-  // Add item to cart
-  addToCart(product: any, quantity: number = 1, size?: string, color?: string): void {
+  // Add item to cart (REQUIRES LOGIN)
+  addToCart(product: any, quantity: number = 1, size?: string, color?: string): boolean {
+    // ✅ CHECK AUTHENTICATION FIRST
+    if (!this.checkAuthentication()) {
+      return false; // User not logged in
+    }
+
+    // User is logged in - proceed with adding to cart
     const existingItemIndex = this.cartItems.findIndex(
       item => 
         item.product._id === product._id &&
@@ -54,6 +93,7 @@ export class CartService {
     }
 
     this.updateCart();
+    return true; // Successfully added
   }
 
   // Remove item from cart
@@ -102,6 +142,8 @@ export class CartService {
     return item ? item.quantity : 0;
   }
 
+  /* ================= STORAGE ================= */
+
   // Private: Update cart and persist to storage
   private updateCart(): void {
     this.cartItemsSubject.next(this.cartItems);
@@ -110,20 +152,49 @@ export class CartService {
 
   // Save cart to localStorage
   private saveCartToStorage(): void {
-    localStorage.setItem('jellof_cart', JSON.stringify(this.cartItems));
+    // Only save if user is logged in
+    if (this.authService.isLoggedIn) {
+      const userId = this.authService.currentUserValue?._id;
+      const storageKey = userId ? `jellof_cart_${userId}` : 'jellof_cart';
+      localStorage.setItem(storageKey, JSON.stringify(this.cartItems));
+    }
   }
 
   // Load cart from localStorage
   private loadCartFromStorage(): void {
-    const savedCart = localStorage.getItem('jellof_cart');
-    if (savedCart) {
-      try {
-        this.cartItems = JSON.parse(savedCart);
-        this.cartItemsSubject.next(this.cartItems);
-      } catch (error) {
-        console.error('Error loading cart from storage:', error);
-        this.cartItems = [];
+    // Only load if user is logged in
+    if (this.authService.isLoggedIn) {
+      const userId = this.authService.currentUserValue?._id;
+      const storageKey = userId ? `jellof_cart_${userId}` : 'jellof_cart';
+      const savedCart = localStorage.getItem(storageKey);
+      
+      if (savedCart) {
+        try {
+          this.cartItems = JSON.parse(savedCart);
+          this.cartItemsSubject.next(this.cartItems);
+        } catch (error) {
+          console.error('Error loading cart from storage:', error);
+          this.cartItems = [];
+        }
       }
     }
+  }
+
+  /* ================= USER-SPECIFIC CART ================= */
+
+  // Load cart for logged-in user
+  loadUserCart(): void {
+    this.loadCartFromStorage();
+  }
+
+  // Clear cart on logout
+  clearUserCart(): void {
+    this.cartItems = [];
+    this.cartItemsSubject.next(this.cartItems);
+    
+    // Clear from localStorage
+    const userId = this.authService.currentUserValue?._id;
+    const storageKey = userId ? `jellof_cart_${userId}` : 'jellof_cart';
+    localStorage.removeItem(storageKey);
   }
 }

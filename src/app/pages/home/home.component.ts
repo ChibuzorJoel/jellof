@@ -44,6 +44,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   successMessage = '';
   errorMessage = '';
 
+
+
+  
+
   ngOnInit(): void {
     this.startHeroRotation();
     this.loadProducts();

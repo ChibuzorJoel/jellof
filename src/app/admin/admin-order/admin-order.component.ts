@@ -32,7 +32,7 @@ interface Order {
 export class AdminOrderComponent implements OnInit {
   // Navigation properties
   adminName = 'Admin';
-  notificationCount = 5;
+  private contactMessages: any[] = [];
   
   // Orders
   orders: Order[] = [];
@@ -55,7 +55,7 @@ export class AdminOrderComponent implements OnInit {
   
   // API URL
   private apiUrl = 'http://localhost:3000/api/orders';
-
+  private contactApiUrl = 'http://localhost:3000/api/contact';
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -67,8 +67,26 @@ export class AdminOrderComponent implements OnInit {
     this.addDemoOrders();
     // Then load real orders
     this.loadOrders();
+    this.loadNotificationCount();
   }
+ // ================= DYNAMIC NOTIFICATION COUNT =================
+  
+ get notificationCount(): number {
+  return this.contactMessages.filter(c => c.status === 'new').length;
+}
 
+loadNotificationCount(): void {
+  this.http.get<any>(this.contactApiUrl).subscribe({
+    next: (response) => {
+      this.contactMessages = response.contacts || [];
+      console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
+    },
+    error: (error) => {
+      console.log('ℹ️ Could not load notification count');
+      this.contactMessages = [];
+    }
+  });
+}
   addDemoOrders(): void {
     // Add 2 demo orders
     this.orders = [

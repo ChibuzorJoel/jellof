@@ -24,7 +24,7 @@ interface Customer {
 export class AdminCustomersComponent implements OnInit {
   // Navigation
   adminName = 'Admin';
-  notificationCount = 0;
+  
   searchQuery = '';
 
   // Customers
@@ -39,6 +39,7 @@ export class AdminCustomersComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 10;
   totalPages = 1;
+  private contactMessages: any[] = [];
 
   // Modal
   showCustomerDetails = false;
@@ -51,6 +52,7 @@ export class AdminCustomersComponent implements OnInit {
 
   // API URL
   private apiUrl = 'http://localhost:3000/api/customers';
+  private contactApiUrl = 'http://localhost:3000/api/contact';
 
   constructor(
     private http: HttpClient,
@@ -59,111 +61,88 @@ export class AdminCustomersComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.addDemoCustomers();
+    console.log('🔄 Loading real customers from database...');
     this.loadCustomers();
+    this.loadNotificationCount();
   }
 
-  // Add demo customers
-  addDemoCustomers(): void {
-    this.customers = [
-      {
-        _id: 'CUST001',
-        name: 'Sarah Johnson',
-        email: 'sarah.johnson@example.com',
-        phone: '+1 (555) 234-5678',
-        numberOfOrders: 12,
-        totalSpent: 1245.50,
-        status: 'active',
-        joinDate: new Date('2023-01-15'),
-        lastOrderDate: new Date('2024-03-05'),
-        address: '123 Main St, New York, NY 10001'
-      },
-      {
-        _id: 'CUST002',
-        name: 'Michael Chen',
-        email: 'michael.chen@example.com',
-        phone: '+1 (555) 876-5432',
-        numberOfOrders: 8,
-        totalSpent: 892.30,
-        status: 'active',
-        joinDate: new Date('2023-03-20'),
-        lastOrderDate: new Date('2024-03-08'),
-        address: '456 Oak Ave, Los Angeles, CA 90001'
-      },
-      {
-        _id: 'CUST003',
-        name: 'Emma Wilson',
-        email: 'emma.wilson@example.com',
-        phone: '+1 (555) 345-6789',
-        numberOfOrders: 15,
-        totalSpent: 2150.75,
-        status: 'active',
-        joinDate: new Date('2022-11-10'),
-        lastOrderDate: new Date('2024-03-10'),
-        address: '789 Pine Rd, Chicago, IL 60601'
-      },
-      {
-        _id: 'CUST004',
-        name: 'James Brown',
-        email: 'james.brown@example.com',
-        phone: '+1 (555) 567-8901',
-        numberOfOrders: 3,
-        totalSpent: 215.00,
-        status: 'active',
-        joinDate: new Date('2024-01-05'),
-        lastOrderDate: new Date('2024-02-20'),
-        address: '321 Elm St, Houston, TX 77001'
-      },
-      {
-        _id: 'CUST005',
-        name: 'Olivia Martinez',
-        email: 'olivia.martinez@example.com',
-        phone: '+1 (555) 789-0123',
-        numberOfOrders: 20,
-        totalSpent: 3420.90,
-        status: 'active',
-        joinDate: new Date('2022-08-15'),
-        lastOrderDate: new Date('2024-03-09'),
-        address: '654 Maple Dr, Miami, FL 33101'
-      },
-      {
-        _id: 'CUST006',
-        name: 'David Lee',
-        email: 'david.lee@example.com',
-        phone: '+1 (555) 234-9876',
-        numberOfOrders: 1,
-        totalSpent: 89.99,
-        status: 'blocked',
-        joinDate: new Date('2024-02-10'),
-        lastOrderDate: new Date('2024-02-15'),
-        address: '987 Cedar Ln, Seattle, WA 98101'
-      }
-    ];
-
-    this.applyFilters();
-    this.isLoading = false;
+  /* ================= DYNAMIC NOTIFICATION COUNT ================= */
+  
+  get notificationCount(): number {
+    return this.contactMessages.filter(c => c.status === 'new').length;
   }
 
-  // Load customers from API
-  loadCustomers(): void {
-    this.http.get<any>(this.apiUrl).subscribe({
+  loadNotificationCount(): void {
+    this.http.get<any>(this.contactApiUrl).subscribe({
       next: (response) => {
-        const apiCustomers = response.customers || [];
-        if (apiCustomers.length > 0) {
-          this.customers = apiCustomers;
-        }
-        this.applyFilters();
-        console.log('Customers loaded:', this.customers.length);
+        this.contactMessages = response.contacts || [];
+        console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
       },
       error: (error) => {
-        console.error('Error loading customers:', error);
-        this.showError('Using demo customers (API unavailable)');
+        console.log('ℹ️ Could not load notification count');
+        this.contactMessages = [];
+      }
+    });
+  }
+
+  /* ================= LOAD REAL CUSTOMERS FROM DATABASE ================= */
+  
+  loadCustomers(): void {
+    console.log('📡 Fetching customers from API...');
+    this.isLoading = true;
+
+    this.http.get<any>(this.apiUrl).subscribe({
+      next: (response) => {
+        console.log('✅ Customers API response:', response);
+        
+        if (response.success && response.customers) {
+          this.customers = response.customers.map((customer: any) => ({
+            _id: customer._id,
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone || 'N/A',
+            numberOfOrders: customer.numberOfOrders || 0,
+            totalSpent: customer.totalSpent || 0,
+            status: customer.status,
+            joinDate: customer.joinDate,
+            lastOrderDate: customer.lastOrderDate,
+            address: customer.address || 'No address provided'
+          }));
+
+          console.log(`✅ Loaded ${this.customers.length} real customers from database`);
+          
+          if (this.customers.length === 0) {
+            this.showError('No customers found in database. Register some users to see them here.');
+          }
+        } else {
+          console.log('⚠️ No customers in response');
+          this.customers = [];
+          this.showError('No customers found in database');
+        }
+
+        this.applyFilters();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('❌ Error loading customers:', error);
+        this.isLoading = false;
+        this.customers = [];
+        
+        if (error.status === 0) {
+          this.showError('Cannot connect to server. Please make sure backend is running on http://localhost:3000');
+        } else if (error.status === 404) {
+          this.showError('Customer API endpoint not found. Please check backend routes.');
+        } else {
+          this.showError('Failed to load customers. Please try again.');
+        }
+        
         this.applyFilters();
       }
     });
   }
 
-  // Apply filters
+  /* ================= FILTERS & SEARCH ================= */
+
   applyFilters(): void {
     let filtered = [...this.customers];
 
@@ -184,134 +163,23 @@ export class AdminCustomersComponent implements OnInit {
 
     this.filteredCustomers = filtered;
     this.totalPages = Math.ceil(this.filteredCustomers.length / this.itemsPerPage);
+    
+    // Reset to page 1 if current page exceeds total pages
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = 1;
+    }
+    
     this.updatePaginatedCustomers();
   }
 
-  // Update paginated customers
+  /* ================= PAGINATION ================= */
+
   updatePaginatedCustomers(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedCustomers = this.filteredCustomers.slice(startIndex, endIndex);
   }
 
-  // View customer details
-  viewCustomer(customer: Customer): void {
-    this.selectedCustomer = customer;
-    this.showCustomerDetails = true;
-  }
-
-  // Close customer details
-  closeCustomerDetails(): void {
-    this.showCustomerDetails = false;
-    this.selectedCustomer = null;
-  }
-
-  // Block customer
-  blockCustomer(customer: Customer, event?: Event): void {
-    if (event) event.stopPropagation();
-
-    if (!confirm(`Are you sure you want to block ${customer.name}?`)) {
-      return;
-    }
-
-    if (!customer._id) return;
-
-    this.http.put<any>(`${this.apiUrl}/${customer._id}`, {
-      status: 'blocked'
-    }).subscribe({
-      next: (response) => {
-        customer.status = 'blocked';
-        this.applyFilters();
-        this.showSuccess('Customer blocked successfully!');
-      },
-      error: (error) => {
-        console.error('Error blocking customer:', error);
-        customer.status = 'blocked';
-        this.applyFilters();
-        this.showSuccess('Customer blocked successfully! (Demo mode)');
-      }
-    });
-  }
-
-  // Unblock customer
-  unblockCustomer(customer: Customer, event?: Event): void {
-    if (event) event.stopPropagation();
-
-    if (!confirm(`Are you sure you want to unblock ${customer.name}?`)) {
-      return;
-    }
-
-    if (!customer._id) return;
-
-    this.http.put<any>(`${this.apiUrl}/${customer._id}`, {
-      status: 'active'
-    }).subscribe({
-      next: (response) => {
-        customer.status = 'active';
-        this.applyFilters();
-        this.showSuccess('Customer unblocked successfully!');
-      },
-      error: (error) => {
-        console.error('Error unblocking customer:', error);
-        customer.status = 'active';
-        this.applyFilters();
-        this.showSuccess('Customer unblocked successfully! (Demo mode)');
-      }
-    });
-  }
-
-  // Delete customer
-  deleteCustomer(customer: Customer, event?: Event): void {
-    if (event) event.stopPropagation();
-
-    if (!confirm(`Are you sure you want to delete ${customer.name}? This action cannot be undone.`)) {
-      return;
-    }
-
-    if (!customer._id) return;
-
-    this.http.delete<any>(`${this.apiUrl}/${customer._id}`).subscribe({
-      next: (response) => {
-        this.showSuccess('Customer deleted successfully!');
-        this.loadCustomers();
-      },
-      error: (error) => {
-        console.error('Error deleting customer:', error);
-        this.customers = this.customers.filter(c => c._id !== customer._id);
-        this.applyFilters();
-        this.showSuccess('Customer deleted successfully! (Demo mode)');
-      }
-    });
-  }
-
-  // Get status count
-  getStatusCount(status: string): number {
-    if (status === 'all') return this.customers.length;
-    return this.customers.filter(c => c.status === status).length;
-  }
-
-  // Get status class
-  getStatusClass(status: string): string {
-    return status === 'active' ? 'status-active' : 'status-blocked';
-  }
-
-  // Get status label
-  getStatusLabel(status: string): string {
-    return status === 'active' ? 'Active' : 'Blocked';
-  }
-
-  // Format currency
-  formatCurrency(amount: number): string {
-    return `$${amount.toFixed(2)}`;
-  }
-
-  // Format date
-  formatDate(date: Date | string | undefined): string {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString();
-  }
-
-  // Pagination
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
@@ -331,13 +199,11 @@ export class AdminCustomersComponent implements OnInit {
     this.updatePaginatedCustomers();
   }
 
-  // Search
   performSearch(): void {
     this.currentPage = 1;
     this.applyFilters();
   }
 
-  // Clear filters
   clearFilters(): void {
     this.searchQuery = '';
     this.filterStatus = 'all';
@@ -345,7 +211,125 @@ export class AdminCustomersComponent implements OnInit {
     this.applyFilters();
   }
 
-  // Messages
+  /* ================= CUSTOMER ACTIONS ================= */
+
+  viewCustomer(customer: Customer): void {
+    this.selectedCustomer = customer;
+    this.showCustomerDetails = true;
+  }
+
+  closeCustomerDetails(): void {
+    this.showCustomerDetails = false;
+    this.selectedCustomer = null;
+  }
+
+  blockCustomer(customer: Customer, event?: Event): void {
+    if (event) event.stopPropagation();
+
+    if (!confirm(`Are you sure you want to block ${customer.name}?`)) {
+      return;
+    }
+
+    if (!customer._id) return;
+
+    console.log(`🚫 Blocking customer: ${customer.name}`);
+
+    this.http.put<any>(`${this.apiUrl}/${customer._id}`, {
+      status: 'blocked'
+    }).subscribe({
+      next: (response) => {
+        console.log('✅ Customer blocked successfully:', response);
+        customer.status = 'blocked';
+        this.applyFilters();
+        this.showSuccess(`${customer.name} has been blocked successfully!`);
+      },
+      error: (error) => {
+        console.error('❌ Error blocking customer:', error);
+        this.showError('Failed to block customer. Please try again.');
+      }
+    });
+  }
+
+  unblockCustomer(customer: Customer, event?: Event): void {
+    if (event) event.stopPropagation();
+
+    if (!confirm(`Are you sure you want to unblock ${customer.name}?`)) {
+      return;
+    }
+
+    if (!customer._id) return;
+
+    console.log(`✅ Unblocking customer: ${customer.name}`);
+
+    this.http.put<any>(`${this.apiUrl}/${customer._id}`, {
+      status: 'active'
+    }).subscribe({
+      next: (response) => {
+        console.log('✅ Customer unblocked successfully:', response);
+        customer.status = 'active';
+        this.applyFilters();
+        this.showSuccess(`${customer.name} has been unblocked successfully!`);
+      },
+      error: (error) => {
+        console.error('❌ Error unblocking customer:', error);
+        this.showError('Failed to unblock customer. Please try again.');
+      }
+    });
+  }
+
+  deleteCustomer(customer: Customer, event?: Event): void {
+    if (event) event.stopPropagation();
+
+    if (!confirm(`Are you sure you want to delete ${customer.name}?\n\nThis action cannot be undone and will permanently remove the customer and all their data.`)) {
+      return;
+    }
+
+    if (!customer._id) return;
+
+    console.log(`🗑️ Deleting customer: ${customer.name}`);
+
+    this.http.delete<any>(`${this.apiUrl}/${customer._id}`).subscribe({
+      next: (response) => {
+        console.log('✅ Customer deleted successfully:', response);
+        this.showSuccess(`${customer.name} has been deleted successfully!`);
+        
+        // Remove from local array
+        this.customers = this.customers.filter(c => c._id !== customer._id);
+        this.applyFilters();
+      },
+      error: (error) => {
+        console.error('❌ Error deleting customer:', error);
+        this.showError('Failed to delete customer. Please try again.');
+      }
+    });
+  }
+
+  /* ================= UTILITY FUNCTIONS ================= */
+
+  getStatusCount(status: string): number {
+    if (status === 'all') return this.customers.length;
+    return this.customers.filter(c => c.status === status).length;
+  }
+
+  getStatusClass(status: string): string {
+    return status === 'active' ? 'status-active' : 'status-blocked';
+  }
+
+  getStatusLabel(status: string): string {
+    return status === 'active' ? 'Active' : 'Blocked';
+  }
+
+  formatCurrency(amount: number): string {
+    return `$${amount.toFixed(2)}`;
+  }
+
+  formatDate(date: Date | string | undefined): string {
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleDateString();
+  }
+
+  /* ================= MESSAGES ================= */
+
   showSuccess(message: string): void {
     this.successMessage = message;
     setTimeout(() => this.successMessage = '', 3000);
@@ -353,10 +337,11 @@ export class AdminCustomersComponent implements OnInit {
 
   showError(message: string): void {
     this.errorMessage = message;
-    setTimeout(() => this.errorMessage = '', 3000);
+    setTimeout(() => this.errorMessage = '', 5000);
   }
 
-  // Navigation
+  /* ================= NAVIGATION ================= */
+
   navigateTo(route: string): void {
     this.router.navigate([`/admin/${route}`]);
   }
@@ -366,7 +351,6 @@ export class AdminCustomersComponent implements OnInit {
   }
 
   logout(): void {
-    
     this.authService.logout();
     this.router.navigate(['/admin/login']);
   }

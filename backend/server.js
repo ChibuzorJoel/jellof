@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 const connectDB = async () => {
   try {
     await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/jellof-clothing',
+      process.env.MONGODB_URI || 'mongodb+srv://jellofFashion:Jellof54@cluster0.arplt.mongodb.net/jellofashion?retryWrites=true&w=majority&appName=Cluster0',
       {
         autoIndex: true,
       }

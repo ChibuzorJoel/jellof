@@ -91,7 +91,7 @@ export class AdminDashboardComponent implements OnInit {
     contactsChange: 0,
     salesChange: 0
   };
-
+  private contactMessages: any[] = [];
   recentOrders: Order[] = [];
   lowStockProducts: LowStockProduct[] = [];
   topProducts: TopProduct[] = [];
@@ -101,6 +101,7 @@ export class AdminDashboardComponent implements OnInit {
 
   // API URLs
   private apiUrl = 'http://localhost:3000/api';
+  private contactApiUrl = 'http://localhost:3000/api/contact';
 
   constructor(
     private http: HttpClient,
@@ -113,27 +114,25 @@ export class AdminDashboardComponent implements OnInit {
     this.addDemoData();
     // Then load real data from API
     this.loadDashboardData();
+    this.loadNotificationCount();
   }
-  // ================= GET NOTIFICATION COUNT (NEW MESSAGES) =================
-  get notificationCount(): number {
-    return this.contacts.filter(c => c.status === 'new').length;
-  }
-
-  // Alternative: Get count by status
-  get newMessagesCount(): number {
-    return this.contacts.filter(c => c.status === 'new').length;
+   // ================= DYNAMIC NOTIFICATION COUNT =================
+  
+   get notificationCount(): number {
+    return this.contactMessages.filter(c => c.status === 'new').length;
   }
 
-  get readMessagesCount(): number {
-    return this.contacts.filter(c => c.status === 'read').length;
-  }
-
-  get repliedMessagesCount(): number {
-    return this.contacts.filter(c => c.status === 'replied').length;
-  }
-
-  get totalMessagesCount(): number {
-    return this.contacts.length;
+  loadNotificationCount(): void {
+    this.http.get<any>(this.contactApiUrl).subscribe({
+      next: (response) => {
+        this.contactMessages = response.contacts || [];
+        console.log(`🔔 Notification count: ${this.notificationCount} new messages`);
+      },
+      error: (error) => {
+        console.log('ℹ️ Could not load notification count');
+        this.contactMessages = [];
+      }
+    });
   }
   // Add demo data for immediate display
   addDemoData(): void {
