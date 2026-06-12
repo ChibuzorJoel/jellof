@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface OrderItem {
   productId: string;
@@ -52,7 +52,7 @@ export interface OrderResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrderService {
   private apiUrl = `${environment.apiUrl}/orders`;
@@ -66,7 +66,7 @@ export class OrderService {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
+      Authorization: token ? `Bearer ${token}` : '',
     });
   }
 
@@ -75,11 +75,15 @@ export class OrderService {
    */
   createOrder(orderData: Partial<Order>): Observable<OrderResponse> {
     const headers = this.getHeaders();
-    
-    return this.http.post<OrderResponse>(this.apiUrl, orderData, { headers }).pipe(
-      tap(response => console.log('✅ Order created:', response.order?._id)),
-      catchError(this.handleError)
-    );
+
+    return this.http
+      .post<OrderResponse>(this.apiUrl, orderData, { headers })
+      .pipe(
+        tap((response) =>
+          console.log('✅ Order created:', response.order?._id),
+        ),
+        catchError(this.handleError),
+      );
   }
 
   /**
@@ -87,10 +91,10 @@ export class OrderService {
    */
   getAllOrders(): Observable<OrderResponse> {
     const headers = this.getHeaders();
-    
+
     return this.http.get<OrderResponse>(this.apiUrl, { headers }).pipe(
-      tap(response => console.log('Orders loaded:', response.count)),
-      catchError(this.handleError)
+      tap((response) => console.log('Orders loaded:', response.count)),
+      catchError(this.handleError),
     );
   }
 
@@ -99,10 +103,10 @@ export class OrderService {
    */
   getOrderById(id: string): Observable<OrderResponse> {
     const headers = this.getHeaders();
-    
-    return this.http.get<OrderResponse>(`${this.apiUrl}/${id}`, { headers }).pipe(
-      catchError(this.handleError)
-    );
+
+    return this.http
+      .get<OrderResponse>(`${this.apiUrl}/${id}`, { headers })
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -110,10 +114,10 @@ export class OrderService {
    */
   getOrdersByStatus(status: string): Observable<OrderResponse> {
     const headers = this.getHeaders();
-    
-    return this.http.get<OrderResponse>(`${this.apiUrl}/status/${status}`, { headers }).pipe(
-      catchError(this.handleError)
-    );
+
+    return this.http
+      .get<OrderResponse>(`${this.apiUrl}/status/${status}`, { headers })
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -121,15 +125,17 @@ export class OrderService {
    */
   updateOrderStatus(id: string, status: string): Observable<OrderResponse> {
     const headers = this.getHeaders();
-    
-    return this.http.put<OrderResponse>(
-      `${this.apiUrl}/${id}/status`,
-      { status },
-      { headers }
-    ).pipe(
-      tap(response => console.log('Order status updated:', status)),
-      catchError(this.handleError)
-    );
+
+    return this.http
+      .put<OrderResponse>(
+        `${this.apiUrl}/${id}/status`,
+        { status },
+        { headers },
+      )
+      .pipe(
+        tap((response) => console.log('Order status updated:', status)),
+        catchError(this.handleError),
+      );
   }
 
   /**
@@ -137,11 +143,13 @@ export class OrderService {
    */
   deleteOrder(id: string): Observable<OrderResponse> {
     const headers = this.getHeaders();
-    
-    return this.http.delete<OrderResponse>(`${this.apiUrl}/${id}`, { headers }).pipe(
-      tap(() => console.log('Order deleted')),
-      catchError(this.handleError)
-    );
+
+    return this.http
+      .delete<OrderResponse>(`${this.apiUrl}/${id}`, { headers })
+      .pipe(
+        tap(() => console.log('Order deleted')),
+        catchError(this.handleError),
+      );
   }
 
   /**
@@ -149,15 +157,15 @@ export class OrderService {
    */
   private handleError(error: any): Observable<never> {
     console.error('Order API Error:', error);
-    
+
     let errorMessage = 'An error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message;
     } else {
       errorMessage = error.error?.message || error.message || errorMessage;
     }
-    
+
     throw new Error(errorMessage);
   }
 }

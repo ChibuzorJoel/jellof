@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import { Product } from '../models/product-model';
-
-
-
 
 export interface ProductsResponse {
   success: boolean;
@@ -20,12 +17,12 @@ export interface ProductResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProductService {
   private apiUrl = environment.apiUrl + '/products';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Get all products
@@ -64,7 +61,9 @@ export class ProductService {
    * Get products by category
    */
   getProductsByCategory(category: string): Observable<ProductsResponse> {
-    return this.http.get<ProductsResponse>(`${this.apiUrl}/category/${category}`);
+    return this.http.get<ProductsResponse>(
+      `${this.apiUrl}/category/${category}`,
+    );
   }
 
   /**
@@ -77,7 +76,10 @@ export class ProductService {
   /**
    * Update existing product
    */
-  updateProduct(id: string, product: Partial<Product>): Observable<ProductResponse> {
+  updateProduct(
+    id: string,
+    product: Partial<Product>,
+  ): Observable<ProductResponse> {
     return this.http.put<ProductResponse>(`${this.apiUrl}/${id}`, product);
   }
 

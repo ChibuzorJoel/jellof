@@ -2,18 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { NewsletterService } from '../../services/newsletter.service';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
-
   constructor(
     private productService: ProductService,
-    private newsletterService: NewsletterService
+    private newsletterService: NewsletterService,
   ) {}
 
   // ================= HERO SECTION =================
@@ -44,10 +43,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   successMessage = '';
   errorMessage = '';
 
-
-
-  
-
   ngOnInit(): void {
     this.startHeroRotation();
     this.loadProducts();
@@ -68,7 +63,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.allProducts = products.map((p: any) => ({
           ...p,
           image: this.fixImagePath(p.image),
-          images: p.images?.map((img: string) => this.fixImagePath(img))
+          images: p.images?.map((img: string) => this.fixImagePath(img)),
         }));
 
         this.loadRandomProducts();
@@ -76,7 +71,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error loading products', err);
-      }
+      },
     });
   }
 
@@ -85,42 +80,61 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!image) return 'assets/images/1.jpeg';
     if (image.startsWith('http')) return image;
     if (image.startsWith('assets')) return image;
-    if (image.startsWith('/uploads')) return `${environment.apiUrl.replace('/api','')}${image}`;
+    if (image.startsWith('/uploads'))
+      return `${environment.apiUrl.replace('/api', '')}${image}`;
     return `assets/images/${image}`;
   }
 
   // ================= HERO PRODUCT IMAGES =================
   setHeroProductImages(): void {
     if (!this.allProducts.length) {
-      this.leftHeroImages = ['assets/images/8.jpeg', 'assets/images/9.jpeg', 'assets/images/10.jpeg'];
-      this.topRightImages = ['assets/images/instagram-1.jpeg', 'assets/images/instagram-2.jpeg'];
+      this.leftHeroImages = [
+        'assets/images/8.jpeg',
+        'assets/images/9.jpeg',
+        'assets/images/10.jpeg',
+      ];
+      this.topRightImages = [
+        'assets/images/instagram-1.jpeg',
+        'assets/images/instagram-2.jpeg',
+      ];
       this.bottomRightImages = ['assets/images/2.jpeg', 'assets/images/5.jpeg'];
       return;
     }
 
     const shuffled = this.shuffleArray([...this.allProducts]);
-    this.leftHeroImages = shuffled.slice(0, 3).map(p => p.image || 'assets/images/8.jpeg');
-    this.topRightImages = shuffled.slice(3, 5).map(p => p.image || 'assets/images/instagram-1.jpeg');
-    this.bottomRightImages = shuffled.slice(5, 7).map(p => p.image || 'assets/images/2.jpeg');
+    this.leftHeroImages = shuffled
+      .slice(0, 3)
+      .map((p) => p.image || 'assets/images/8.jpeg');
+    this.topRightImages = shuffled
+      .slice(3, 5)
+      .map((p) => p.image || 'assets/images/instagram-1.jpeg');
+    this.bottomRightImages = shuffled
+      .slice(5, 7)
+      .map((p) => p.image || 'assets/images/2.jpeg');
   }
 
   // ================= HERO ROTATION =================
   startHeroRotation(): void {
-    this.heroSubscription = interval(3000).subscribe(() => this.rotateLeftImage());
+    this.heroSubscription = interval(3000).subscribe(() =>
+      this.rotateLeftImage(),
+    );
     setInterval(() => this.rotateTopRightImages(), 4000);
     setInterval(() => this.rotateBottomRightImages(), 5000);
   }
 
   rotateLeftImage(): void {
-    this.currentLeftImageIndex = (this.currentLeftImageIndex + 1) % this.leftHeroImages.length;
+    this.currentLeftImageIndex =
+      (this.currentLeftImageIndex + 1) % this.leftHeroImages.length;
   }
 
   rotateTopRightImages(): void {
-    this.currentTopRightIndex = (this.currentTopRightIndex + 1) % this.topRightImages.length;
+    this.currentTopRightIndex =
+      (this.currentTopRightIndex + 1) % this.topRightImages.length;
   }
 
   rotateBottomRightImages(): void {
-    this.currentBottomRightIndex = (this.currentBottomRightIndex + 1) % this.bottomRightImages.length;
+    this.currentBottomRightIndex =
+      (this.currentBottomRightIndex + 1) % this.bottomRightImages.length;
   }
 
   // ================= RANDOM PRODUCTS =================
@@ -162,7 +176,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   getSecondTopRightImage(): string {
-    const nextIndex = (this.currentTopRightIndex + 1) % this.topRightImages.length;
+    const nextIndex =
+      (this.currentTopRightIndex + 1) % this.topRightImages.length;
     return this.topRightImages[nextIndex];
   }
 
@@ -172,7 +187,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   getSecondBottomRightImage(): string {
-    const nextIndex = (this.currentBottomRightIndex + 1) % this.bottomRightImages.length;
+    const nextIndex =
+      (this.currentBottomRightIndex + 1) % this.bottomRightImages.length;
     return this.bottomRightImages[nextIndex];
   }
 
@@ -212,9 +228,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         this.isSubmitting = false;
         this.submitError = true;
-        this.errorMessage = err.error?.message || 'Failed to subscribe. Please try again.';
+        this.errorMessage =
+          err.error?.message || 'Failed to subscribe. Please try again.';
         setTimeout(() => (this.submitError = false), 5000);
-      }
+      },
     });
   }
 

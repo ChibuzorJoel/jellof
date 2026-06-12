@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface LookbookProduct {
   name: string;
@@ -33,7 +33,7 @@ export interface LookbookResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LookbookService {
   private apiUrl = `${environment.apiUrl}/lookbook`;
@@ -43,13 +43,17 @@ export class LookbookService {
   /**
    * Get all lookbook items
    */
-  getAllItems(params?: { season?: string; featured?: boolean }): Observable<LookbookResponse> {
+  getAllItems(params?: {
+    season?: string;
+    featured?: boolean;
+  }): Observable<LookbookResponse> {
     let queryParams = '';
-    
+
     if (params) {
       const paramArray: string[] = [];
       if (params.season) paramArray.push(`season=${params.season}`);
-      if (params.featured !== undefined) paramArray.push(`featured=${params.featured}`);
+      if (params.featured !== undefined)
+        paramArray.push(`featured=${params.featured}`);
       if (paramArray.length > 0) {
         queryParams = '?' + paramArray.join('&');
       }
@@ -75,7 +79,10 @@ export class LookbookService {
   /**
    * Update lookbook item (admin only)
    */
-  updateItem(id: string, itemData: Partial<LookbookItem>): Observable<LookbookResponse> {
+  updateItem(
+    id: string,
+    itemData: Partial<LookbookItem>,
+  ): Observable<LookbookResponse> {
     return this.http.put<LookbookResponse>(`${this.apiUrl}/${id}`, itemData);
   }
 
@@ -90,6 +97,9 @@ export class LookbookService {
    * Toggle featured status (admin only)
    */
   toggleFeatured(id: string): Observable<LookbookResponse> {
-    return this.http.patch<LookbookResponse>(`${this.apiUrl}/${id}/featured`, {});
+    return this.http.patch<LookbookResponse>(
+      `${this.apiUrl}/${id}/featured`,
+      {},
+    );
   }
 }

@@ -10,7 +10,6 @@
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {
-
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
@@ -18,17 +17,11 @@
             "index": "src/index.html",
             "main": "src/main.ts",
 
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
 
             "tsConfig": "tsconfig.app.json",
 
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/_redirects" 
-            ],
+            "assets": ["src/favicon.ico", "src/assets", "src/_redirects"],
 
             "styles": [
               "node_modules/quill/dist/quill.snow.css",
@@ -40,13 +33,11 @@
           },
 
           "configurations": {
-
             "production": {
-
               "fileReplacements": [
                 {
                   "src": "src/environments/environment.ts",
-                  "replace": "src/environments/environment.prod.ts"
+                  "replaceWith": "src/environments/environment.prod.ts"
                 }
               ],
 
@@ -74,7 +65,6 @@
               "sourceMap": true,
               "namedChunks": true
             }
-
           },
 
           "defaultConfiguration": "development"
@@ -108,18 +98,11 @@
           "builder": "@angular-devkit/build-angular:karma",
 
           "options": {
-
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
 
             "tsConfig": "tsconfig.spec.json",
 
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
 
             "styles": [
               "node_modules/quill/dist/quill.snow.css",
@@ -129,7 +112,6 @@
             "scripts": []
           }
         }
-
       }
     }
   },

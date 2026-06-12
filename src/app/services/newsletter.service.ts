@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface NewsletterSubscriber {
   _id?: string;
@@ -29,7 +29,7 @@ export interface NewsletterResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NewsletterService {
   private apiUrl = `${environment.apiUrl}/newsletter`;
@@ -52,7 +52,9 @@ export class NewsletterService {
    * Unsubscribe from newsletter
    */
   unsubscribe(email: string): Observable<NewsletterResponse> {
-    return this.http.get<NewsletterResponse>(`${this.apiUrl}/unsubscribe/${email}`);
+    return this.http.get<NewsletterResponse>(
+      `${this.apiUrl}/unsubscribe/${email}`,
+    );
   }
 
   /**
@@ -64,7 +66,7 @@ export class NewsletterService {
     limit?: number;
   }): Observable<NewsletterResponse> {
     let queryParams = '';
-    
+
     if (params) {
       const paramArray: string[] = [];
       if (params.status) paramArray.push(`status=${params.status}`);
@@ -88,10 +90,13 @@ export class NewsletterService {
   /**
    * Update preferences
    */
-  updatePreferences(email: string, preferences: any): Observable<NewsletterResponse> {
+  updatePreferences(
+    email: string,
+    preferences: any,
+  ): Observable<NewsletterResponse> {
     return this.http.put<NewsletterResponse>(
       `${this.apiUrl}/${email}/preferences`,
-      { preferences }
+      { preferences },
     );
   }
 
@@ -113,7 +118,7 @@ export class NewsletterService {
    * Export subscribers (admin)
    */
   exportSubscribers(status?: string): string {
-    const url = status 
+    const url = status
       ? `${this.apiUrl}/export?status=${status}`
       : `${this.apiUrl}/export`;
     return url;

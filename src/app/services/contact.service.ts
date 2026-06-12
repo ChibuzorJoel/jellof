@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
-
+import { environment } from '../../environments/environment';
 
 export interface ContactForm {
   name: string;
@@ -36,12 +35,12 @@ export interface ContactsResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContactService {
   private apiUrl = environment.apiUrl + '/contact';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   /**
    * Submit contact form
