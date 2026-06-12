@@ -15,36 +15,30 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Enhanced CORS configuration
-const allowedOrigins = [
-  'http://localhost:4200',
-  'https://jellof-clothingzz.netlify.app',
-  'https://jellof-1.onrender.com',
-  process.env.FRONTEND_URL
-].filter(Boolean);filter(Boolean); // Removes any undefined values
-
+/* =========================
+   CORS CONFIGURATION
+========================= */
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, etc.)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.log('❌ CORS blocked origin:', origin);
-        callback(null, false); // Block but don't throw error
-      }
-    },
+    origin: [
+      'http://localhost:4200',
+      'http://localhost:3000',
+      'https://jellof-clothingzz.netlify.app'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   })
 );
 
-// Request logging
+// Handle preflight requests
+app.options('*', cors());
+
+/* =========================
+   REQUEST LOGGING
+========================= */
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
+  console.log(`${req.method} ${req.originalUrl}`);
   console.log('Origin:', req.headers.origin);
   next();
 });
@@ -189,7 +183,7 @@ app.listen(PORT, () => {
   console.log(`🔗 API: http://localhost:${PORT}`);
   console.log(`🧪 Test: http://localhost:${PORT}/api/test`);
   console.log('═══════════════════════════════════════\n');
-  console.log('✅ CORS enabled for origins:', allowedOrigins);
+  console.log('✅ CORS enabled');
 });
 
 module.exports = app;
