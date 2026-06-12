@@ -21,7 +21,7 @@ const allowedOrigins = [
   'https://jellof-clothingzz.netlify.app',
   'https://jellof-1.onrender.com',
   process.env.FRONTEND_URL
-].filter(Boolean);filter(Boolean); // Removes any undefined values
+].filter(Boolean); // Removes any undefined values
 
 app.use(
   cors({
