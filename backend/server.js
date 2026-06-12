@@ -17,10 +17,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Enhanced CORS configuration
 const allowedOrigins = [
-  'http://localhost:4200',           // Local development
-  'https://jellof-1.onrender.com',   // Your Render backend (for testing)
-  process.env.FRONTEND_URL           // Your Netlify frontend (set this in Render env)
-].filter(Boolean); // Removes any undefined values
+  'http://localhost:4200',
+  'https://jellof-clothingzz.netlify.app',
+  'https://jellof-1.onrender.com',
+  process.env.FRONTEND_URL
+].filter(Boolean);filter(Boolean); // Removes any undefined values
 
 app.use(
   cors({
