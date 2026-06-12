@@ -14,16 +14,37 @@ const app = express();
 ========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Enhanced CORS configuration
+const allowedOrigins = [
+  'http://localhost:4200',           // Local development
+  'https://jellof-1.onrender.com',   // Your Render backend (for testing)
+  process.env.FRONTEND_URL           // Your Netlify frontend (set this in Render env)
+].filter(Boolean); // Removes any undefined values
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log('❌ CORS blocked origin:', origin);
+        callback(null, false); // Block but don't throw error
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
 
 // Request logging
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
+  console.log('Origin:', req.headers.origin);
   next();
 });
 
@@ -70,14 +91,14 @@ app.get('/api/test', (req, res) => {
 ========================= */
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/products');
-const categoryRoutes = require('./routes/categories.routes');  // ✅ ADD THIS
+const categoryRoutes = require('./routes/categories.routes');
 const orderRoutes = require('./routes/orders');
 const newsletterRoutes = require('./routes/newsletter');
 const contactRoutes = require('./routes/contact');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);  // ✅ ADD THIS
+app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
@@ -85,7 +106,7 @@ app.use('/api/contact', contactRoutes);
 console.log('\n📋 Routes registered:');
 console.log('✅ /api/auth');
 console.log('✅ /api/products');
-console.log('✅ /api/categories');  // ✅ LOG THIS
+console.log('✅ /api/categories');
 console.log('✅ /api/orders');
 console.log('✅ /api/newsletter');
 console.log('✅ /api/contact');
@@ -113,11 +134,11 @@ app.get('/', (req, res) => {
     routes: {
       auth: '/api/auth',
       products: '/api/products',
-      categories: '/api/categories',  // ✅ ADD THIS
+      categories: '/api/categories',
       orders: '/api/orders',
       newsletter: '/api/newsletter',
       contact: '/api/contact',
-      test: '/api/test'  // ✅ ADD THIS
+      test: '/api/test'
     },
   });
 });
@@ -167,6 +188,7 @@ app.listen(PORT, () => {
   console.log(`🔗 API: http://localhost:${PORT}`);
   console.log(`🧪 Test: http://localhost:${PORT}/api/test`);
   console.log('═══════════════════════════════════════\n');
+  console.log('✅ CORS enabled for origins:', allowedOrigins);
 });
 
 module.exports = app;
